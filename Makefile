@@ -1,5 +1,5 @@
 
-# ${F90} -o LOCA_Colate_to_HUCS  -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff ./LOCA_Colate_to_HUCS.f90
+${F90} -o LOCA_Colate_to_HUCS.exe  -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff ./LOCA_Colate_to_HUCS.f90
 
 FCFLAGS = -I${NETCDFINC}
 FLFLAGS = -L${NETCDFLIB} -lnetcdff
