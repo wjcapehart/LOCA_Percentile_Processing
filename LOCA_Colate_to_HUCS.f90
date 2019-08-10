@@ -89,7 +89,7 @@ program LOCA_Colate_to_HUCS
 
 
 
-  file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
+  file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/" 
   ! file_front_root = "http://kyrill.ias.sdsmt.edu:8080/thredds/dodsC/LOCA_NGP/"
 
   variables = (/ "pr    ", &
