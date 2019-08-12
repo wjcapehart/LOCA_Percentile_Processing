@@ -1,0 +1,2 @@
+
+gfortran -o ./LOCA_Colate_to_HUCS.exe  -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff ./LOCA_Colate_to_HUCS.f90
