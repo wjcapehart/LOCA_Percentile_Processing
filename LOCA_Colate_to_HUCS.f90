@@ -5,7 +5,6 @@
 program LOCA_Colate_to_HUCS
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
-
   implicit none
 
 
@@ -42,8 +41,11 @@ program LOCA_Colate_to_HUCS
 
   integer (kind=4), dimension(nhucs) :: unit_huc
 
-  real (kind=4), allocatable          :: sort_array(:)
-  real (kind=4), dimension(nlat*nlon) :: linear_array
+  real (kind=4), allocatable          :: sort_pr(:)
+  real (kind=4), allocatable          :: sort_tasmax(:)
+  real (kind=4), allocatable          :: sort_tasmin(:)
+
+  real (kind=4), dimension(nlat*nlon) :: linear_array, mask_linear
 
   integer (kind=4), dimension(ntime_hist) :: time_cord_hist
   integer (kind=4), dimension(ntime_futr) :: time_cord_futr
@@ -52,6 +54,8 @@ program LOCA_Colate_to_HUCS
   character (len = 19), dimension(ntime_futr) :: caldate_futr
 
   character (len=19)  :: caldate
+
+  integer (kind=4) :: myhucs = 10120000
 
 
   character (len=21), dimension(nens)   :: ensembles
@@ -63,8 +67,13 @@ program LOCA_Colate_to_HUCS
   character (len = (6+1+21+1+10)) :: tasmax_variable_name
   character (len = (6+1+21+1+10)) :: tasmin_variable_name
 
+
+
   real (kind=4) :: pr_add_offset,   tasmax_add_offset,   tasmin_add_offset
   real (kind=4) :: pr_scale_factor, tasmax_scale_factor, tasmin_scale_factor
+  real (kind=4) :: pr_FillValue,    tasmax_FillValue,    tasmin_FillValue
+
+  real (kind=4) :: quantile7
 
   integer (kind=4), dimension(nhucs) :: nhuccells
 
@@ -117,8 +126,8 @@ program LOCA_Colate_to_HUCS
   file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
   ! file_front_root = "http://kyrill.ias.sdsmt.edu:8080/thredds/dodsC/LOCA_NGP/"
 
-  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/NGP_LOCA_HUC08_"
-  file_output_root = "./NGP_LOCA_HUC08_"
+  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUC08_"
+!  file_output_root = "./NGP_LOCA_HUC08_"
 
   variables = (/ "pr    ", &
                  "tasmax", &
@@ -185,29 +194,32 @@ program LOCA_Colate_to_HUCS
 
 
   print*, "Listing Available Hucs"
-  print*, hucs
 
-  do h = 1, 1 !nhucs
+  do h = 1, nhucs
 
-    mask_map = huc_map
+    if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+9999))) then
 
-    where( mask_map .eq. hucs(h) )
-      mask_map = 1
-    elsewhere
-      mask_map = 0
-    end where
+      mask_map = huc_map
 
-    nhuccells(h) = sum(mask_map)
+      where( mask_map .eq. hucs(h) )
+        mask_map = 1
+      elsewhere
+        mask_map = 0
+      end where
 
-
-
-    write(basin_file_name,'(A, i8.8,".csv")') trim(file_output_root), hucs(h)
-    print*, hucs(h), nhuccells(h) , trim(basin_file_name)
+      nhuccells(h) = sum(mask_map)
 
 
-    !open(1, FILE=trim(basin_file)name), form="FORMATTED", access="APPEND")
-    !write(1,*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
-    !close (1)
+
+      write(basin_file_name,'(A, i8.8,".csv")') trim(file_output_root), hucs(h)
+      print*, hucs(h), nhuccells(h) , trim(basin_file_name)
+
+
+      open(1, FILE=trim(basin_file_name), form="FORMATTED")
+      write(1,*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
+      close (1)
+
+    end if
 
   end do
 
@@ -251,15 +263,11 @@ print*, "got the times"
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-  do t = 1, ntime_hist
-    print*, time_cord_hist(t), caldate_hist(t)
-  end do
 
-  print*, "--"
 
-  do t = 1, ntime_futr
-    print*, time_cord_futr(t), caldate_futr(t)
-  end do
+
+
+
 
   !!!!!!!!!!!!!!!!!!
 
@@ -302,7 +310,10 @@ print*, "got the times"
       ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "add_offset",  pr_add_offset)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      print*, trim(filename_pr), pr_scale_factor, pr_add_offset
+      ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "_FillValue",  pr_FillValue)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+      print*, trim(filename_pr), pr_scale_factor, pr_add_offset, pr_FillValue
 
 
       ncstat = NF90_OPEN(filename_tasmax, NF90_NOWRITE, netcdf_id_file_tasmax)
@@ -317,7 +328,10 @@ print*, "got the times"
       ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      print*, trim(filename_tasmax), tasmax_scale_factor, tasmax_add_offset
+      ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
+         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+      print*, trim(filename_tasmax), tasmax_scale_factor, tasmax_add_offset, tasmax_FillValue
 
 
 
@@ -333,14 +347,18 @@ print*, "got the times"
       ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "add_offset",  tasmin_add_offset)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      print*, trim(filename_tasmin), tasmin_scale_factor, tasmin_add_offset
+      ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+
+      print*, trim(filename_tasmin), tasmin_scale_factor, tasmin_add_offset, tasmin_FillValue
 
 
 
 
 
 
-      do t = 1, 1! ntime, npull
+      do t = 1,  ntime, npull
 
 
         if (trim(scenarios(s)) .eq. "historical") then
@@ -348,6 +366,10 @@ print*, "got the times"
         else
           caldate = caldate_futr(t)
         end if
+
+        write(*,'(A,2(",",A))')  trim(caldate), &
+                    trim(ensembles(e)), &
+                    trim(scenarios(s))
 
         netcdf_dims_3d_start = (/ 1, 1, t /)
 
@@ -358,8 +380,7 @@ print*, "got the times"
 
 
         map_pr = input_map * pr_scale_factor + pr_add_offset
-
-
+        where (input_map .eq. pr_FillValue) map_pr = pr_FillValue
 
 
         ncstat = NF90_GET_VAR(netcdf_id_file_tasmax,   netcdf_id_tasmax,  input_map,  &
@@ -368,9 +389,9 @@ print*, "got the times"
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
         map_tasmax = input_map * tasmax_scale_factor + tasmax_add_offset
+        where (input_map .eq. tasmax_FillValue) map_tasmax = tasmax_FillValue
 
-        print*,"input_map",  maxval(input_map)
-        print*,"map_tasmax", maxval(map_tasmax)
+
 
 
 
@@ -380,45 +401,135 @@ print*, "got the times"
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
         map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
+        where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
 
 
 
 
 
+        do h = 1, nhucs
 
-        do h = 1, 1 ! nhucs
-
-          mask_map = huc_map
-
-          where( mask_map .eq. hucs(h) )
-            mask_map = 1
-          elsewhere
-            mask_map = 0
-          end where
-          print*, "mask", MINVAL(mask_map),MAXVAL(mask_map), sum(mask_map)
-
-          !!! tasmax
-
-          print*,"map_tasmax", minval(map_tasmax),maxval(map_tasmax)
-
-          masked_variable_map =  map_tasmax * merge(1,0,mask_map .eq. hucs(h))
-
-          print*,"merged field " , maxval(merge(1,0,huc_map .eq. hucs(h))), sum(merge(1,0,huc_map .eq. hucs(h)))
-
-          print*, "masked", MAXVAL(masked_variable_map), maxval( map_tasmax * merge(1,0,huc_map.eq.hucs(h)))
-
-          linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
-
-          print*, "sorted", MAXVAL(linear_array)
-
-          call QSort(linear_array, nlon*nlat)
-
-          !write(basin_file_name,'(A, i8.8,".csv")') trim(file_output_root), hucs(h)
-          !open(1, FILE=trim(basin_file)name), form="FORMATTED", access="APPEND")
-          !write(1,*)  "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
-          ! dclose (1)
+          if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+9999))) then
 
 
+            mask_map = merge(1,0, (huc_map    .eq.          hucs(h)) .and. &
+                                  (map_pr     .ne.     pr_FillValue) .and. &
+                                  (map_tasmax .ne. tasmax_FillValue) .and. &
+                                  (map_tasmin .ne. tasmax_FillValue)       )
+
+
+            nhuccells(h) = sum(mask_map)
+
+
+            allocate ( sort_tasmax(nhuccells(h)) )
+            allocate ( sort_tasmin(nhuccells(h)) )
+            allocate ( sort_pr(nhuccells(h)) )
+
+
+            !!! tasmax
+
+              masked_variable_map = map_tasmax
+
+              where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
+
+              linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+
+
+              call QSort(linear_array, nlon*nlat)
+
+              sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+
+            !!! tasmin
+
+              masked_variable_map = map_tasmin
+
+              where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
+
+              linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+
+
+              call QSort(linear_array, nlon*nlat)
+
+              sort_tasmin(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+
+            !!! pr
+
+              masked_variable_map = map_pr
+
+              where (mask_map .eq. 0) masked_variable_map = pr_FillValue
+
+              linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+
+
+              call QSort(linear_array, nlon*nlat)
+
+              sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+
+
+    write(basin_file_name,'(A, i8.8,".csv")') trim(file_output_root), hucs(h)
+
+
+    open(1, FILE=trim(basin_file_name), form="FORMATTED",  status="OLD", access="APPEND")
+
+              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                          hucs(h), &
+                          trim(ensembles(e)), &
+                          trim(scenarios(s)), &
+                          "P000",  &
+                          minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
+
+              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                          hucs(h), &
+                          trim(ensembles(e)), &
+                          trim(scenarios(s)), &
+                          "P025",  &
+                          quantile7(sort_tasmax, 0.25, nhuccells(h)), &
+                          quantile7(sort_tasmin, 0.25, nhuccells(h)), &
+                          quantile7(sort_pr,     0.25, nhuccells(h))
+
+              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                          hucs(h), &
+                          trim(ensembles(e)), &
+                          trim(scenarios(s)), &
+                          "P050",  &
+                          quantile7(sort_tasmax, 0.50, nhuccells(h)), &
+                          quantile7(sort_tasmin, 0.50, nhuccells(h)), &
+                          quantile7(sort_pr,     0.50, nhuccells(h))
+
+              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                          hucs(h), &
+                          trim(ensembles(e)), &
+                          trim(scenarios(s)), &
+                          "P075",  &
+                          quantile7(sort_tasmax, 0.75, nhuccells(h)), &
+                          quantile7(sort_tasmin, 0.75, nhuccells(h)), &
+                          quantile7(sort_pr,     0.75, nhuccells(h))
+
+              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                          hucs(h), &
+                          trim(ensembles(e)), &
+                          trim(scenarios(s)), &
+                          "P100",  &
+                          maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
+
+                write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                            hucs(h), &
+                            trim(ensembles(e)), &
+                            trim(scenarios(s)), &
+                            "MEAN",  &
+                            (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
+
+                close(1)
+
+
+
+
+
+            deallocate (sort_tasmax)
+            deallocate (sort_tasmin)
+            deallocate (sort_pr)
+
+          end if
 
         end do
 
@@ -438,8 +549,6 @@ print*, "got the times"
 
 end program LOCA_Colate_to_HUCS
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 subroutine handle_err(status)
   USE netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
 
@@ -449,6 +558,7 @@ subroutine handle_err(status)
     stop "Stopped"
   end if
 end subroutine handle_err
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -500,3 +610,44 @@ integer (kind=4) :: marker
     end if
 
 end subroutine QSort
+
+
+!!!!!
+
+
+  real (kind=4) function   quantile7(x,quart,nx)
+    implicit none
+    ! Excel's method to calculate quartiles.
+    ! Based on discussion in this paper http://www.haiweb.org/medicineprices/manual/quartiles_iTSS.pdf
+    !
+    integer (kind=4), intent(in) :: nx
+    real (kind=4), intent (in), dimension(nx)  :: x
+    real (kind=4), intent (in) :: quart
+    real (kind=4) :: a,b,c
+    integer (kind=4) :: n,ib
+
+    n=size(x)
+
+    a=(n-1)*quart
+    call getgp(a,b,c)
+
+    ib=int(c)
+    !print *,n,a,b,c,ib
+
+
+    quantile7= (1-b)*x(ib+1) +b*x(ib+2)
+
+    return
+
+  end function quantile7
+
+
+  subroutine getgp(a,b,c)
+    ! Subroutine to that returns the Right hand and Left hand side digits of a decimal number
+    real (kind=4), intent(in) :: a
+    real (kind=4), intent(out) :: b,c
+
+    b=mod(a,1.0d0)
+    c=a-b
+
+  end subroutine getgp
