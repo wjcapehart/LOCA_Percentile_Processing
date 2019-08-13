@@ -21,7 +21,7 @@ program LOCA_Colate_to_HUCS
   ! hust = 487 :  42 ;
   ! futr = 247 : 139
 
-  integer :: e, s, h, v, t, ntime
+  integer :: e, s, h, v, t, ntime, huc_counter
 
   integer (kind=2), dimension(nlon,nlat) :: input_map
   real    (kind=4), dimension(nlon,nlat) :: map_pr, map_tasmax, map_tasmin
@@ -56,6 +56,7 @@ program LOCA_Colate_to_HUCS
   character (len=19)  :: caldate
 
   integer (kind=4) :: myhucs = 10120000
+  logical :: first_huc
 
 
   character (len=21), dimension(nens)   :: ensembles
@@ -117,7 +118,7 @@ program LOCA_Colate_to_HUCS
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
+   first_huc = .TRUE.
   !netcdf_dims_3d_count = (/ nlon, nlat, npull /)
   netcdf_dims_3d_count = (/ nlon, nlat, npull /)
 
@@ -195,9 +196,19 @@ program LOCA_Colate_to_HUCS
 
   print*, "Listing Available Hucs"
 
+  huc_counter = 8
+
   do h = 1, nhucs
 
     if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+9999))) then
+
+      if (first_huc) then
+           first_huc = .FALSE.
+      else
+           huc_counter = 1 + huc_counter
+      end if
+
+      unit_huc(h) = huc_counter
 
       mask_map = huc_map
 
@@ -215,9 +226,9 @@ program LOCA_Colate_to_HUCS
       print*, hucs(h), nhuccells(h) , trim(basin_file_name)
 
 
-      open(1, FILE=trim(basin_file_name), form="FORMATTED")
-      write(1,*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
-      close (1)
+
+      open(unit_huc(h), FILE=trim(basin_file_name), form="FORMATTED")
+      write(unit_huc(h),*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
 
     end if
 
@@ -471,14 +482,14 @@ print*, "got the times"
 
     open(1, FILE=trim(basin_file_name), form="FORMATTED",  status="OLD", access="APPEND")
 
-              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+              write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                           hucs(h), &
                           trim(ensembles(e)), &
                           trim(scenarios(s)), &
                           "P000",  &
                           minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
 
-              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+              write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                           hucs(h), &
                           trim(ensembles(e)), &
                           trim(scenarios(s)), &
@@ -487,7 +498,7 @@ print*, "got the times"
                           quantile7(sort_tasmin, 0.25, nhuccells(h)), &
                           quantile7(sort_pr,     0.25, nhuccells(h))
 
-              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+              write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                           hucs(h), &
                           trim(ensembles(e)), &
                           trim(scenarios(s)), &
@@ -496,7 +507,7 @@ print*, "got the times"
                           quantile7(sort_tasmin, 0.50, nhuccells(h)), &
                           quantile7(sort_pr,     0.50, nhuccells(h))
 
-              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+              write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                           hucs(h), &
                           trim(ensembles(e)), &
                           trim(scenarios(s)), &
@@ -505,21 +516,20 @@ print*, "got the times"
                           quantile7(sort_tasmin, 0.75, nhuccells(h)), &
                           quantile7(sort_pr,     0.75, nhuccells(h))
 
-              write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+              write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                           hucs(h), &
                           trim(ensembles(e)), &
                           trim(scenarios(s)), &
                           "P100",  &
                           maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
-                write(1,'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
+                write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                             hucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "MEAN",  &
                             (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
 
-                close(1)
 
 
 
@@ -543,6 +553,15 @@ print*, "got the times"
   end do
 
 
+    do h = 1, nhucs
+
+      if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+9999))) then
+
+        close(unit_huc(h))
+
+      end if
+
+    end do
 
   !!!!!!!!!!!!!!!!!!
 
