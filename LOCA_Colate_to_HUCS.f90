@@ -477,10 +477,10 @@ print*, "got the times"
               sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
 
 
-    write(basin_file_name,'(A, i8.8,".csv")') trim(file_output_root), hucs(h)
+    !write(basin_file_name,'(A, i8.8,".csv")') trim(file_output_root), hucs(h)
 
 
-    open(1, FILE=trim(basin_file_name), form="FORMATTED",  status="OLD", access="APPEND")
+    !open(1, FILE=trim(basin_file_name), form="FORMATTED",  status="OLD", access="APPEND")
 
               write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                           hucs(h), &
