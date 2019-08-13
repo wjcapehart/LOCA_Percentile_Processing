@@ -272,7 +272,7 @@ print*, "got the times"
   !!!!!!!!!!!!!!!!!!
 
 
-  do s = 1, 1 ! nscen
+  do s = 1,  nscen
 
     if (trim(scenarios(s)) .eq. "historical") then
       ntime = ntime_hist
@@ -283,7 +283,7 @@ print*, "got the times"
     print*, "====================="
 
 
-    do e = 1, 1 ! nens
+    do e = 1, nens
 
       print*, "---------------------"
 
