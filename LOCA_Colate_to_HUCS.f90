@@ -647,7 +647,7 @@ end subroutine QSort
     real (kind=4), intent(in) :: a
     real (kind=4), intent(out) :: b,c
 
-    b=mod(a,1.0d0)
+    b=mod(a,1.0)
     c=a-b
 
   end subroutine getgp
