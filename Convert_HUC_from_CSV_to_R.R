@@ -14,7 +14,7 @@ csv_files = intersect(list.files(path    = directory,
                       list.files(path    = directory,
                                  pattern = ".csv"))
 
-load(file="./HUC08_Missouri_River_Basin.Rdata")
+load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
 
 
 Divisions_factor = HUC08_MRB_LUT$HUC08_Code_ID
