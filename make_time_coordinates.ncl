@@ -24,7 +24,7 @@ begin
   time_futr!0 = "time_futr"
   time_futr&time_futr = time_futr
 
-  calendar_date_hist = stringtochar( cd_string(time_hist, "%Y-%N-%D 12:%M:%S"))
+  calendar_date_hist = stringtochar( cd_string(time_hist, "%Y/%N/%D 12:%M:%S"))
   calendar_date_hist@long_name = "Calendar Date for Historical Period" ;
   calendar_date_hist@description = "Calendar Date for Historical Period"
   calendar_date_hist@calendar = "standard" ;
@@ -34,7 +34,7 @@ begin
 
 
 
-  calendar_date_futr= stringtochar(cd_string(time_futr, "%Y-%N-%D 12:%M:%S"))
+  calendar_date_futr= stringtochar(cd_string(time_futr, "%Y/%N/%D 12:%M:%S"))
   calendar_date_futr@long_name = "Calendar Date for Future Period" ;
   calendar_date_futr@description = "Calendar Date for Future Period"
   calendar_date_futr@calendar = "standard" ;
