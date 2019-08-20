@@ -61,7 +61,9 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=19)  :: caldate, caldate_pull
 
-  integer (kind=4) :: myhucs = 0300 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low   = 2000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high  = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+
   logical :: first_huc
 
 
@@ -201,7 +203,7 @@ program LOCA_Colate_to_ClimDivs
 
   do h = 1, nhucs
 
-    if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+99))) then
+    if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
 
       if (first_huc) then
            first_huc = .FALSE.
@@ -448,7 +450,7 @@ print*, "got the times"
 
           do h = 1, nhucs, 1
 
-            if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+99))) then
+            if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
 
 
               mask_map = merge(1,0, (huc_map           .eq.          hucs(h)) .and. &
@@ -587,7 +589,7 @@ end do   !! Scenario Loop (s)
 
     do h = 1, nhucs
 
-      if ((hucs(h) .ge. myhucs) .and. (hucs(h) .le. (myhucs+99))) then
+      if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
 
         close(unit_huc(h))
 
