@@ -314,7 +314,6 @@ print*, "got the times"
     span_t(1:n_reads-1) = npull
     span_t(n_reads)     = last_read
 
-    print*, sum(span_t)
 
     start_t(1) = 1
     end_t(1)   = span_t(1)
@@ -327,7 +326,6 @@ print*, "got the times"
 
 
 
-    print*, (start_t(2:n_reads) - start_t(1:n_reads-1)  )
 
 
 
@@ -438,8 +436,7 @@ print*, "got the times"
         netcdf_dims_3d_start   = (/    1,    1,     start_t(tt) /)
         netcdf_dims_3d_count   = (/ nlon, nlat,     span_t(tt) /)
 
-        print*, netcdf_dims_3d_start
-        print*, netcdf_dims_3d_count
+
 
 
 
@@ -473,7 +470,6 @@ print*, "got the times"
         map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
         where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
 
-        print*, map_tasmin(10,10,:)
 
 
         do t = 1,  span_t(tt), 1
