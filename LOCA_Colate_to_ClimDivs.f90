@@ -17,9 +17,15 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
 
+  integer (kind=4) :: myhuc_low   = 3901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high  = 3901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+
+  integer (kind=4), allocatable          :: start_t(:)
+  integer (kind=4), allocatable          :: end_t(:)
+  integer (kind=4), allocatable          :: span_t(:)
 
 
-  integer :: e, s, h, v, t, tt, ntime, huc_counter
+  integer :: e, s, h, v, t, tt, ntime, huc_counter, n_reads, last_read
 
   integer (kind=4), dimension(nlon,nlat) :: mask_map
   real    (kind=4), dimension(nlon,nlat) :: masked_variable_map
@@ -59,10 +65,8 @@ program LOCA_Colate_to_ClimDivs
   character (len = 19), dimension(ntime_hist) :: caldate_hist
   character (len = 19), dimension(ntime_futr) :: caldate_futr
 
-  character (len=19)  :: caldate, caldate_pull
+  character (len=19)  :: caldate, caldate_pull, caldate_end
 
-  integer (kind=4) :: myhuc_low   = 2000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high  = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   logical :: first_huc
 
@@ -288,22 +292,46 @@ print*, "got the times"
 
   do s = 1,  nscen
 
+    npull = 50           ! 2, 3, 7, 487
+
     if (trim(scenarios(s)) .eq. "historical") then
       ntime = ntime_hist
-      npull = 2*3*7           ! 2, 3, 7, 487
     else
       ntime = ntime_futr
-      npull = 19           ! 13, 19, 139
     end if
 
-    print*, trim(scenarios(s)), " ", ntime, " ", npull, " ", (real(ntime)/real(npull))
+    n_reads   = ceiling(real(ntime)/real(npull))   ! number of reads
+    last_read = int(mod(real(ntime),real(npull)))  ! last N's
 
-    netcdf_dims_3d_count = (/ nlon, nlat, npull /)
+    print*, scenarios(s)," ", ntime, " ", npull, " ", n_reads, last_read
 
-    allocate (  input_map(nlon, nlat, npull) )
-    allocate ( map_tasmax(nlon, nlat, npull) )
-    allocate ( map_tasmin(nlon, nlat, npull) )
-    allocate (     map_pr(nlon, nlat, npull) )
+
+
+    allocate( span_t(n_reads) )
+    allocate(start_t(n_reads) )
+    allocate(  end_t(n_reads) )
+
+    span_t(1:n_reads-1) = npull
+    span_t(n_reads)     = last_read
+
+    print*, sum(span_t)
+
+    start_t(1) = 1
+    end_t(1)   = span_t(1)
+
+
+    do tt = 2, n_reads
+      start_t(tt) = start_t(tt-1) + span_t(tt-1)
+      end_t(tt)   = end_t(tt-1)   + span_t(tt)
+    end do
+
+
+
+    print*, (start_t(2:n_reads) - start_t(1:n_reads-1)  )
+
+
+
+
 
     print*, "====================="
 
@@ -382,25 +410,36 @@ print*, "got the times"
 
 
 
-      do tt = 1,  ntime, npull
+      do tt = 1, n_reads
 
         if (trim(scenarios(s)) .eq. "historical") then
-          caldate_pull = caldate_hist(tt)
+          caldate_pull = caldate_hist(start_t(tt))
+          caldate_end = caldate_hist(end_t(tt))
+
         else
-          caldate_pull = caldate_futr(tt)
+          caldate_pull = caldate_futr(start_t(tt))
+          caldate_end = caldate_futr(end_t(tt))
+
+        end if
+
+        if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
+          allocate (  input_map(nlon, nlat, span_t(tt)) )
+          allocate ( map_tasmax(nlon, nlat, span_t(tt)) )
+          allocate ( map_tasmin(nlon, nlat, span_t(tt)) )
+          allocate (     map_pr(nlon, nlat, span_t(tt)) )
         end if
 
 
 
-        netcdf_dims_3d_start = (/    1,    1,     tt /)
-
-
-
-
-        write(*,'(A,2(",",A))')  trim(caldate_pull), &
+        write(*,'(A,"  ",A,"   ",A,"_",A)')  trim(caldate_pull),trim(caldate_end), &
                     trim(ensembles(e)), &
                     trim(scenarios(s))
 
+        netcdf_dims_3d_start   = (/    1,    1,     start_t(tt) /)
+        netcdf_dims_3d_count   = (/    1,    1,     span_t(tt) /)
+
+        print*, netcdf_dims_3d_start
+        print*, netcdf_dims_3d_count
 
 
 
@@ -434,11 +473,13 @@ print*, "got the times"
         map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
         where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
 
+        print*, map_tasmin(10,10,:)
 
-        do t = 1,  npull, 1
+
+        do t = 1,  span_t(tt), 1
 
 
-          t_in_tt = t + tt - 1
+          t_in_tt = start_t(tt) + t
 
           if (trim(scenarios(s)) .eq. "historical") then
             caldate = caldate_hist(t_in_tt)
@@ -569,8 +610,14 @@ print*, "got the times"
       end do  !!  Internal Time Loop (t)
 
 
+      if ((tt .eq. n_reads-1) .or. (tt .eq. n_reads)) then
 
+        deallocate (  input_map )
+        deallocate ( map_tasmax )
+        deallocate ( map_tasmin )
+        deallocate (     map_pr )
 
+      end if
 
 
     end do  !!  NetCSF Time Loop (tt)
@@ -579,10 +626,11 @@ print*, "got the times"
 
   end do  !! Ensemble Loop (e)
 
-  deallocate (  input_map )
-  deallocate ( map_tasmax )
-  deallocate ( map_tasmin )
-  deallocate (     map_pr)
+
+
+  deallocate(span_t)
+  deallocate(start_t)
+  deallocate(end_t)
 
 end do   !! Scenario Loop (s)
 

@@ -1,4 +1,5 @@
 
-rm -frv  ./LOCA_Colate_to_HUCS.exe ./LOCA_Colate_to_ClimDivs.exe
+rm -frv  ./LOCA_Colate_to_HUCS.exe ./LOCA_Colate_to_ClimDivs.exe ./LOCA_time_test.exe
+${FC} -o ./LOCA_time_test.exe          -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_time_test.f90
 ${FC} -o ./LOCA_Colate_to_HUCS.exe     -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_HUCS.f90
 ${FC} -o ./LOCA_Colate_to_ClimDivs.exe -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_ClimDivs.f90
