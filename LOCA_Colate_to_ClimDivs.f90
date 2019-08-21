@@ -436,7 +436,7 @@ print*, "got the times"
                     trim(scenarios(s))
 
         netcdf_dims_3d_start   = (/    1,    1,     start_t(tt) /)
-        netcdf_dims_3d_count   = (/    1,    1,     span_t(tt) /)
+        netcdf_dims_3d_count   = (/ nlon, nlat,     span_t(tt) /)
 
         print*, netcdf_dims_3d_start
         print*, netcdf_dims_3d_count
