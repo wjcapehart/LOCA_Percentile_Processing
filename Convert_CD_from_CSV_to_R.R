@@ -54,12 +54,28 @@ Divisions = str_sub(string = csv_files,
 for (division in Divisions)
 {
 
+  
   filename = str_c(directory,
-                   "NGP_LOCA_nCLIMDIV_",
+                   "NGP_LOCA_HUC08_",
                    division,
                    sep = "")
-
-  print(filename)
+  
+  shell_command = str_c("tail -n 1  ",
+                        filename,
+                        ".csv",
+                        sep = "")
+  
+  a = system(shell_command, intern = TRUE)
+  
+  
+  print(a)
+  
+  if (str_detect(a,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
+      str_detect(a,"2099-12-31" )) {
+    
+    print(csv_file)
+    
+    
 
   loca_daily = read_csv(str_c(filename,".csv",sep=""))
 
@@ -160,6 +176,13 @@ for (division in Divisions)
                                     "_Yearly",
                                     ".RData",
                                     sep=""))
+    
+    
+  } else {
+    print("nope!")
+  }
+  
+  
 
 }
 
