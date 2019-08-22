@@ -93,7 +93,7 @@ for (division in Divisions)
   a = system(shell_command, intern = TRUE)
   
 
-  print(filename)
+  print(a)
   
   if (str_detect(a,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
       str_detect(a,"2099-12-31" )) {
