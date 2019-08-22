@@ -91,7 +91,8 @@ for (division in Divisions)
                                             "P025",
                                             "P050",
                                             "P075",
-                                            "P100"))
+                                            "P100",
+                                            "MEAN"))
 
   last_record = loca_daily[nrow(loca_daily), ]
 
@@ -165,7 +166,7 @@ for (division in Divisions)
 rData_files = intersect(list.files(path    = directory,
                                    pattern = "NGP_LOCA_nCLIMDIV_"),
                         list.files(path    = directory,
-                                   pattern = "RData"))
+                                   pattern = "_Yearly.RData"))
 
 Completed_Divisions = str_sub(string = rData_files,
                               start  = str_length(string = prefix) + 1,
@@ -176,4 +177,5 @@ save(Completed_Divisions, file = str_c(directory,
                               ".RData",
                               sep=""))
 
-print(rData_files)
+print(Completed_Divisions)
+
