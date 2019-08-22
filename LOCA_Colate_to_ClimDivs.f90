@@ -17,8 +17,11 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
 
-  integer (kind=4) :: myhuc_low   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high  = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer, parameter ::      npull = 50           ! 2, 3, 7, 487
+
+
+  integer (kind=4) :: myhuc_low    = 3202 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 5099 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
@@ -43,7 +46,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer (kind=4), dimension(nhucs) :: unit_huc
 
-  integer (kind=4) :: npull, t_in_tt
+  integer (kind=4) :: t_in_tt
 
 
   integer (kind=2), allocatable :: input_map(:,:,:)
@@ -292,7 +295,6 @@ print*, "got the times"
 
   do s = 1,  nscen
 
-    npull = 50           ! 2, 3, 7, 487
 
     if (trim(scenarios(s)) .eq. "historical") then
       ntime = ntime_hist
