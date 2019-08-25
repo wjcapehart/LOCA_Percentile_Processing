@@ -20,8 +20,8 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter ::      npull = 50           ! 2, 3, 7, 487
 
 
-  integer (kind=4) :: myhuc_low    = 3202 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 5099 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
