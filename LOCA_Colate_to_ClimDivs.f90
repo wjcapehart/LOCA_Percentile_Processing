@@ -536,7 +536,7 @@ print*, "got the times"
 
 
 
-          print*, "Splitting Tasks to ",omp_get_max_threads(),"processors"
+          ! print*, "Splitting Tasks to ",omp_get_max_threads(),"processors"
 
 
 !$OMP PARALLEL DO PRIVATE (h,                   &
@@ -569,7 +569,7 @@ print*, "got the times"
 
           do h = 1, nmyhucs, 1
 
-              print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+              ! print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
