@@ -348,12 +348,15 @@ print*, "got the times"
     n_reads   = ceiling(real(ntime)/real(npull))   ! number of reads
     last_read = int(mod(real(ntime),real(npull)))  ! last N's
 
-    print*, scenarios(s)," ", ntime, " ", npull, " ", n_reads, last_read
+    print*, "               Number of Time Steps", ntime
+    print*, " Normal Length of Time Record Pull ", npull
+    print*, "                   Number of Pulls ", n_reads
+    print*, "  Length of Final Time Record Pull ", last_read
 
     do h = 1, nmyhucs
 
-      write(basin_file_name,'(A, I8.8,"_",A,".csv")') trim(file_output_root), hucs(h), trim(scenarios(s))
-      print*,h, unit_huc(h), myhucs(h), nhuccells(h) , trim(basin_file_name)
+      write(basin_file_name,'(A, I8.8,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
+      print*,h, trim(basin_file_name)
 
 
 

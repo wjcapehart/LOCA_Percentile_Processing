@@ -351,8 +351,8 @@ print*, "got the times"
 
     do h = 1, nmyhucs
 
-      write(basin_file_name,'(A, I4.4,"_",A,".csv")') trim(file_output_root), hucs(h), trim(scenarios(s))
-      print*,h, unit_huc(h), myhucs(h), nhuccells(h) , trim(basin_file_name)
+      write(basin_file_name,'(A, I4.4,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
+      print*,h, trim(basin_file_name)
 
 
 
