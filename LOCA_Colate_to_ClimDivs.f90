@@ -391,7 +391,7 @@ print*, "got the times"
 
     do e = 1, nens
 
-      print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s)
+      print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s))
       print*, "== "
 
 
