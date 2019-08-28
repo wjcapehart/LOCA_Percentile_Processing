@@ -8,3 +8,4 @@ rm -frv  ./*.exe
 
 
 ${FC} -o ./LOCA_Colate_to_ClimDivs.exe ${OMP_ENV_VAR} -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_ClimDivs.f90
+${FC} -o ./LOCA_Colate_to_HUCS.exe     ${OMP_ENV_VAR} -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_HUCS.f90

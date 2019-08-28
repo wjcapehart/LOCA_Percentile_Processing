@@ -2,7 +2,7 @@
 
 
 
-program LOCA_Colate_to_ClimDivs
+program LOCA_Colate_to_HUCS
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   use omp_lib
@@ -16,14 +16,14 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   450
   integer, parameter :: nlat       =   302
-  integer, parameter :: nhucs      =   248
+  integer, parameter :: nhucs      =   307
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
 
   integer, parameter ::      npull = 50           ! 2, 3, 7, 487
 
-  integer (kind=4) :: myhuc_low    = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10120000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10129999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
@@ -99,8 +99,8 @@ program LOCA_Colate_to_ClimDivs
   integer (kind=4), allocatable :: nhuccells(:)
   integer (kind=4), allocatable :: unit_huc(:)
 
-  character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
-  character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
+  character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
+  character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -146,7 +146,7 @@ program LOCA_Colate_to_ClimDivs
 
   file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
 
-  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_nCLIMDIV_"
+  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_HUCS_"
 
   variables = (/ "pr    ", &
                  "tasmax", &
@@ -192,7 +192,7 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  filename_map = "./USCAN_Climate_Divisions.nc"
+  filename_map = "./HUC08_Missouri_River_Basin.nc"
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -266,7 +266,7 @@ program LOCA_Colate_to_ClimDivs
 
       nhuccells(t) = sum(mask_map)
 
-      write(basin_file_name,'(A, I4.4)') trim(file_output_root), myhucs(t)
+      write(basin_file_name,'(A, I8.8)') trim(file_output_root), myhucs(t)
       print*, t, unit_huc(t), myhucs(t), nhuccells(t) , trim(basin_file_name)
 
     end if
@@ -316,12 +316,15 @@ print*, "got the times"
 
 
 
-  if (nmyhucs .lt. num_procs) then
-    call omp_set_num_threads(nmyhucs)
-    num_procs = nmyhucs
-    print*, "adjusting total number of cores to ",omp_get_num_threads()
 
-  end if
+
+      if (nmyhucs .lt. num_procs) then
+        call omp_set_num_threads(nmyhucs)
+        num_procs = nmyhucs
+        print*, "adjusting total number of cores to ",omp_get_num_threads()
+
+      end if
+
 
 
   !!!!!!!!!!!!!!!!!!
@@ -348,7 +351,7 @@ print*, "got the times"
 
     do h = 1, nmyhucs
 
-      write(basin_file_name,'(A, I4.4,"_",A,".csv")') trim(file_output_root), hucs(h), trim(scenarios(s))
+      write(basin_file_name,'(A, I8.8,"_",A,".csv")') trim(file_output_root), hucs(h), trim(scenarios(s))
       print*,h, unit_huc(h), hucs(h), nhuccells(h) , trim(basin_file_name)
 
 
@@ -632,14 +635,14 @@ print*, "got the times"
               !!! output
 
 
-                write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
+                write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P000",  &
                             minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
 
-                write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
+                write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
@@ -648,7 +651,7 @@ print*, "got the times"
                             quantile7(sort_tasmin, 0.25, nhuccells(h)), &
                             quantile7(sort_pr,     0.25, nhuccells(h))
 
-                write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
+                write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
@@ -657,7 +660,7 @@ print*, "got the times"
                             quantile7(sort_tasmin, 0.50, nhuccells(h)), &
                             quantile7(sort_pr,     0.50, nhuccells(h))
 
-                write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
+                write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
@@ -666,14 +669,14 @@ print*, "got the times"
                             quantile7(sort_tasmin, 0.75, nhuccells(h)), &
                             quantile7(sort_pr,     0.75, nhuccells(h))
 
-                write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
+                write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P100",  &
                             maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
-                  write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
+                  write(unit_huc(h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  trim(caldate), &
                               myhucs(h), &
                               trim(ensembles(e)), &
                               trim(scenarios(s)), &
@@ -741,7 +744,7 @@ end do   !! Scenario Loop (s)
   deallocate(  unit_huc )
 
 
-end program LOCA_Colate_to_ClimDivs
+end program LOCA_Colate_to_HUCS
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
