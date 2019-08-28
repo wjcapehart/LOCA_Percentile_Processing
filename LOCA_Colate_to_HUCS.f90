@@ -384,15 +384,7 @@ print*, "got the times"
       end_t(tt)   = end_t(tt-1)   + span_t(tt)
     end do
 
-
-
-
-
-
-
-
-    print*, "====================="
-
+    print*, "---------------------"
 
     do e = 1, nens
 
@@ -444,7 +436,7 @@ print*, "got the times"
       ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-         print*, "==     TASMAX:",trim(filename_tasmin)
+         print*, "==     TASMAX:",trim(filename_tasmax)
          print*, "==          scale:",tasmax_scale_factor
          print*, "==         offset:",tasmax_add_offset
          print*, "==      FillValue:",tasmax_FillValue

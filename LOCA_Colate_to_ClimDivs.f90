@@ -385,9 +385,7 @@ print*, "got the times"
       end_t(tt)   = end_t(tt-1)   + span_t(tt)
     end do
 
-
-
-
+    print*, "---------------------"
 
     do e = 1, nens
 
