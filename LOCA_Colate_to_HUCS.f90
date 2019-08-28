@@ -146,7 +146,7 @@ program LOCA_Colate_to_HUCS
 
   file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
 
-  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_HUCS_"
+  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
 
   variables = (/ "pr    ", &
                  "tasmax", &
@@ -321,7 +321,7 @@ print*, "got the times"
       if (nmyhucs .lt. num_procs) then
         call omp_set_num_threads(nmyhucs)
         num_procs = nmyhucs
-        print*, "adjusting total number of cores to ",omp_get_num_threads()
+        print*, "adjusting total number of cores to ",num_procs
 
       end if
 
