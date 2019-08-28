@@ -396,7 +396,7 @@ print*, "got the times"
 
     do e = 1, nens
 
-      print*, "== processing ensemble ",trim(ensembles(e)),", scenario ",trim(scenarios(s)
+      print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s))
       print*, "== "
 
       pr_variable_name     = "pr_"     // trim(ensembles(e)) // "_" // trim(scenarios(s))
