@@ -5,6 +5,9 @@
 program LOCA_Colate_to_ClimDivs
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
+  use omp_lib
+
+
   implicit none
 
 
@@ -19,8 +22,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer, parameter ::      npull = 50           ! 2, 3, 7, 487
 
-
-  integer (kind=4) :: myhuc_low    = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 0101 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
   integer (kind=4) :: myhuc_high   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
@@ -44,7 +46,6 @@ program LOCA_Colate_to_ClimDivs
   character (len=090) :: file_output_root
   character (len=180) :: basin_file_name
 
-  integer (kind=4), dimension(nhucs) :: unit_huc
 
   integer (kind=4) :: t_in_tt
 
@@ -89,7 +90,14 @@ program LOCA_Colate_to_ClimDivs
 
   real (kind=4) :: quantile7
 
-  integer (kind=4), dimension(nhucs) :: nhuccells
+  integer (kind=4)              :: nmyhucs
+
+  integer (kind=4)              :: num_procs,local_proc
+
+
+  integer (kind=4), allocatable :: myhucs(:)
+  integer (kind=4), allocatable :: nhuccells(:)
+  integer (kind=4), allocatable :: unit_huc(:)
 
   character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
   character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
@@ -133,7 +141,7 @@ program LOCA_Colate_to_ClimDivs
 
   first_huc = .TRUE.
 
-
+  num_procs = omp_get_max_threads()
 
 
   file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
@@ -208,17 +216,45 @@ program LOCA_Colate_to_ClimDivs
 
   huc_counter = 8
 
+  nmyhucs = 0
+
+  ! Pass One - get the nuber of matching hucs
+  print*, " "
+  print*, "--- Pass One for Polygons ---"
+  print*, " "
   do h = 1, nhucs
 
     if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
 
-      if (first_huc) then
-           first_huc = .FALSE.
-      else
-           huc_counter = 1 + huc_counter
-      end if
+      nmyhucs = nmyhucs + 1
 
-      unit_huc(h) = huc_counter
+      print*, h, hucs(h)
+
+    end if
+
+  end do
+
+
+  ! allocate our hucs to be USCAN_Climate_Divisions
+
+  allocate(    myhucs( nmyhucs ) )
+  allocate( nhuccells( nmyhucs ) )
+  allocate(  unit_huc( nmyhucs ) )
+
+    !Pass 2
+
+  t = 0
+  print*, " "
+  print*, "--- Pass Two for Polygons ---"
+  print*, " "
+  do h = 1, nhucs
+
+    if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
+
+      t = t + 1
+
+      myhucs(t) = hucs(h)
+      unit_huc(t) = 8 + t
 
       mask_map = huc_map
 
@@ -228,17 +264,10 @@ program LOCA_Colate_to_ClimDivs
         mask_map = 0
       end where
 
-      nhuccells(h) = sum(mask_map)
+      nhuccells(t) = sum(mask_map)
 
-
-
-      write(basin_file_name,'(A, I4.4,".csv")') trim(file_output_root), hucs(h)
-      print*, hucs(h), nhuccells(h) , trim(basin_file_name)
-
-
-
-      open(unit_huc(h), FILE=trim(basin_file_name), form="FORMATTED")
-      write(unit_huc(h),*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
+      write(basin_file_name,'(A, I4.4)') trim(file_output_root), myhucs(t)
+      print*, t, unit_huc(t), myhucs(t), nhuccells(t) , trim(basin_file_name)
 
     end if
 
@@ -295,6 +324,11 @@ print*, "got the times"
 
   do s = 1,  nscen
 
+    print*, "==============================="
+    print*, "== "
+    print*, "== ", trim(scenarios(s))
+    print*, "== "
+
 
     if (trim(scenarios(s)) .eq. "historical") then
       ntime = ntime_hist
@@ -306,6 +340,18 @@ print*, "got the times"
     last_read = int(mod(real(ntime),real(npull)))  ! last N's
 
     print*, scenarios(s)," ", ntime, " ", npull, " ", n_reads, last_read
+
+    do h = 1, nmyhucs
+
+      write(basin_file_name,'(A, I4.4,"_",A,".csv")') trim(file_output_root), hucs(h), trim(scenarios(s))
+      print*,h, unit_huc(h), hucs(h), nhuccells(h) , trim(basin_file_name)
+
+
+
+      open(unit_huc(h), FILE=trim(basin_file_name), form="FORMATTED")
+      write(unit_huc(h),*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
+
+    end do
 
 
 
@@ -431,9 +477,10 @@ print*, "got the times"
 
 
 
-        write(*,'(A,"  ",A,"   ",A,"_",A)')  trim(caldate_pull),trim(caldate_end), &
+        write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
                     trim(ensembles(e)), &
-                    trim(scenarios(s))
+                    trim(scenarios(s)), &
+                    num_procs
 
         netcdf_dims_3d_start   = (/    1,    1,     start_t(tt) /)
         netcdf_dims_3d_count   = (/ nlon, nlat,     span_t(tt) /)
@@ -487,19 +534,49 @@ print*, "got the times"
 
           !! print*, "-----",caldate
 
-          do h = 1, nhucs, 1
-
-            if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
 
 
-              mask_map = merge(1,0, (huc_map           .eq.          hucs(h)) .and. &
+          print*, "Splitting Tasks to ",omp_get_max_threads(),"processors"
+
+
+!$OMP PARALLEL DO PRIVATE (h,                   &
+!$OMP&                     linear_array,        &
+!$OMP&                     mask_map,            &
+!$OMP&                     masked_variable_map, &
+!$OMP&                     sort_tasmax,         &
+!$OMP&                     sort_tasmin,         &
+!$OMP&                     sort_pr              ), &
+!$OMP&             SHARED (e,                   &
+!$OMP&                     s,                   &
+!$OMP&                     t,                   &
+!$OMP&                     ensembles,           &
+!$OMP&                     scenarios,           &
+!$OMP&                     nhuccells,           &
+!$OMP&                     caldate,             &
+!$OMP&                     huc_map,             &
+!$OMP&                     map_pr,              &
+!$OMP&                     map_tasmax,          &
+!$OMP&                     map_tasmin,          &
+!$OMP&                     pr_FillValue,        &
+!$OMP&                     tasmax_FillValue,    &
+!$OMP&                     tasmin_FillValue,    &
+!$OMP&                     unit_huc,            &
+!$OMP&                     num_procs,           &
+!$OMP&                     myhucs               ), &
+!$OMP&            DEFAULT (NONE) , &
+!$OMP&           SCHEDULE (DYNAMIC)
+
+          do h = 1, nmyhucs, 1
+
+              print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+
+              mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
-                                    (map_tasmin(:,:,t) .ne. tasmax_FillValue)       )
+                                    (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
 
 
               nhuccells(h) = sum(mask_map)
-
 
               allocate ( sort_tasmax(nhuccells(h)) )
               allocate ( sort_tasmin(nhuccells(h)) )
@@ -550,14 +627,14 @@ print*, "got the times"
 
 
                 write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
-                            hucs(h), &
+                            myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P000",  &
                             minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
 
                 write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
-                            hucs(h), &
+                            myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P025",  &
@@ -566,7 +643,7 @@ print*, "got the times"
                             quantile7(sort_pr,     0.25, nhuccells(h))
 
                 write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
-                            hucs(h), &
+                            myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P050",  &
@@ -575,7 +652,7 @@ print*, "got the times"
                             quantile7(sort_pr,     0.50, nhuccells(h))
 
                 write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
-                            hucs(h), &
+                            myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P075",  &
@@ -584,14 +661,14 @@ print*, "got the times"
                             quantile7(sort_pr,     0.75, nhuccells(h))
 
                 write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
-                            hucs(h), &
+                            myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P100",  &
                             maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
                   write(unit_huc(h),'(A,",",I4.4,3(",",A),3(",",F8.2))')  trim(caldate), &
-                              hucs(h), &
+                              myhucs(h), &
                               trim(ensembles(e)), &
                               trim(scenarios(s)), &
                               "MEAN",  &
@@ -602,9 +679,12 @@ print*, "got the times"
               deallocate (sort_tasmin)
               deallocate (sort_pr)
 
-            end if  !! if we are on a valid huc
 
           end do  !! HUCS loop (h)
+
+!$OMP END PARALLEL DO
+
+
       end do  !!  Internal Time Loop (t)
 
 
@@ -630,20 +710,29 @@ print*, "got the times"
   deallocate(start_t)
   deallocate(end_t)
 
+  do h = 1, nmyhucs
+
+      close(unit_huc(h))
+
+  end do
+
+  print*, "== "
+  print*, "== "
+  print*, "==============================="
+
+
+
 end do   !! Scenario Loop (s)
 
 
-    do h = 1, nhucs
 
-      if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
-
-        close(unit_huc(h))
-
-      end if
-
-    end do
 
   !!!!!!!!!!!!!!!!!!
+
+
+  deallocate(    myhucs )
+  deallocate( nhuccells )
+  deallocate(  unit_huc )
 
 
 end program LOCA_Colate_to_ClimDivs
@@ -767,3 +856,8 @@ subroutine getgp(a,b,c)
     c=a-b
 
 end subroutine getgp
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
