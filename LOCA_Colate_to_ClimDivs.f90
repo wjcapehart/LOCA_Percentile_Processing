@@ -347,12 +347,16 @@ print*, "got the times"
     n_reads   = ceiling(real(ntime)/real(npull))   ! number of reads
     last_read = int(mod(real(ntime),real(npull)))  ! last N's
 
-    print*, scenarios(s)," ", ntime, " ", npull, " ", n_reads, last_read
+    print*, "==               Number of Time Steps", ntime
+    print*, "== Normal Length of Time Record Pull ", npull
+    print*, "==                   Number of Pulls ", n_reads
+    print*, "==  Length of Final Time Record Pull ", last_read
+    print*, "== "
 
     do h = 1, nmyhucs
 
       write(basin_file_name,'(A, I4.4,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
-      write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') h, unit_huc(h), myhucs(h), nhuccells(h) , trim(basin_file_name)
+      write(*,'("== h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') h, unit_huc(h), myhucs(h), nhuccells(h) , trim(basin_file_name)
 
 
 
@@ -360,6 +364,7 @@ print*, "got the times"
       write(unit_huc(h),*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
 
     end do
+    print*, "== "
 
 
 
@@ -384,15 +389,11 @@ print*, "got the times"
 
 
 
-
-
-
-    print*, "====================="
-
-
     do e = 1, nens
 
-      print*, "---------------------"
+      print*, "== processing ensemble ",trim(ensembles(e)),", scenario ",trim(scenarios(s)
+      print*, "== "
+
 
 
       pr_variable_name     = "pr_"     // trim(ensembles(e)) // "_" // trim(scenarios(s))
@@ -419,8 +420,11 @@ print*, "got the times"
 
       ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "_FillValue",  pr_FillValue)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-      print*, trim(filename_pr), pr_scale_factor, pr_add_offset, pr_FillValue
+        print*, "==         PR:",trim(filename_pr)
+        print*, "==          scale:",pr_scale_factor
+        print*, "==         offset:",pr_add_offset
+        print*, "==      FillValue:",pr_FillValue
+        print*, "== "
 
 
       ncstat = NF90_OPEN(filename_tasmax, NF90_NOWRITE, netcdf_id_file_tasmax)
@@ -438,8 +442,11 @@ print*, "got the times"
       ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      print*, trim(filename_tasmax), tasmax_scale_factor, tasmax_add_offset, tasmax_FillValue
-
+         print*, "==     TASMAX:",trim(filename_tasmin)
+         print*, "==          scale:",tasmax_scale_factor
+         print*, "==         offset:",tasmax_add_offset
+         print*, "==      FillValue:",tasmax_FillValue
+         print*, "== "
 
 
       ncstat = NF90_OPEN(filename_tasmin, NF90_NOWRITE, netcdf_id_file_tasmin)
@@ -457,8 +464,12 @@ print*, "got the times"
       ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+        print*, "==     TASMIN:",trim(filename_tasmin)
+        print*, "==          scale:",tasmin_scale_factor
+        print*, "==         offset:",tasmin_add_offset
+        print*, "==      FillValue:",tasmin_FillValue
+        print*, "== "
 
-      print*, trim(filename_tasmin), tasmin_scale_factor, tasmin_add_offset, tasmin_FillValue
 
 
 
