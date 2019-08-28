@@ -562,6 +562,7 @@ print*, "got the times"
 !$OMP&                     tasmin_FillValue,    &
 !$OMP&                     unit_huc,            &
 !$OMP&                     num_procs,           &
+!$OMP&                     nmyhucs,             &
 !$OMP&                     myhucs               ), &
 !$OMP&            DEFAULT (NONE) , &
 !$OMP&           SCHEDULE (DYNAMIC)
