@@ -323,8 +323,11 @@ print*, "got the times"
 
   end if
 
+  print*, myhucs
+
 
   !!!!!!!!!!!!!!!!!!
+
 
 
   do s = 1,  nscen

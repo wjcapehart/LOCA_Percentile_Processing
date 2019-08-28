@@ -325,6 +325,7 @@ print*, "got the times"
 
       end if
 
+      print*, myhucs
 
 
   !!!!!!!!!!!!!!!!!!
