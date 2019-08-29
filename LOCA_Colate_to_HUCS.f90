@@ -22,8 +22,8 @@ program LOCA_Colate_to_HUCS
 
   integer, parameter ::      npull = 50           ! 2, 3, 7, 487
 
-  integer (kind=4) :: myhuc_low    = 10160000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10169999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10150000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10159999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
@@ -326,11 +326,10 @@ print*, "got the times"
         call omp_set_num_threads(nmyhucs)
         num_procs = nmyhucs
         print*, "adjusting total number of cores to ",num_procs
-
+      else
+        print*, "using default number of cores: ",num_procs
       end if
-      print*, "using total number of cores to ",num_procs
-
-      print*, myhucs
+      print*, "myhucs: ", myhucs
 
 
   !!!!!!!!!!!!!!!!!!
