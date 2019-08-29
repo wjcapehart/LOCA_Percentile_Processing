@@ -328,6 +328,7 @@ print*, "got the times"
         print*, "adjusting total number of cores to ",num_procs
 
       end if
+      print*, "using total number of cores to ",num_procs
 
       print*, myhucs
 
