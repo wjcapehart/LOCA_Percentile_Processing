@@ -267,7 +267,11 @@ program LOCA_Colate_to_HUCS
       nhuccells(t) = sum(mask_map)
 
       write(basin_file_name,'(A, I8.8)') trim(file_output_root), myhucs(t)
-      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') t, unit_huc(t), myhucs(t), nhuccells(t) , trim(basin_file_name)
+      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') t, &
+                                                                       unit_huc(t), &
+                                                                       myhucs(t), &
+                                                                       nhuccells(t), &
+                                                                       trim(basin_file_name)
 
     end if
 
@@ -356,7 +360,11 @@ print*, "got the times"
     do h = 1, nmyhucs
 
       write(basin_file_name,'(A, I8.8,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
-      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') h, unit_huc(h), myhucs(h), nhuccells(h) , trim(basin_file_name)
+      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') t, &
+                                                                       unit_huc(t), &
+                                                                       myhucs(t), &
+                                                                       nhuccells(t), &
+                                                                       trim(basin_file_name)
 
 
 
