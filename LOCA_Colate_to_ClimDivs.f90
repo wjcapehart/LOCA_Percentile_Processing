@@ -12,7 +12,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   integer, parameter :: nens       =    27
-  integer, parameter :: nscen      =     2
+  integer, parameter :: nscen      =     3
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   450
   integer, parameter :: nlat       =   302
@@ -152,7 +152,8 @@ program LOCA_Colate_to_ClimDivs
                  "tasmax", &
                  "tasmin"  /)
 
-  scenarios = (/ "rcp45     ", &
+  scenarios = (/ "historical", &
+                 "rcp45     ", &
                  "rcp85     " /)
 
 
