@@ -101,8 +101,8 @@ program LOCA_Colate_to_ClimDivs
   integer  (kind=4),  allocatable :: myhucs(:) ! nmyhucs
   integer  (kind=4),  allocatable :: nhuccells(:) !nmyhucs
   integer  (kind=4),  allocatable :: unit_huc(:) !nmyhucs
-  character(len=:),   allocatable :: output_buffer(:,:) ! span_t, nmyhucs
-  character(len=100), allocatable :: csv_filename(:)   ! span_t, nmyhucs
+  character(len=:),   allocatable :: output_buffer(:) ! span_t,
+  character(len=100), allocatable :: csv_filename(:)   ! \, nmyhucs
 
 
 
@@ -635,7 +635,7 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     sort_tasmax,         &
 !$OMP&                     sort_tasmin,         &
 !$OMP&                     sort_pr              ), &
-!$OMP&             SHARED (e,                   &
+!$OMP&             SHARED (e, tt,                  &
 !$OMP&                     s,  n_reads,                 &
 !$OMP&                     csv_filename,        &
 !$OMP&                     ensembles,           &
