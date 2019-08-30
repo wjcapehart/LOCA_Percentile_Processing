@@ -21,7 +21,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_futr = 34333
   integer, parameter :: len_hucstr =     8
 
-  integer, parameter ::      npull = 30           ! 2, 3, 7, 487
+  integer, parameter ::      npull = 60           ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
@@ -725,7 +725,7 @@ program LOCA_Colate_to_ClimDivs
 
               !!! output
 
- 
+
 
                 write(output_buffer(t_buffer,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
