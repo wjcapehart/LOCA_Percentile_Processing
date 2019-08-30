@@ -523,7 +523,7 @@ program LOCA_Colate_to_ClimDivs
           allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
           allocate (                  map_pr(nlon, nlat, span_t(tt)) )
-          allocate (character(55+len_hucstr+LEN_TRIM(scenarios(s))+LEN_TRIM(ensembles(e))) :: output_buffer(span_t(tt)*6))
+          allocate (character(60+len_hucstr+LEN_TRIM(scenarios(s))+LEN_TRIM(ensembles(e))) :: output_buffer(span_t(tt)*6))
 
           print*, "Text Buffer Length = ",((54+len_hucstr+LEN_TRIM(scenarios(s))+LEN_TRIM(ensembles(e))))
           print*, "Actl Buffer Length = ",len(output_buffer(1))
