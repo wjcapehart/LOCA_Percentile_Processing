@@ -512,7 +512,6 @@ program LOCA_Colate_to_ClimDivs
           print*, "act buffer length = ",len(output_buffer(1,1))
         end if
 
-        print(*
 
 
 
