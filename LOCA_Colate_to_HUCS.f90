@@ -21,12 +21,12 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_futr = 34333
   integer, parameter :: len_hucstr =     8
 
-  integer, parameter ::      npull = 60           ! 2, 3, 7, 487
+  integer, parameter ::      npull = 90           ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
-  integer (kind=4) :: myhuc_low    = 10000000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10029999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10120000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10169999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
