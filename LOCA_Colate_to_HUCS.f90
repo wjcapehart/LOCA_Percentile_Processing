@@ -362,11 +362,11 @@ program LOCA_Colate_to_ClimDivs
     do h = 1, nmyhucs
 
       write(csv_filename(h),'(A, I8.8,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
-      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') t, &
-                                                                       unit_huc(t), &
-                                                                       myhucs(t), &
-                                                                       nhuccells(t), &
-                                                                       trim(basin_file_name)
+      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') h, &
+                                                                       unit_huc(h), &
+                                                                       myhucs(h), &
+                                                                       nhuccells(h), &
+                                                                       trim(csv_filename(h))
 
 
       open(unit_huc(h), FILE=trim(csv_filename(h)), form="FORMATTED")
