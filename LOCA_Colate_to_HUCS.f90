@@ -727,15 +727,6 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-                              write(*,'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
-                                          trim(caldate), &
-                                          myhucs(h), &
-                                          trim(ensembles(e)), &
-                                          trim(scenarios(s)), &
-                                          "P000",  &
-                                          minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
-
-                 print*, len(output_buffer(t_buffer,h))
                 write(output_buffer(t_buffer,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
