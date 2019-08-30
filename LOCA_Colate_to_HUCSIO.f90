@@ -487,7 +487,7 @@ program LOCA_Colate_to_ClimDivs
         print*, "==         offset:",tasmin_add_offset
         print*, "==      FillValue:",tasmin_FillValue
         print*, "== "
-]
+
       do tt = 1, n_reads
 
         if (trim(scenarios(s)) .eq. "historical") then
