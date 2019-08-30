@@ -7,18 +7,17 @@ program LOCA_Colate_to_ClimDivs
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   use omp_lib
 
-
   implicit none
-
 
   integer, parameter :: nens       =    27
   integer, parameter :: nscen      =     3
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   450
   integer, parameter :: nlat       =   302
-  integer, parameter :: nhucs      =   248
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
+
+  integer, parameter :: nhucs      =   248
   integer, parameter :: len_hucstr =     4
   integer, parameter :: len_outbuf =   100
 
@@ -830,12 +829,6 @@ program LOCA_Colate_to_ClimDivs
   deallocate(span_t)
   deallocate(start_t)
   deallocate(end_t)
-
-  do h = 1, nmyhucs
-
-      close(unit_huc(h))
-
-  end do
 
   print*, "== "
   print*, "== "

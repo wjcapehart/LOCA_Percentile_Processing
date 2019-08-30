@@ -2,38 +2,38 @@
 
 
 
-program LOCA_Colate_to_ClimDivs
+program LOCA_Colate_to_HUCS
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   use omp_lib
 
-
   implicit none
-
 
   integer, parameter :: nens       =    27
   integer, parameter :: nscen      =     3
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   450
   integer, parameter :: nlat       =   302
-  integer, parameter :: nhucs      =   307
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
-  integer, parameter :: len_hucstr =     8
 
-  integer, parameter ::      npull = 60           ! 2, 3, 7, 487
+  integer, parameter :: nhucs      =   307
+  integer, parameter :: len_hucstr =     8
+  integer, parameter :: len_outbuf =   100
+
+  integer, parameter ::      npull = 60    ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
-  integer (kind=4) :: myhuc_low    = 10120000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10139999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10010000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10119999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
   integer (kind=4), allocatable          :: span_t(:)
 
 
-  integer :: e, s, h, v, t, tt, ntime, huc_counter, n_reads, last_read
+  integer :: e, s, h, t, tt, ntime, huc_counter, n_reads, last_read
 
   integer (kind=4), dimension(nlon,nlat) :: mask_map
   real    (kind=4), dimension(nlon,nlat) :: masked_variable_map
@@ -64,7 +64,7 @@ program LOCA_Colate_to_ClimDivs
   real (kind=4), allocatable          :: sort_tasmin(:)
 
 
-  real (kind=4), dimension(nlat*nlon) :: linear_array, mask_linear
+  real (kind=4), dimension(nlat*nlon) :: linear_array
 
   integer (kind=4), dimension(ntime_hist) :: time_cord_hist
   integer (kind=4), dimension(ntime_futr) :: time_cord_futr
@@ -75,7 +75,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
 
-  logical :: first_huc, end_of_buffer
+  logical :: first_huc
 
 
   character (len=21), dimension(nens)   :: ensembles
@@ -95,18 +95,18 @@ program LOCA_Colate_to_ClimDivs
 
   integer (kind=4)              :: nmyhucs
 
-  integer (kind=4)              :: num_procs,local_proc
+  integer (kind=4)              :: num_procs
 
 
-  integer  (kind=4),  allocatable :: myhucs(:) ! nmyhucs
-  integer  (kind=4),  allocatable :: nhuccells(:) !nmyhucs
-  integer  (kind=4),  allocatable :: unit_huc(:) !nmyhucs
-  character(len=:),   allocatable :: output_buffer(:,:) ! span_t, nmyhucs
-  character(len=100), allocatable :: csv_filename(:)   ! span_t, nmyhucs
+  integer  (kind=4),         allocatable :: myhucs(:) ! nmyhucs
+  integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
+  integer  (kind=4),         allocatable :: unit_huc(:) !nmyhucs
+  character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
+  character(len=100),        allocatable :: csv_filename(:)   ! \, nmyhucs
 
 
-
-   !20                  8 1  len(ens) 1 len(scen) 1 4 9, 9, 9
+    !                    8    21  10
+   !54                  lh   le  ls
   !2060-09-30 12:00:00,3201,CCSM4_r6i1p1,rcp45,P075,   32.90,    9.70,    0.00
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
@@ -142,7 +142,6 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  INTEGER, DIMENSION(3) :: netcdf_dims_3d         ! NX,NY,NT netcdf dim macro
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_start   !  1, 1, 1 array
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_count   ! NX,NY,NT array
 
@@ -152,6 +151,7 @@ program LOCA_Colate_to_ClimDivs
   first_huc = .TRUE.
 
   num_procs = omp_get_max_threads()
+
 
   file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
 
@@ -193,9 +193,13 @@ program LOCA_Colate_to_ClimDivs
                  "NorESM1-M_r1i1p1     ", &
                  "bcc-csm1-1-m_r1i1p1  " /)
 
+
+
 !!!!!!!!!!!!!!!!  Get input_map
 
-  filename_map = "./HUC08_Missouri_River_Basin.nc"
+
+
+filename_map = "./HUC08_Missouri_River_Basin.nc"
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -214,7 +218,8 @@ program LOCA_Colate_to_ClimDivs
   ncstat = NF90_CLOSE(netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-  print*, "Listing Available HUCS"
+
+  print*, "Listing Available Climate Divisions"
 
   huc_counter = 8
 
@@ -315,8 +320,12 @@ program LOCA_Colate_to_ClimDivs
 
         print*, "got the calendar"
 
-      ncstat = NF90_CLOSE(netcdf_id_file_dates)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+  ncstat = NF90_CLOSE(netcdf_id_file_dates)
+    if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+
+
+
 
 
           if (nmyhucs .lt. num_procs) then
@@ -488,6 +497,11 @@ program LOCA_Colate_to_ClimDivs
         print*, "==      FillValue:",tasmin_FillValue
         print*, "== "
 
+
+
+
+
+
       do tt = 1, n_reads
 
         if (trim(scenarios(s)) .eq. "historical") then
@@ -505,11 +519,9 @@ program LOCA_Colate_to_ClimDivs
           allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
           allocate (                  map_pr(nlon, nlat, span_t(tt)) )
-          !allocate (character(100) :: output_buffer(span_t(tt)*6, nmyhucs))
-          allocate (character(64+len_hucstr+LEN_TRIM(scenarios(s))+LEN_TRIM(ensembles(e))) :: output_buffer(span_t(tt)*6, nmyhucs))
+          allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
 
         end if
-
 
 
 
@@ -605,54 +617,30 @@ program LOCA_Colate_to_ClimDivs
         !
         !!!!!!!!!!!!!!!!!!!!!!!!!
 
-        t_buffer = 1
-        end_of_buffer = .FALSE.
-
-        do t = 1,  span_t(tt), 1
-
-
-          t_in_tt = start_t(tt) + t
-
-          if (trim(scenarios(s)) .eq. "historical") then
-            caldate = caldate_hist(t_in_tt)
-          else
-            caldate = caldate_futr(t_in_tt)
-          end if
-
-          if (t .eq. span_t(tt)) then
-            end_of_buffer = .TRUE.
-          else
-            end_of_buffer = .FALSE.
-          end if
-          !!print*, "   -- ",trim(caldate)," ",end_of_buffer,t, span_t(tt)
-
-
-          !! print*, "-----",caldate
-
-
-
-          ! print*, "Splitting Tasks to ",omp_get_max_threads(),"processors"
-
 
 !$OMP PARALLEL DO PRIVATE (h,                   &
+!$OMP&                     t,                   &
 !$OMP&                     linear_array,        &
 !$OMP&                     mask_map,            &
+!$OMP&                     t_buffer,            &
 !$OMP&                     masked_variable_map, &
+!$OMP&                     caldate,             &
+!$OMP&                     output_buffer,       &
 !$OMP&                     sort_tasmax,         &
 !$OMP&                     sort_tasmin,         &
 !$OMP&                     sort_pr              ), &
-!$OMP&             SHARED (e,                   &
-!$OMP&                     s,                   &
-!$OMP&                     t,                   &
-!$OMP&                     t_buffer,            &
-!$OMP&                     end_of_buffer,       &
-!$OMP&                     output_buffer,       &
+!$OMP&             SHARED (e, tt,                  &
+!$OMP&                     s,  n_reads,                 &
 !$OMP&                     csv_filename,        &
 !$OMP&                     ensembles,           &
 !$OMP&                     scenarios,           &
 !$OMP&                     nhuccells,           &
-!$OMP&                     caldate,             &
+!$OMP&                     start_t,             &
+!$OMP&                     span_t,              &
+!$OMP&                     t_in_tt,             &
 !$OMP&                     huc_map,             &
+!$OMP&                     caldate_hist,        &
+!$OMP&                     caldate_futr,        &
 !$OMP&                     map_pr,              &
 !$OMP&                     map_tasmax,          &
 !$OMP&                     map_tasmin,          &
@@ -664,23 +652,37 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     nmyhucs,             &
 !$OMP&                     myhucs               ), &
 !$OMP&            DEFAULT (NONE)                 , &
-!$OMP&           SCHEDULE (DYNAMIC)
+!$OMP&           SCHEDULE (STATIC)
 
-          do h = 1, nmyhucs, 1
+        do h = 1, nmyhucs, 1
 
-              ! print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+
+          t_buffer = 1
+
+          do t = 1,  span_t(tt), 1
+
+
+            t_in_tt = start_t(tt) + t - 1
+
+            if (trim(scenarios(s)) .eq. "historical") then
+              caldate = caldate_hist(t_in_tt)
+            else
+              caldate = caldate_futr(t_in_tt)
+            end if
+
+
+!print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
 
-
               nhuccells(h) = sum(mask_map)
 
               allocate ( sort_tasmax(nhuccells(h)) )
               allocate ( sort_tasmin(nhuccells(h)) )
-              allocate ( sort_pr(nhuccells(h)) )
+              allocate (     sort_pr(nhuccells(h)) )
 
 
               !!! tasmax
@@ -726,8 +728,7 @@ program LOCA_Colate_to_ClimDivs
               !!! output
 
 
-
-                write(output_buffer(t_buffer,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -735,7 +736,7 @@ program LOCA_Colate_to_ClimDivs
                             "P000",  &
                             minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
 
-                write(output_buffer(t_buffer+1,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+1),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -745,7 +746,7 @@ program LOCA_Colate_to_ClimDivs
                             quantile7(sort_tasmin, 0.25, nhuccells(h)), &
                             quantile7(sort_pr,     0.25, nhuccells(h))
 
-                write(output_buffer(t_buffer+2,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+2),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -755,7 +756,7 @@ program LOCA_Colate_to_ClimDivs
                             quantile7(sort_tasmin, 0.50, nhuccells(h)), &
                             quantile7(sort_pr,     0.50, nhuccells(h))
 
-                write(output_buffer(t_buffer+3,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')   &
+                write(output_buffer(t_buffer+3),'(A,",",I8.8,3(",",A),3(",",F8.2))')   &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -765,7 +766,7 @@ program LOCA_Colate_to_ClimDivs
                             quantile7(sort_tasmin, 0.75, nhuccells(h)), &
                             quantile7(sort_pr,     0.75, nhuccells(h))
 
-                write(output_buffer(t_buffer+4,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+4),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -773,7 +774,7 @@ program LOCA_Colate_to_ClimDivs
                             "P100",  &
                             maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
-                write(output_buffer(t_buffer+5,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+5),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -783,37 +784,35 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-                if (end_of_buffer) then
-                  open(unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
-                  write(unit_huc(h),"(A)") output_buffer(:,h)
-                  close(unit_huc(h))
-                end if
-
-
               deallocate (sort_tasmax)
               deallocate (sort_tasmin)
               deallocate (sort_pr)
 
+              t_buffer = t_buffer + 6
 
-          end do  !! HUCS loop (h)
+            end do  !!  Internal Time Loop (t)
+
+
+            open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
+            write(unit_huc(h),"(A)") output_buffer(:)
+            close(unit_huc(h))
+
+
+
+        end do  !! HUCS loop (h)
 
 !$OMP END PARALLEL DO
 
-        t_buffer = t_buffer + 6
 
+        if ((tt .eq. n_reads-1) .or. (tt .eq. n_reads)) then
 
-      end do  !!  Internal Time Loop (t)
+          deallocate (     input_map )
+          deallocate (    map_tasmax )
+          deallocate (    map_tasmin )
+          deallocate (        map_pr )
+          deallocate ( output_buffer )
 
-
-      if ((tt .eq. n_reads-1) .or. (tt .eq. n_reads)) then
-
-        deallocate (     input_map )
-        deallocate (    map_tasmax )
-        deallocate (    map_tasmin )
-        deallocate (        map_pr )
-        deallocate ( output_buffer )
-
-      end if
+        end if
 
 
     end do  !!  NetCDF Time Loop (tt)
@@ -827,12 +826,6 @@ program LOCA_Colate_to_ClimDivs
   deallocate(span_t)
   deallocate(start_t)
   deallocate(end_t)
-
-  do h = 1, nmyhucs
-
-      close(unit_huc(h))
-
-  end do
 
   print*, "== "
   print*, "== "
@@ -853,7 +846,7 @@ end do   !! Scenario Loop (s)
   deallocate(  unit_huc )
 
 
-end program LOCA_Colate_to_ClimDivs
+end program LOCA_Colate_to_HUCS
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
