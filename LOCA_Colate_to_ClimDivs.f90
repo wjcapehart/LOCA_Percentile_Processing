@@ -197,16 +197,16 @@ program LOCA_Colate_to_ClimDivs
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-  ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_variable_name, netcdf_id_map)
-     if(ncstat /= nf90_noerr) call handle_err(ncstat)
-  ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_map,  huc_map)
-     if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_variable_name, netcdf_id_map)
+         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_map,  huc_map)
+         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-  ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_values_name,   netcdf_id_hucs)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_values_name,   netcdf_id_hucs)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-  ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_hucs, hucs)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_hucs, hucs)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
   ncstat = NF90_CLOSE(netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -286,32 +286,32 @@ program LOCA_Colate_to_ClimDivs
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-  ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "time_hist", netcdf_id_time_hist)
-     if(ncstat /= nf90_noerr) call handle_err(ncstat)
-  ncstat = NF90_GET_VAR(netcdf_id_file_dates,  netcdf_id_time_hist, time_cord_hist)
-     if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "time_hist", netcdf_id_time_hist)
+         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_GET_VAR(netcdf_id_file_dates,  netcdf_id_time_hist, time_cord_hist)
+         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-  ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "time_futr", netcdf_id_time_futr)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
-  ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_time_futr, time_cord_futr)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "time_futr", netcdf_id_time_futr)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_time_futr, time_cord_futr)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-print*, "got the times"
+    print*, "got the times"
 
-  ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "calendar_date_hist", netcdf_id_cal_hist)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
-  ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_cal_hist, caldate_hist)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-
-  ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "calendar_date_futr", netcdf_id_cal_futr)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
-  ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_cal_futr, caldate_futr)
-    if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "calendar_date_hist", netcdf_id_cal_hist)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_cal_hist, caldate_hist)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-    print*, "got the calendar"
+      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "calendar_date_futr", netcdf_id_cal_futr)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_cal_futr, caldate_futr)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+
+        print*, "got the calendar"
 
   ncstat = NF90_CLOSE(netcdf_id_file_dates)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -415,17 +415,21 @@ print*, "got the times"
       ncstat = NF90_OPEN(filename_pr, NF90_NOWRITE, netcdf_id_file_pr)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_pr, trim(pr_variable_name), netcdf_id_pr)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_INQ_VARID(netcdf_id_file_pr, trim(pr_variable_name), netcdf_id_pr)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "scale_factor",  pr_scale_factor)
+          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "scale_factor",  pr_scale_factor)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "add_offset",  pr_add_offset)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "_FillValue",  pr_FillValue)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+      ncstat = NF90_CLOSE(netcdf_id_file_pr)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "add_offset",  pr_add_offset)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-      ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "_FillValue",  pr_FillValue)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
         print*, "==         PR:",trim(filename_pr)
         print*, "==          scale:",pr_scale_factor
         print*, "==         offset:",pr_add_offset
@@ -436,16 +440,19 @@ print*, "got the times"
       ncstat = NF90_OPEN(filename_tasmax, NF90_NOWRITE, netcdf_id_file_tasmax)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, trim(tasmax_variable_name), netcdf_id_tasmax)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, trim(tasmax_variable_name), netcdf_id_tasmax)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "scale_factor",  tasmax_scale_factor)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "scale_factor",  tasmax_scale_factor)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+       ncstat = NF90_CLOSE(netcdf_id_file_tasmax)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
          print*, "==     TASMAX:",trim(filename_tasmin)
@@ -458,17 +465,20 @@ print*, "got the times"
       ncstat = NF90_OPEN(filename_tasmin, NF90_NOWRITE, netcdf_id_file_tasmin)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin, trim(tasmin_variable_name), netcdf_id_tasmin)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin, trim(tasmin_variable_name), netcdf_id_tasmin)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "scale_factor",  tasmin_scale_factor)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "scale_factor",  tasmin_scale_factor)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "add_offset",  tasmin_add_offset)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "add_offset",  tasmin_add_offset)
+             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+     ncstat = NF90_CLOSE(netcdf_id_file_tasmin)
+       if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
         print*, "==     TASMIN:",trim(filename_tasmin)
         print*, "==          scale:",tasmin_scale_factor
@@ -513,36 +523,86 @@ print*, "got the times"
 
 
 
+        !!!!!!!!!!!!!!!!!!!!!!!!!
+        !
+        ! Read Precip Block
+        !
 
-        ncstat = NF90_GET_VAR(netcdf_id_file_pr,   netcdf_id_pr,  input_map,  &
-                              start = netcdf_dims_3d_start, &
-                              count = netcdf_dims_3d_count  )
+        ncstat = NF90_OPEN(filename_pr, NF90_NOWRITE, netcdf_id_file_pr)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+            ncstat = NF90_INQ_VARID(netcdf_id_file_pr, trim(pr_variable_name), netcdf_id_pr)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        map_pr = input_map * pr_scale_factor + pr_add_offset
-        where (input_map .eq. pr_FillValue) map_pr = pr_FillValue
+            ncstat = NF90_GET_VAR(netcdf_id_file_pr,   netcdf_id_pr,  input_map,  &
+                                  start = netcdf_dims_3d_start, &
+                                  count = netcdf_dims_3d_count  )
+              if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-        ncstat = NF90_GET_VAR(netcdf_id_file_tasmax,   netcdf_id_tasmax,  input_map,  &
-                              start = netcdf_dims_3d_start, &
-                              count = netcdf_dims_3d_count  )
+            map_pr = input_map * pr_scale_factor + pr_add_offset
+            where (input_map .eq. pr_FillValue) map_pr = pr_FillValue
+
+        ncstat = NF90_CLOSE(netcdf_id_file_pr)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+        !
+        !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+        !!!!!!!!!!!!!!!!!!!!!!!!!
+        !
+        ! Read Tasmax Block
+        !
+
+        ncstat = NF90_OPEN(filename_tasmax, NF90_NOWRITE, netcdf_id_file_tasmax)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        map_tasmax = input_map * tasmax_scale_factor + tasmax_add_offset
-        where (input_map .eq. tasmax_FillValue) map_tasmax = tasmax_FillValue
+            ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, trim(tasmax_variable_name), netcdf_id_tasmax)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
+            ncstat = NF90_GET_VAR(netcdf_id_file_tasmax,   netcdf_id_tasmax,  input_map,  &
+                                  start = netcdf_dims_3d_start, &
+                                  count = netcdf_dims_3d_count  )
+              if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+            map_tasmax = input_map * tasmax_scale_factor + tasmax_add_offset
+            where (input_map .eq. tasmax_FillValue) map_tasmax = tasmax_FillValue
+
+        ncstat = NF90_CLOSE(netcdf_id_file_tasmax)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+        !
+        !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
+        !!!!!!!!!!!!!!!!!!!!!!!!!
+        !
+        ! Read Tasmin Block
+        !
 
-        ncstat = NF90_GET_VAR(netcdf_id_file_tasmin,   netcdf_id_tasmin,  input_map,  &
-                              start = netcdf_dims_3d_start, &
-                              count = netcdf_dims_3d_count  )
+        ncstat = NF90_OPEN(filename_tasmin, NF90_NOWRITE, netcdf_id_file_tasmin)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
-        where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
+            ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin, trim(tasmin_variable_name), netcdf_id_tasmin)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+
+            ncstat = NF90_GET_VAR(netcdf_id_file_tasmin,   netcdf_id_tasmin,  input_map,  &
+                                  start = netcdf_dims_3d_start, &
+                                  count = netcdf_dims_3d_count  )
+              if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+            map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
+            where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
+
+        ncstat = NF90_CLOSE(netcdf_id_file_tasmin)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+        !
+        !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 
