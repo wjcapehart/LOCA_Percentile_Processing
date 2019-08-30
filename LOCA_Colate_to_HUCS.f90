@@ -509,8 +509,8 @@ program LOCA_Colate_to_ClimDivs
           !allocate (character(64+len_hucstr+LEN_TRIM(scenarios(s))+LEN_TRIM(ensembles(e))) :: output_buffer(span_t(tt)*6, nmyhucs))
 
           print*, "Text Buffer Length = ",((64+len_hucstr+LEN_TRIM(scenarios(s))+LEN_TRIM(ensembles(e))))
-          print*, " act buffer length = ",len(output_buffer(1,1))
         end if
+        print*, " act buffer length = ",len(output_buffer(1,1))
 
 
 
