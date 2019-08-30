@@ -25,7 +25,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer (kind=4) :: t_buffer
 
-  integer (kind=4) :: myhuc_low    = 0101 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 2001 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
   integer (kind=4) :: myhuc_high   = 3200 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
