@@ -636,7 +636,7 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     sort_tasmin,         &
 !$OMP&                     sort_pr              ), &
 !$OMP&             SHARED (e,                   &
-!$OMP&                     s,                   &
+!$OMP&                     s,  n_reads,                 &
 !$OMP&                     csv_filename,        &
 !$OMP&                     ensembles,           &
 !$OMP&                     scenarios,           &
