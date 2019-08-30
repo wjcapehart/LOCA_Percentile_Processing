@@ -109,8 +109,8 @@ program LOCA_Colate_to_ClimDivs
    !20                  8 1  len(ens) 1 len(scen) 1 4 9, 9, 9
   !2060-09-30 12:00:00,3201,CCSM4_r6i1p1,rcp45,P075,   32.90,    9.70,    0.00
 
-  character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
-  character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
+  character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
+  character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
