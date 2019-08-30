@@ -725,7 +725,7 @@ program LOCA_Colate_to_ClimDivs
 
               !!! output
 
-
+ 
 
                 write(output_buffer(t_buffer,h),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
