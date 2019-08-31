@@ -409,7 +409,7 @@ program LOCA_Colate_to_ClimDivs
 
     print*, "---------------------"
 
-    do e = 1, nens
+    do e = 2, nens
 
       print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s))
       print*, "== "
