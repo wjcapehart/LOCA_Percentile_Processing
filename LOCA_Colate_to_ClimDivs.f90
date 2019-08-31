@@ -402,7 +402,7 @@ program LOCA_Colate_to_ClimDivs
     end_t(1)   = span_t(1)
 
 
-    do tt = 2, n_reads
+    do tt = 1, n_reads
       start_t(tt) = start_t(tt-1) + span_t(tt-1)
       end_t(tt)   = end_t(tt-1)   + span_t(tt)
     end do
