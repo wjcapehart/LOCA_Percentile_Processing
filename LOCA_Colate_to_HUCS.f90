@@ -515,6 +515,8 @@ filename_map = "./HUC08_Missouri_River_Basin.nc"
         end if
 
         if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
+          print*, "Allocating OMP Arrays for large bulk reads ", tt, n_reads
+
           allocate (                  input_map(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
@@ -804,19 +806,27 @@ filename_map = "./HUC08_Missouri_River_Basin.nc"
 !$OMP END PARALLEL DO
 
 
-        if ((tt .eq. n_reads-1) .or. (tt .eq. n_reads)) then
+      if ((tt .eq. n_reads-1)) then
+        print*, "Dellocating OMP Arrays for large bulk Reads ", tt,n_reads-1, n_reads
 
-          deallocate (     input_map )
-          deallocate (    map_tasmax )
-          deallocate (    map_tasmin )
-          deallocate (        map_pr )
-          deallocate ( output_buffer )
+        deallocate (     input_map )
+        deallocate (    map_tasmax )
+        deallocate (    map_tasmin )
+        deallocate (        map_pr )
+        deallocate ( output_buffer )
 
-        end if
+      end if
 
 
-    end do  !!  NetCDF Time Loop (tt)
+  end do  !!  NetCDF Time Loop (tt)
 
+    print*, "Dellocating OMP Arrays for large bulk Reads Last Pull "
+
+    deallocate (     input_map )
+    deallocate (    map_tasmax )
+    deallocate (    map_tasmin )
+    deallocate (        map_pr )
+    deallocate ( output_buffer )
 
 
   end do  !! Ensemble Loop (e)

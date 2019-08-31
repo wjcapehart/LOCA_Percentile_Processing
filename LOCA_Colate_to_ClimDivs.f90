@@ -25,8 +25,8 @@ program LOCA_Colate_to_ClimDivs
 
   integer (kind=4) :: t_buffer
 
-  integer (kind=4) :: myhuc_low    = 0000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 0999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
@@ -345,7 +345,7 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  do s = 1,  nscen
+  do s = 2,  nscen
 
     print*, "==============================="
     print*, "== "
@@ -518,6 +518,8 @@ program LOCA_Colate_to_ClimDivs
         end if
 
         if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
+
+          print*, "Allocating OMP Arrays for large bulk reads ", tt, n_reads
           allocate (                  input_map(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
@@ -807,7 +809,8 @@ program LOCA_Colate_to_ClimDivs
 !$OMP END PARALLEL DO
 
 
-        if ((tt .eq. n_reads-1) .or. (tt .eq. n_reads)) then
+        if ((tt .eq. n_reads-1)) then
+          print*, "Dellocating OMP Arrays for large bulk Reads ", tt,n_reads-1, n_reads
 
           deallocate (     input_map )
           deallocate (    map_tasmax )
@@ -820,6 +823,13 @@ program LOCA_Colate_to_ClimDivs
 
     end do  !!  NetCDF Time Loop (tt)
 
+      print*, "Dellocating OMP Arrays for large bulk Reads Last Pull "
+
+      deallocate (     input_map )
+      deallocate (    map_tasmax )
+      deallocate (    map_tasmin )
+      deallocate (        map_pr )
+      deallocate ( output_buffer )
 
 
   end do  !! Ensemble Loop (e)
