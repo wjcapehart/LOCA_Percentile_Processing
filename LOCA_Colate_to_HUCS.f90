@@ -28,7 +28,7 @@ program LOCA_Colate_to_HUCS
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
   character (len=*), PARAMETER  :: filename_map      = "./HUC08_Missouri_River_Basin.nc"
   character (len=*), PARAMETER  :: file_front_root =  "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
-  character (len=*), PARAMETER  :: file_output_root = file_output_root // "huc_08_basins/NGP_LOCA_HUCS_"
+  character (len=*), PARAMETER  :: file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
 
   integer, parameter ::      npull = 60    ! 2, 3, 7, 487
 

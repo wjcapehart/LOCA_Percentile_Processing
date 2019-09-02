@@ -25,7 +25,7 @@ program LOCA_Colate_to_HUCS
   character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
   character (len=*), PARAMETER  :: filename_map      = "./HUC08_Missouri_River_Basin.nc"
   character (len=*), PARAMETER  :: file_front_root =  "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
-  character (len=*), PARAMETER  :: file_output_root = file_output_root // "climate_divisions/NGP_LOCA_nCLIMDIV_"
+  character (len=*), PARAMETER  :: file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_nCLIMDIV_"
 
   integer (kind=4) :: myhuc_low    = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
   integer (kind=4) :: myhuc_high   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
