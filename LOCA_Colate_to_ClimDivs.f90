@@ -2,7 +2,7 @@
 
 
 
-program LOCA_Colate_to_ClimDivs
+program LOCA_Colate_to_HUCS
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   use omp_lib
@@ -21,17 +21,22 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: len_hucstr =     4
   integer, parameter :: len_outbuf =   100
 
-  integer, parameter ::      npull = 60    ! 2, 3, 7, 487
-
-  integer (kind=4) :: t_buffer
+  character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
+  character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
+  character (len=*), PARAMETER  :: filename_map      = "./HUC08_Missouri_River_Basin.nc"
+  character (len=*), PARAMETER  :: file_front_root =  "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
+  character (len=*), PARAMETER  :: file_output_root = file_output_root // "climate_divisions/NGP_LOCA_nCLIMDIV_"
 
   integer (kind=4) :: myhuc_low    = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
   integer (kind=4) :: myhuc_high   = 3201 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
+  integer, parameter :: npull = 60    ! 2, 3, 7, 487
+
+  integer (kind=4) :: t_buffer
+
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
   integer (kind=4), allocatable          :: span_t(:)
-
 
   integer :: e, s, h, t, tt, ntime, huc_counter, n_reads, last_read
 
@@ -40,29 +45,22 @@ program LOCA_Colate_to_ClimDivs
   integer (kind=4), dimension(nlon,nlat) :: huc_map
   integer (kind=4), dimension(nhucs)     :: hucs
 
-  character (len=090) :: file_front_root
-  character (len=090) :: filename_map
   character (len=090) :: filename_times
   character (len=180) :: filename_pr
   character (len=180) :: filename_tasmax
   character (len=180) :: filename_tasmin
-  character (len=090) :: file_output_root
   character (len=180) :: basin_file_name
 
-
   integer (kind=4) :: t_in_tt
-
 
   integer (kind=2), allocatable :: input_map(:,:,:)
   real    (kind=4), allocatable :: map_pr(:,:,:)
   real    (kind=4), allocatable :: map_tasmax(:,:,:)
   real    (kind=4), allocatable :: map_tasmin(:,:,:)
 
-
   real (kind=4), allocatable          :: sort_pr(:)
   real (kind=4), allocatable          :: sort_tasmax(:)
   real (kind=4), allocatable          :: sort_tasmin(:)
-
 
   real (kind=4), dimension(nlat*nlon) :: linear_array
 
@@ -74,9 +72,7 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
-
   logical :: first_huc
-
 
   character (len=21), dimension(nens)   :: ensembles
 
@@ -94,9 +90,7 @@ program LOCA_Colate_to_ClimDivs
   real (kind=4) :: quantile7
 
   integer (kind=4)              :: nmyhucs
-
   integer (kind=4)              :: num_procs
-
 
   integer  (kind=4),         allocatable :: myhucs(:) ! nmyhucs
   integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
@@ -104,13 +98,6 @@ program LOCA_Colate_to_ClimDivs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
   character(len=100),        allocatable :: csv_filename(:)   ! \, nmyhucs
 
-
-    !                    8    21  10
-   !54                  lh   le  ls
-  !2060-09-30 12:00:00,3201,CCSM4_r6i1p1,rcp45,P075,   32.90,    9.70,    0.00
-
-  character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
-  character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -137,11 +124,6 @@ program LOCA_Colate_to_ClimDivs
   INTEGER :: netcdf_id_tasmax     ! netcdf time variable ID
   INTEGER :: netcdf_id_tasmin     ! netcdf pres variable ID
 
-
-
-
-
-
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_start   !  1, 1, 1 array
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_count   ! NX,NY,NT array
 
@@ -153,11 +135,6 @@ program LOCA_Colate_to_ClimDivs
   num_procs = omp_get_max_threads()
 
 
-  file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
-
-  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_nCLIMDIV_"
-  !file_output_root = "./NGP_LOCA_nCLIMDIV_"
-
   variables = (/ "pr    ", &
                  "tasmax", &
                  "tasmin"  /)
@@ -165,8 +142,6 @@ program LOCA_Colate_to_ClimDivs
   scenarios = (/ "historical", &
                  "rcp45     ", &
                  "rcp85     " /)
-
-
 
   ensembles = (/ "ACCESS1-0_r1i1p1     ", &
                  "ACCESS1-3_r1i1p1     ", &
@@ -202,7 +177,6 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  filename_map = "./USCAN_Climate_Divisions.nc"
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -345,7 +319,7 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  do s = 2,  nscen
+  do s = 1,  nscen
 
     print*, "==============================="
     print*, "== "
@@ -402,7 +376,7 @@ program LOCA_Colate_to_ClimDivs
     end_t(1)   = span_t(1)
 
 
-    do tt = 1, n_reads
+    do tt = 2, n_reads
       start_t(tt) = start_t(tt-1) + span_t(tt-1)
       end_t(tt)   = end_t(tt-1)   + span_t(tt)
     end do
@@ -412,7 +386,7 @@ program LOCA_Colate_to_ClimDivs
     do e = 1, nens
 
       print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s))
-      print*, "== "
+      print*, "==  "
 
 
 
@@ -518,8 +492,8 @@ program LOCA_Colate_to_ClimDivs
         end if
 
         if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
-
           print*, "Allocating OMP Arrays for large bulk reads ", tt, n_reads
+
           allocate (                  input_map(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
@@ -809,27 +783,27 @@ program LOCA_Colate_to_ClimDivs
 !$OMP END PARALLEL DO
 
 
-        if ((tt .eq. n_reads-1)) then
-          print*, "Dellocating OMP Arrays for large bulk Reads ", tt,n_reads-1, n_reads
+      if ((tt .eq. n_reads-1)) then
+        print*, "Dellocating OMP Arrays for large bulk Reads ", tt,n_reads-1, n_reads
 
-          deallocate (     input_map )
-          deallocate (    map_tasmax )
-          deallocate (    map_tasmin )
-          deallocate (        map_pr )
-          deallocate ( output_buffer )
+        deallocate (     input_map )
+        deallocate (    map_tasmax )
+        deallocate (    map_tasmin )
+        deallocate (        map_pr )
+        deallocate ( output_buffer )
 
-        end if
+      end if
 
 
-    end do  !!  NetCDF Time Loop (tt)
+  end do  !!  NetCDF Time Loop (tt)
 
-      print*, "Dellocating OMP Arrays for large bulk Reads Last Pull "
+    print*, "Dellocating OMP Arrays for large bulk Reads Last Pull "
 
-      deallocate (     input_map )
-      deallocate (    map_tasmax )
-      deallocate (    map_tasmin )
-      deallocate (        map_pr )
-      deallocate ( output_buffer )
+    deallocate (     input_map )
+    deallocate (    map_tasmax )
+    deallocate (    map_tasmin )
+    deallocate (        map_pr )
+    deallocate ( output_buffer )
 
 
   end do  !! Ensemble Loop (e)
@@ -859,7 +833,7 @@ end do   !! Scenario Loop (s)
   deallocate(  unit_huc )
 
 
-end program LOCA_Colate_to_ClimDivs
+end program LOCA_Colate_to_HUCS
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

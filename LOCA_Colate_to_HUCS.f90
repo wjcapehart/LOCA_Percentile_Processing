@@ -21,17 +21,22 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: len_hucstr =     8
   integer, parameter :: len_outbuf =   100
 
+  integer (kind=4) :: myhuc_low    = 10130000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10139999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+
+  character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
+  character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
+  character (len=*), PARAMETER  :: filename_map      = "./HUC08_Missouri_River_Basin.nc"
+  character (len=*), PARAMETER  :: file_front_root =  "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
+  character (len=*), PARAMETER  :: file_output_root = file_output_root // "huc_08_basins/NGP_LOCA_HUCS_"
+
   integer, parameter ::      npull = 60    ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
-  integer (kind=4) :: myhuc_low    = 10130000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10139999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-
   integer (kind=4), allocatable          :: start_t(:)
   integer (kind=4), allocatable          :: end_t(:)
   integer (kind=4), allocatable          :: span_t(:)
-
 
   integer :: e, s, h, t, tt, ntime, huc_counter, n_reads, last_read
 
@@ -40,29 +45,22 @@ program LOCA_Colate_to_HUCS
   integer (kind=4), dimension(nlon,nlat) :: huc_map
   integer (kind=4), dimension(nhucs)     :: hucs
 
-  character (len=090) :: file_front_root
-  character (len=090) :: filename_map
   character (len=090) :: filename_times
   character (len=180) :: filename_pr
   character (len=180) :: filename_tasmax
   character (len=180) :: filename_tasmin
-  character (len=090) :: file_output_root
   character (len=180) :: basin_file_name
 
-
   integer (kind=4) :: t_in_tt
-
 
   integer (kind=2), allocatable :: input_map(:,:,:)
   real    (kind=4), allocatable :: map_pr(:,:,:)
   real    (kind=4), allocatable :: map_tasmax(:,:,:)
   real    (kind=4), allocatable :: map_tasmin(:,:,:)
 
-
   real (kind=4), allocatable          :: sort_pr(:)
   real (kind=4), allocatable          :: sort_tasmax(:)
   real (kind=4), allocatable          :: sort_tasmin(:)
-
 
   real (kind=4), dimension(nlat*nlon) :: linear_array
 
@@ -74,12 +72,9 @@ program LOCA_Colate_to_HUCS
 
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
-
   logical :: first_huc
 
-
   character (len=21), dimension(nens)   :: ensembles
-
   character (len=06), dimension(nvars)  :: variables
   character (len=10), dimension(nscen)  :: scenarios
 
@@ -94,7 +89,6 @@ program LOCA_Colate_to_HUCS
   real (kind=4) :: quantile7
 
   integer (kind=4)              :: nmyhucs
-
   integer (kind=4)              :: num_procs
 
 
@@ -104,13 +98,6 @@ program LOCA_Colate_to_HUCS
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
   character(len=100),        allocatable :: csv_filename(:)   ! \, nmyhucs
 
-
-    !                    8    21  10
-   !54                  lh   le  ls
-  !2060-09-30 12:00:00,3201,CCSM4_r6i1p1,rcp45,P075,   32.90,    9.70,    0.00
-
-  character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
-  character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -137,11 +124,6 @@ program LOCA_Colate_to_HUCS
   INTEGER :: netcdf_id_tasmax     ! netcdf time variable ID
   INTEGER :: netcdf_id_tasmin     ! netcdf pres variable ID
 
-
-
-
-
-
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_start   !  1, 1, 1 array
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_count   ! NX,NY,NT array
 
@@ -153,9 +135,6 @@ program LOCA_Colate_to_HUCS
   num_procs = omp_get_max_threads()
 
 
-  file_front_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
-
-  file_output_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
 
   variables = (/ "pr    ", &
                  "tasmax", &
@@ -199,7 +178,6 @@ program LOCA_Colate_to_HUCS
 
 
 
-filename_map = "./HUC08_Missouri_River_Basin.nc"
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
