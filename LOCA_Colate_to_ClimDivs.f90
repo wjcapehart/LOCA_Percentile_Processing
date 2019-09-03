@@ -1,7 +1,3 @@
-
-
-
-
 program LOCA_Colate_to_ClimDivs
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
