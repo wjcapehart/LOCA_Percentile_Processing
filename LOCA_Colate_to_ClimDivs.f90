@@ -317,7 +317,7 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  do s = 2,  2; nscen
+  do s = 2,  2  !  nscen
 
     print*, "==============================="
     print*, "== "
