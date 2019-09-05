@@ -11,7 +11,7 @@ prefix    = "NGP_LOCA_nCLIMDIV_"
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
                       list.files(path    = directory,
-                                 pattern = ".csv"))
+                                 pattern = "rcp85.csv"))
 
 load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"))
 
@@ -51,6 +51,8 @@ Divisions = str_sub(string = csv_files,
                     start  = str_length(string = prefix) + 1,
                     end    = str_length(string = prefix) + 4)
 
+division=Divisions[1]
+
 for (division in Divisions)
 {
 
@@ -58,7 +60,7 @@ for (division in Divisions)
   filename = str_c(directory,
                    prefix,
                    division,
-                   "_rcp85"
+                   "_rcp85",
                    sep = "")
 
   shell_command = str_c("tail -n 1  ",
@@ -74,7 +76,6 @@ for (division in Divisions)
   if (str_detect(a,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
       str_detect(a,"2099-12-31" )) {
 
-    print(csv_file)
 
 
 
@@ -82,22 +83,26 @@ for (division in Divisions)
                          prefix,
                          division,
                          "_",
-                         "historical"
+                         "historical",
                          sep = "")
 
         loca_daily = read_csv(str_c(filename,".csv",sep=""))
-
+        loca_daily[nrow(loca_daily), ]
+        
         filename = str_c(directory,
                          prefix,
                          division,
                          "_",
-                         "rcp45"
+                         "rcp45",
                          sep = "")
 
         loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
 
         loca_daily = rbind(loca_daily,
                            loca_dailyrcp)
+        
+        loca_dailyrcp[nrow(loca_dailyrcp), ]
+        
 
         remove(loca_dailyrcp)
 
@@ -106,11 +111,12 @@ for (division in Divisions)
                           prefix,
                           division,
                           "_",
-                          "rcp85"
+                          "rcp85",
                           sep = "")
 
          loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
-
+         loca_dailyrcp[nrow(loca_dailyrcp), ]
+         
          loca_daily = rbind(loca_daily,
                             loca_dailyrcp)
 
@@ -166,7 +172,7 @@ for (division in Divisions)
 
         filename = str_c(directory,
                          prefix,
-                         division
+                         division,
                          sep = "")
 
         save(loca_daily, file = str_c(filename,
