@@ -240,7 +240,7 @@ program LOCA_Colate_to_HUCS
 
       mask_map = huc_map
 
-      where( mask_map .eq. hucs(h) )
+      where( mask_map .eq. hucs(h) ) 
         mask_map = 1
       elsewhere
         mask_map = 0

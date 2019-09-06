@@ -56,6 +56,38 @@ division=Divisions[1]
 for (division in Divisions)
 {
 
+  filename = str_c(directory,
+                   prefix,
+                   division,
+                   "_historical",
+                   sep = "")
+
+  shell_command = str_c("tail -n 1  ",
+                        filename,
+                        ".csv",
+                        sep = "")
+
+  a = system(shell_command, intern = TRUE)
+
+
+  print(a)
+
+  filename = str_c(directory,
+                   prefix,
+                   division,
+                   "_rcp45",
+                   sep = "")
+
+  shell_command = str_c("tail -n 1  ",
+                        filename,
+                        ".csv",
+                        sep = "")
+
+  a = system(shell_command, intern = TRUE)
+
+
+  print(a)
+
 
   filename = str_c(directory,
                    prefix,
@@ -88,7 +120,7 @@ for (division in Divisions)
 
         loca_daily = read_csv(str_c(filename,".csv",sep=""))
         loca_daily[nrow(loca_daily), ]
-        
+
         filename = str_c(directory,
                          prefix,
                          division,
@@ -100,9 +132,9 @@ for (division in Divisions)
 
         loca_daily = rbind(loca_daily,
                            loca_dailyrcp)
-        
+
         loca_dailyrcp[nrow(loca_dailyrcp), ]
-        
+
 
         remove(loca_dailyrcp)
 
@@ -116,7 +148,7 @@ for (division in Divisions)
 
          loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
          loca_dailyrcp[nrow(loca_dailyrcp), ]
-         
+
          loca_daily = rbind(loca_daily,
                             loca_dailyrcp)
 
