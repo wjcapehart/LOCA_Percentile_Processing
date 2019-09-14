@@ -319,7 +319,7 @@ program LOCA_Colate_to_HUCS
 
 
 
-  do s = 3,  nscen
+  do s = 1,  nscen
 
     print*, "==============================="
     print*, "== "
