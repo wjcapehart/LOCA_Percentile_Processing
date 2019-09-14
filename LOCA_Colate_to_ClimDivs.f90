@@ -496,8 +496,8 @@ program LOCA_Colate_to_ClimDivs
 
         if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
           print*, "=="
-          print*, "Allocating OMP Arrays for large bulk reads in tt loop ", // &
-                   " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) "
+          print*, "Allocating OMP Arrays for large bulk reads in tt loop ", &
+                   " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", &
                    tt, n_reads
           print*, "=="
 
@@ -794,8 +794,8 @@ program LOCA_Colate_to_ClimDivs
 
       if ((tt .eq. n_reads-1)) then
         print*, "=="
-        print*, "== Deallocating OMP Arrays for large bulk Reads inside tt loop " // &
-              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", //  &
+        print*, "== De-allocating OMP Arrays for large bulk Reads inside tt loop ",  &
+              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",   &
               tt,n_reads-1, n_reads
         print*, "=="
 
@@ -811,7 +811,7 @@ program LOCA_Colate_to_ClimDivs
   end do  !!  NetCDF Time Loop (tt)
 
   print*, "=="
-  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble " // &
+  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble ",  &
         "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
   print*, "=="
 

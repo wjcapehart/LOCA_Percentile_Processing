@@ -498,8 +498,8 @@ program LOCA_Colate_to_HUCS
 
         if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
           print*, "=="
-          print*, "Allocating OMP Arrays for large bulk reads in tt loop ", // &
-                   " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) "
+          print*, "Allocating OMP Arrays for large bulk reads in tt loop ",  &
+                   " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", &
                    tt, n_reads
           print*, "=="
           allocate (                  input_map(nlon, nlat, span_t(tt)) )
@@ -791,8 +791,8 @@ program LOCA_Colate_to_HUCS
 
       if ((tt .eq. n_reads-1)) then
         print*, "=="
-        print*, "== De-Allocating OMP Arrays for large bulk Reads inside tt loop " // &
-              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", //  &
+        print*, "== De-Allocating OMP Arrays for large bulk Reads inside tt loop ", &
+              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",  &
               tt,n_reads-1, n_reads
         print*, "=="
 
@@ -808,7 +808,7 @@ program LOCA_Colate_to_HUCS
   end do  !!  NetCDF Time Loop (tt)
 
   print*, "=="
-  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble " // &
+  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble ", &
         "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
   print*, "=="
 
