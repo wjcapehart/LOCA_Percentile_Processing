@@ -219,6 +219,8 @@ program LOCA_Colate_to_HUCS
 
   ! allocate our hucs to be USCAN_Climate_Divisions
 
+  print*, "Allocating myhucs, nhuccells, unit_huc"
+
   allocate(    myhucs( nmyhucs ) )
   allocate( nhuccells( nmyhucs ) )
   allocate(  unit_huc( nmyhucs ) )
@@ -240,7 +242,7 @@ program LOCA_Colate_to_HUCS
 
       mask_map = huc_map
 
-      where( mask_map .eq. hucs(h) ) 
+      where( mask_map .eq. hucs(h) )
         mask_map = 1
       elsewhere
         mask_map = 0
@@ -317,7 +319,7 @@ program LOCA_Colate_to_HUCS
 
 
 
-  do s = 2,  nscen
+  do s = 3,  nscen
 
     print*, "==============================="
     print*, "== "
@@ -338,6 +340,9 @@ program LOCA_Colate_to_HUCS
     print*, "== Normal Length of Time Record Pull ", npull
     print*, "==                   Number of Pulls ", n_reads
     print*, "==  Length of Final Time Record Pull ", last_read
+    print*, "== "
+
+    print*, "== Allocating csv_filename"
     print*, "== "
 
     allocate(character(100) :: csv_filename(nmyhucs))
@@ -361,6 +366,8 @@ program LOCA_Colate_to_HUCS
     print*, "== "
 
 
+    print*, "== Allocating span_t, start_t, end_t"
+    print*, "== "
 
     allocate( span_t(n_reads) )
     allocate(start_t(n_reads) )
@@ -490,14 +497,16 @@ program LOCA_Colate_to_HUCS
         end if
 
         if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
-          print*, "Allocating OMP Arrays for large bulk reads ", tt, n_reads
-
+          print*, "=="
+          print*, "Allocating OMP Arrays for large bulk reads in tt loop ", // &
+                   " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) "
+                   tt, n_reads
+          print*, "=="
           allocate (                  input_map(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
           allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
           allocate (                  map_pr(nlon, nlat, span_t(tt)) )
           allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
-
         end if
 
 
@@ -509,9 +518,6 @@ program LOCA_Colate_to_HUCS
 
         netcdf_dims_3d_start   = (/    1,    1, start_t(tt) /)
         netcdf_dims_3d_count   = (/ nlon, nlat,  span_t(tt) /)
-
-
-
 
         !!!!!!!!!!!!!!!!!!!!!!!!!
         !
@@ -657,6 +663,7 @@ program LOCA_Colate_to_HUCS
 
               nhuccells(h) = sum(mask_map)
 
+              !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
               allocate ( sort_tasmax(nhuccells(h)) )
               allocate ( sort_tasmin(nhuccells(h)) )
               allocate (     sort_pr(nhuccells(h)) )
@@ -760,6 +767,7 @@ program LOCA_Colate_to_HUCS
                             (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
 
 
+              !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
 
               deallocate (sort_tasmax)
               deallocate (sort_tasmin)
@@ -782,7 +790,11 @@ program LOCA_Colate_to_HUCS
 
 
       if ((tt .eq. n_reads-1)) then
-        print*, "Dellocating OMP Arrays for large bulk Reads ", tt,n_reads-1, n_reads
+        print*, "=="
+        print*, "== De-Allocating OMP Arrays for large bulk Reads inside tt loop " // &
+              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", //  &
+              tt,n_reads-1, n_reads
+        print*, "=="
 
         deallocate (     input_map )
         deallocate (    map_tasmax )
@@ -795,7 +807,10 @@ program LOCA_Colate_to_HUCS
 
   end do  !!  NetCDF Time Loop (tt)
 
-    print*, "Dellocating OMP Arrays for large bulk Reads Last Pull "
+  print*, "=="
+  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble " // &
+        "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
+  print*, "=="
 
     deallocate (     input_map )
     deallocate (    map_tasmax )
@@ -807,10 +822,16 @@ program LOCA_Colate_to_HUCS
   end do  !! Ensemble Loop (e)
 
 
+      print*, "== "
+      print*, "== De-Allocating arrays at the end of scenario (span_t,start_t,end_t)"
+      print*, "== "
 
-  deallocate(span_t)
-  deallocate(start_t)
-  deallocate(end_t)
+
+      deallocate(span_t)
+      deallocate(start_t)
+      deallocate(end_t)
+
+
 
   print*, "== "
   print*, "== "
@@ -825,10 +846,14 @@ end do   !! Scenario Loop (s)
 
   !!!!!!!!!!!!!!!!!!
 
+  print*, "Deallocating arrays at the end of program (my hucs,nhuccells,unit_huc,csv_filename)"
 
   deallocate(    myhucs )
   deallocate( nhuccells )
   deallocate(  unit_huc )
+  deallocate(csv_filename)
+
+  print*, "We're Out of Here Like Vladimir"
 
 
 end program LOCA_Colate_to_HUCS
