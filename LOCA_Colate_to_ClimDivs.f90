@@ -319,7 +319,7 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  do s = 1, nscen
+  do s = 2, nscen
 
     print*, "==============================="
     print*, "== "
@@ -342,9 +342,8 @@ program LOCA_Colate_to_ClimDivs
     print*, "==  Length of Final Time Record Pull ", last_read
     print*, "== "
     print*, "== Allocating csv_filename"
-    print*, "== "
-
     allocate(character(100) :: csv_filename(nmyhucs))
+    print*, "== "
 
 
     do h = 1, nmyhucs
@@ -363,7 +362,6 @@ program LOCA_Colate_to_ClimDivs
 
     end do
     print*, "== "
-
     print*, "== Allocating span_t, start_t, end_t"
     print*, "== "
 
