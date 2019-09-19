@@ -17,8 +17,8 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: len_hucstr =     8
   integer, parameter :: len_outbuf =   100
 
-  integer (kind=4) :: myhuc_low    = 10040000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10049999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10020000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10029999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
@@ -319,7 +319,7 @@ program LOCA_Colate_to_HUCS
 
 
 
-  do s = 1,  nscen
+  do s = 2,  nscen
 
     print*, "==============================="
     print*, "== "
@@ -830,6 +830,7 @@ program LOCA_Colate_to_HUCS
       deallocate(span_t)
       deallocate(start_t)
       deallocate(end_t)
+      deallocate(csv_filename)
 
 
 
@@ -851,7 +852,6 @@ end do   !! Scenario Loop (s)
   deallocate(    myhucs )
   deallocate( nhuccells )
   deallocate(  unit_huc )
-  deallocate(csv_filename)
 
   print*, "We're Out of Here Like Vladimir"
 

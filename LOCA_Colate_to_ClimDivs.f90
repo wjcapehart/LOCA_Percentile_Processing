@@ -829,6 +829,8 @@ program LOCA_Colate_to_ClimDivs
   deallocate(span_t)
   deallocate(start_t)
   deallocate(end_t)
+  deallocate(csv_filename)
+
 
   print*, "== "
   print*, "== "
@@ -848,7 +850,6 @@ print*, "De-Allocating arrays at the end of program (my hucs,nhuccells,unit_huc,
 deallocate(    myhucs )
 deallocate( nhuccells )
 deallocate(  unit_huc )
-deallocate(csv_filename)
 
 print*, "We're Out of Here Like Vladimir"
 
