@@ -56,57 +56,61 @@ division=Divisions[1]
 for (division in Divisions)
 {
 
-  filename = str_c(directory,
-                   prefix,
-                   division,
-                   "_historical",
-                   sep = "")
+filename = str_c(directory,
+                 prefix,
+                 division,
+                 "_historical",
+                 sep = "")
 
-  shell_command = str_c("tail -n 1  ",
-                        filename,
-                        ".csv",
-                        sep = "")
+shell_command = str_c("tail -n 1  ",
+                      filename,
+                      ".csv",
+                      sep = "")
 
-  a = system(shell_command, intern = TRUE)
-
-
-  print(a)
-
-  filename = str_c(directory,
-                   prefix,
-                   division,
-                   "_rcp45",
-                   sep = "")
-
-  shell_command = str_c("tail -n 1  ",
-                        filename,
-                        ".csv",
-                        sep = "")
-
-  a = system(shell_command, intern = TRUE)
+ah = system(shell_command, intern = TRUE)
 
 
-  print(a)
+print(ah)
+
+filename = str_c(directory,
+                 prefix,
+                 division,
+                 "_rcp45",
+                 sep = "")
+
+shell_command = str_c("tail -n 1  ",
+                      filename,
+                      ".csv",
+                      sep = "")
+
+a4 = system(shell_command, intern = TRUE)
 
 
-  filename = str_c(directory,
-                   prefix,
-                   division,
-                   "_rcp85",
-                   sep = "")
-
-  shell_command = str_c("tail -n 1  ",
-                        filename,
-                        ".csv",
-                        sep = "")
-
-  a = system(shell_command, intern = TRUE)
+print(a4)
 
 
-  print(a)
+filename = str_c(directory,
+                 prefix,
+                 division,
+                 "_rcp85",
+                 sep = "")
 
-  if (str_detect(a,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
-      str_detect(a,"2099-12-31" )) {
+shell_command = str_c("tail -n 1  ",
+                      filename,
+                      ".csv",
+                      sep = "")
+
+a8 = system(shell_command, intern = TRUE)
+
+
+print(a8)
+
+if (str_detect(ah,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
+    str_detect(a4,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
+    str_detect(a8,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
+    str_detect(ah,"2005-12-31" ) &
+    str_detect(a4,"2099-12-31" ) &
+    str_detect(a8,"2099-12-31" )) { {
 
 
 

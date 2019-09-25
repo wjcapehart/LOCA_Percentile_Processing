@@ -11,12 +11,12 @@ prefix    = "NGP_LOCA_HUCS_"
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
                       list.files(path    = directory,
-                                 pattern = ".csv"))
+                                 pattern = "rcp85.csv"))
 
-load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"))
+load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
 
 
-Divisions_factor = Climate_Zones_Name_LUT$Full_Zone_Code
+Divisions_factor = factor(HUC08_MRB_LUT$HUC08_Code_ID)
 
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
@@ -49,16 +49,17 @@ Ensembles = c("ACCESS1-0_r1i1p1",
 
 Divisions = str_sub(string = csv_files,
                     start  = str_length(string = prefix) + 1,
-                    end    = str_length(string = prefix) + 4)
+                    end    = str_length(string = prefix) + 8)
+
+division=Divisions[1]
 
 for (division in Divisions)
 {
 
-
   filename = str_c(directory,
                    prefix,
                    division,
-                   "_rcp85"
+                   "_historical",
                    sep = "")
 
   shell_command = str_c("tail -n 1  ",
@@ -66,15 +67,51 @@ for (division in Divisions)
                         ".csv",
                         sep = "")
 
-  a = system(shell_command, intern = TRUE)
+  ah = system(shell_command, intern = TRUE)
 
 
-  print(a)
+  print(ah)
 
-  if (str_detect(a,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
-      str_detect(a,"2099-12-31" )) {
+  filename = str_c(directory,
+                   prefix,
+                   division,
+                   "_rcp45",
+                   sep = "")
 
-    print(csv_file)
+  shell_command = str_c("tail -n 1  ",
+                        filename,
+                        ".csv",
+                        sep = "")
+
+  a4 = system(shell_command, intern = TRUE)
+
+
+  print(a4)
+
+
+  filename = str_c(directory,
+                   prefix,
+                   division,
+                   "_rcp85",
+                   sep = "")
+
+  shell_command = str_c("tail -n 1  ",
+                        filename,
+                        ".csv",
+                        sep = "")
+
+  a8 = system(shell_command, intern = TRUE)
+
+
+  print(a8)
+
+  if (str_detect(ah,"bcc-csm1-1-m_r1i1p1,historical,MEAN") &
+      str_detect(a4,"bcc-csm1-1-m_r1i1p1,rcp45,MEAN") &
+      str_detect(a8,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
+      str_detect(ah,"2005-12-31" ) &
+      str_detect(a4,"2099-12-31" ) &
+      str_detect(a8,"2099-12-31" )) {
+
 
 
 
@@ -82,22 +119,26 @@ for (division in Divisions)
                          prefix,
                          division,
                          "_",
-                         "historical"
+                         "historical",
                          sep = "")
 
         loca_daily = read_csv(str_c(filename,".csv",sep=""))
+        loca_daily[nrow(loca_daily), ]
 
         filename = str_c(directory,
                          prefix,
                          division,
                          "_",
-                         "rcp45"
+                         "rcp45",
                          sep = "")
 
         loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
 
         loca_daily = rbind(loca_daily,
                            loca_dailyrcp)
+
+        loca_dailyrcp[nrow(loca_dailyrcp), ]
+
 
         remove(loca_dailyrcp)
 
@@ -106,10 +147,11 @@ for (division in Divisions)
                           prefix,
                           division,
                           "_",
-                          "rcp85"
+                          "rcp85",
                           sep = "")
 
          loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
+         loca_dailyrcp[nrow(loca_dailyrcp), ]
 
          loca_daily = rbind(loca_daily,
                             loca_dailyrcp)
@@ -166,7 +208,7 @@ for (division in Divisions)
 
         filename = str_c(directory,
                          prefix,
-                         division
+                         division,
                          sep = "")
 
         save(loca_daily, file = str_c(filename,
@@ -228,7 +270,7 @@ for (division in Divisions)
 }
 
 rData_files = intersect(list.files(path    = directory,
-                                   pattern = "NGP_LOCA_nCLIMDIV_"),
+                                   pattern = "NGP_LOCA_HUC_"),
                         list.files(path    = directory,
                                    pattern = "_Yearly.RData"))
 
@@ -237,7 +279,7 @@ Completed_Divisions = str_sub(string = rData_files,
                               end    = str_length(string = prefix) + 4)
 
 save(Completed_Divisions, file = str_c(directory,
-                              "Completed_Divisions",
+                              "Completed_HUCS",
                               ".RData",
                               sep=""))
 
