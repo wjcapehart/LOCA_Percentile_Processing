@@ -17,6 +17,9 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: len_hucstr =     8
   integer, parameter :: len_outbuf =   100
 
+  integer, parameter :: start_scen = 2
+  integer, parameter :: end_scen   = 3
+
   integer (kind=4) :: myhuc_low    = 10160000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
   integer (kind=4) :: myhuc_high   = 10169999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
@@ -319,7 +322,7 @@ program LOCA_Colate_to_HUCS
 
 
 
-  do s =   2,  nscen
+  do s =   start_scen,  end_scen
 
     print*, "==============================="
     print*, "== "
