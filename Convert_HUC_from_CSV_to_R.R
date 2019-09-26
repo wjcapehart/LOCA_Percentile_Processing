@@ -7,6 +7,7 @@ library(lubridate)
 directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
 
 prefix    = "NGP_LOCA_HUCS_"
+outpref   = "NGP_LOCA_HUC08_"
 
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
@@ -207,7 +208,7 @@ for (division in Divisions)
         }
 
         filename = str_c(directory,
-                         prefix,
+                         outpref,
                          division,
                          sep = "")
 
@@ -270,17 +271,17 @@ for (division in Divisions)
 }
 
 rData_files = intersect(list.files(path    = directory,
-                                   pattern = "NGP_LOCA_HUC_"),
+                                   pattern = "NGP_LOCA_HUC08_"),
                         list.files(path    = directory,
                                    pattern = "_Yearly.RData"))
 
-Completed_Divisions = str_sub(string = rData_files,
-                              start  = str_length(string = prefix) + 1,
-                              end    = str_length(string = prefix) + 4)
+Completed_HUCS = str_sub(string = rData_files,
+                              start  = str_length(string = outpref) + 1,
+                              end    = str_length(string = outpref) + 8)
 
-save(Completed_Divisions, file = str_c(directory,
+save(Completed_HUCS,   file = str_c(directory,
                               "Completed_HUCS",
                               ".RData",
                               sep=""))
 
-print(Completed_Divisions)
+print(Completed_HUCS)
