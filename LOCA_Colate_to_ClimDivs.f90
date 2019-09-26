@@ -24,9 +24,11 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: file_output_root  = &
                     "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_nCLIMDIV_"
 
+  integer, parameter :: start_scen = 2
+  integer, parameter :: end_scen   = 2
 
-  integer (kind=4) :: myhuc_low    = 2001 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 2999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 3901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 3999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer, parameter :: npull = 90    ! 2, 3, 7, 487
 
@@ -319,7 +321,7 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-  do s = 2,nscen ! 1, nscen
+  do s = start_scen, end_scen ! 1, nscen
 
     print*, "==============================="
     print*, "== "
