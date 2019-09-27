@@ -121,7 +121,7 @@ for (huc_zone_lut in Completed_HUCS)
 
         for (ensemble in Ensembles)
         {
-          print(str_c(scenario, " ", ensemble))
+          print(str_c(huc_zone_lut, " ",scenario, " ", ensemble))
 
           loca_scen_ens = loca_period %>%
                              filter((Ensemble == ensemble),
