@@ -58,18 +58,18 @@ Ensembles_factor = factor(Ensembles)
 for (filename in csv_files)
 {
   command = str_c("gunzip -v ",
-                  filename, 
+                  filename,
                   ".csv.gz",
                   sep = "")
-  
+
   system(command)
-        
-        loca_daily = read_csv(str_c(filename, 
+
+        loca_daily = read_csv(str_c(filename,
                                     ".csv",
                                     sep=""))
-        
-        
-        
+
+
+
         print(loca_daily$Division[1])
         if (is.numeric(loca_daily$Division[1]))
         {
@@ -79,20 +79,20 @@ for (filename in csv_files)
           mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
                                       Scenario == "rcp45"      ~ "RCP 4.5",
                                       Scenario == "rcp85"      ~ "RCP 8.5"))
-        
+
         loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
-        
+
         loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
                                        levels = c("Historical",
                                                   "RCP 4.5",
                                                   "RCP 8.5"))
-        
+
         loca_daily$Division   = factor(x    = loca_daily$Division,
                                        levels = Divisions_factor)
-        
+
         loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
                                        levels = Ensembles)
-        
+
         loca_daily$Percentile = factor(x      = loca_daily$Percentile,
                                        levels = c("P000",
                                                   "P025",
@@ -100,28 +100,29 @@ for (filename in csv_files)
                                                   "P075",
                                                   "P100",
                                                   "MEAN"))
-        
+
         last_record = loca_daily[nrow(loca_daily), ]
         print(last_record)
-        
+
         save(loca_daily,
-             file = str_c(filename, 
+             file = str_c(filename,
                           ".RData",
                           sep=""))
-        
-    
-  
-  
-  
+
+
+
+
+
   command = str_c("gzip -9fv ",
                   filename,
                    ".csv",
                   sep = "")
-  
+
   system(command)
-  
-  
+
+
   print("")
 }
 
 
+print("We're Outahere like Vladimir")
