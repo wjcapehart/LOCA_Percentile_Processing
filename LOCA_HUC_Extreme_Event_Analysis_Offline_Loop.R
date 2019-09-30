@@ -212,7 +212,7 @@ for (huc_zone_lut in Completed_HUCS)
                          sep = "")
   print(loca_filename)
 
-  save(return_events, file=loca_filename)
+  save(Periods, return_events, file=loca_filename)
   remove(return_events)
 
   print("---------")
