@@ -7,6 +7,7 @@ library(lubridate)
 directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/"
 
 prefix    = "NGP_LOCA_nCLIMDIV_"
+outpref   = "NGP_LOCA_nCLIMDIV_"
 
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
@@ -55,218 +56,145 @@ division=Divisions[1]
 
 for (division in Divisions)
 {
+  {
+    
+    
+    
+    
+    filename = str_c(directory,
+                     prefix,
+                     division,
+                     "_",
+                     "historical",
+                     sep = "")
+    
+    load(str_c(filename,".RData",sep=""))
+    loca_hist = loca_daily
+    loca_hist[nrow(loca_hist), ]
+    
+    filename = str_c(directory,
+                     prefix,
+                     division,
+                     "_",
+                     "rcp45",
+                     sep = "")
+    
+    load(str_c(filename,".RData",sep=""))
+    loca_45 = loca_daily
+    loca_45[nrow(loca_45), ]
+    
+    filename = str_c(directory,
+                     prefix,
+                     division,
+                     "_",
+                     "rcp45",
+                     sep = "")
+    
+    load(str_c(filename,".RData",sep=""))
+    loca_85 = loca_daily
+    loca_85[nrow(loca_85), ]        
+    
+    loca_daily = rbind(loca_hist,  loca_45)
+    loca_daily = rbind(loca_daily, loca_85)
+    
+    remove(loca_hist)
+    remove(loca_45)
+    remove(loca_85)
+    
+    
+    print(loca_daily$Division[1])
+    if (is.numeric(loca_daily$Division[1]))
+    {
+      loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
+    }
+    loca_daily = loca_daily %>%
+      mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
+                                  Scenario == "rcp45"      ~ "RCP 4.5",
+                                  Scenario == "rcp85"      ~ "RCP 8.5"))
+    
+    loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
+    
+    loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
+                                   levels = c("Historical",
+                                              "RCP 4.5",
+                                              "RCP 8.5"))
+    
+    loca_daily$Division   = factor(x    = loca_daily$Division,
+                                   levels = Divisions_factor)
+    
+    loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
+                                   levels = Ensembles)
+    
+    loca_daily$Percentile = factor(x      = loca_daily$Percentile,
+                                   levels = c("P000",
+                                              "P025",
+                                              "P050",
+                                              "P075",
+                                              "P100",
+                                              "MEAN"))
+    
+    last_record = loca_daily[nrow(loca_daily), ]
+    last_record
 
-filename = str_c(directory,
-                 prefix,
-                 division,
-                 "_historical",
-                 sep = "")
-
-shell_command = str_c("tail -n 1  ",
-                      filename,
-                      ".csv",
-                      sep = "")
-
-ah = system(shell_command, intern = TRUE)
-
-
-print(ah)
-
-filename = str_c(directory,
-                 prefix,
-                 division,
-                 "_rcp45",
-                 sep = "")
-
-shell_command = str_c("tail -n 1  ",
-                      filename,
-                      ".csv",
-                      sep = "")
-
-a4 = system(shell_command, intern = TRUE)
-
-
-print(a4)
-
-
-filename = str_c(directory,
-                 prefix,
-                 division,
-                 "_rcp85",
-                 sep = "")
-
-shell_command = str_c("tail -n 1  ",
-                      filename,
-                      ".csv",
-                      sep = "")
-
-a8 = system(shell_command, intern = TRUE)
-
-
-print(a8)
-
-if (str_detect(ah,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
-    str_detect(a4,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
-    str_detect(a8,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
-    str_detect(ah,"2005-12-31" ) &
-    str_detect(a4,"2099-12-31" ) &
-    str_detect(a8,"2099-12-31" )) { {
-
-
-
-
-        filename = str_c(directory,
-                         prefix,
-                         division,
-                         "_",
-                         "historical",
-                         sep = "")
-
-        loca_daily = read_csv(str_c(filename,".csv",sep=""))
-        loca_daily[nrow(loca_daily), ]
-
-        filename = str_c(directory,
-                         prefix,
-                         division,
-                         "_",
-                         "rcp45",
-                         sep = "")
-
-        loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
-
-        loca_daily = rbind(loca_daily,
-                           loca_dailyrcp)
-
-        loca_dailyrcp[nrow(loca_dailyrcp), ]
-
-
-        remove(loca_dailyrcp)
-
-
-         filename = str_c(directory,
-                          prefix,
-                          division,
-                          "_",
-                          "rcp85",
-                          sep = "")
-
-         loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
-         loca_dailyrcp[nrow(loca_dailyrcp), ]
-
-         loca_daily = rbind(loca_daily,
-                            loca_dailyrcp)
-
-         remove(loca_dailyrcp)
-
-         print(loca_daily$Division[1])
-        if (is.numeric(loca_daily$Division[1]))
-        {
-             loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
-        }
-        loca_daily = loca_daily %>%
-            mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
-                                        Scenario == "rcp45"      ~ "RCP 4.5",
-                                        Scenario == "rcp85"      ~ "RCP 8.5"))
-
-        loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
-
-        loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
-                                       levels = c("Historical",
-                                                  "RCP 4.5",
-                                                  "RCP 8.5"))
-
-        loca_daily$Division   = factor(x    = loca_daily$Division,
-                                       levels = Divisions_factor)
-
-        loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
-                                       levels = Ensembles)
-
-        loca_daily$Percentile = factor(x      = loca_daily$Percentile,
-                                       levels = c("P000",
-                                                  "P025",
-                                                  "P050",
-                                                  "P075",
-                                                  "P100",
-                                                  "MEAN"))
-
-        last_record = loca_daily[nrow(loca_daily), ]
-
-        if ( ((last_record$Scenario == "Historical") & (last_record$Time != "2005-12-31")) |
-             ((last_record$Scenario != "Historical") & (last_record$Time != "2099-12-31")) )
-        {
-            print(str_c("  truncating",
-                        last_record$Ensemble,
-                        last_record$Scenario,
-                        last_record$Time,
-                        sep = " "))
-
-            loca_daily = loca_daily %>%
-                filter( ! ((loca_daily$Scenario   == last_record$Scenario)   &
-                           (loca_daily$Ensemble   == last_record$Ensemble)   &
-                           (year(loca_daily$Time) == year(last_record$Time)) ) )
-        }
-
-        filename = str_c(directory,
-                         prefix,
-                         division,
-                         sep = "")
-
-        save(loca_daily, file = str_c(filename,
-                                      ".RData",
-                                      sep=""))
-
-
-
-
-
-          loca_monthly = loca_daily %>%
-            mutate(Time  = as.Date(str_c(year(Time),
-                                         month(Time),
-                                         "15",
-                                         sep="-"),
-                                   tryFormats = c("%Y-%m-%d")),
-                   tasavg = (tasmin + tasmax)/2)   %>%
-            group_by(Time,
-                     Division,
-                     Ensemble,
-                     Scenario,
-                     Percentile) %>%
-            summarize(tasmax = mean(tasmax),
-                      tasavg = mean(tasavg),
-                      tasmin = mean(tasmin),
-                      pr     = sum(pr))
-
-          save(loca_monthly, file = str_c(filename,
-                                          "_Monthly",
-                                          ".RData",
-                                          sep=""))
-
-          loca_yearly = loca_daily %>%
-            mutate(Year  = year(Time),
-                   tasavg = (tasmin + tasmax)/2)   %>%
-            group_by(Year,
-                     Division,
-                     Ensemble,
-                     Scenario,
-                     Percentile) %>%
-            summarize(tasmax = mean(tasmax),
-                      tasavg = mean(tasavg),
-                      tasmin = mean(tasmin),
-                      pr     = sum(pr))
-
-          save(loca_yearly, file = str_c(filename,
-                                          "_Yearly",
-                                          ".RData",
-                                          sep=""))
-
-
-
-  } else {
-    print("nope!")
+    
+    filename = str_c(directory,
+                     outpref,
+                     division,
+                     sep = "")
+    
+    save(loca_daily, file = str_c(filename,
+                                  ".RData",
+                                  sep=""))
+    
+    
+    
+    
+    
+    loca_monthly = loca_daily %>%
+      mutate(Time  = as.Date(str_c(year(Time),
+                                   month(Time),
+                                   "15",
+                                   sep="-"),
+                             tryFormats = c("%Y-%m-%d")),
+             tasavg = (tasmin + tasmax)/2)   %>%
+      group_by(Time,
+               Division,
+               Ensemble,
+               Scenario,
+               Percentile) %>%
+      summarize(tasmax = mean(tasmax),
+                tasavg = mean(tasavg),
+                tasmin = mean(tasmin),
+                pr     = sum(pr))
+    
+    save(loca_monthly, file = str_c(filename,
+                                    "_Monthly",
+                                    ".RData",
+                                    sep=""))
+    
+    loca_yearly = loca_daily %>%
+      mutate(Year  = year(Time),
+             tasavg = (tasmin + tasmax)/2)   %>%
+      group_by(Year,
+               Division,
+               Ensemble,
+               Scenario,
+               Percentile) %>%
+      summarize(tasmax = mean(tasmax),
+                tasavg = mean(tasavg),
+                tasmin = mean(tasmin),
+                pr     = sum(pr))
+    
+    save(loca_yearly, file = str_c(filename,
+                                   "_Yearly",
+                                   ".RData",
+                                   sep=""))
+    
+    
+    
+    
+    
   }
-
-
-
 }
 
 rData_files = intersect(list.files(path    = directory,

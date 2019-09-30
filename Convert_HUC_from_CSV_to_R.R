@@ -12,7 +12,7 @@ outpref   = "NGP_LOCA_HUC08_"
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
                       list.files(path    = directory,
-                                 pattern = "rcp85.csv"))
+                                 pattern = "rcp85.Rdata"))
 
 load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
 
@@ -57,62 +57,6 @@ division=Divisions[1]
 for (division in Divisions)
 {
 
-  filename = str_c(directory,
-                   prefix,
-                   division,
-                   "_historical",
-                   sep = "")
-
-  shell_command = str_c("tail -n 1  ",
-                        filename,
-                        ".csv",
-                        sep = "")
-
-  ah = system(shell_command, intern = TRUE)
-
-
-  print(ah)
-
-  filename = str_c(directory,
-                   prefix,
-                   division,
-                   "_rcp45",
-                   sep = "")
-
-  shell_command = str_c("tail -n 1  ",
-                        filename,
-                        ".csv",
-                        sep = "")
-
-  a4 = system(shell_command, intern = TRUE)
-
-
-  print(a4)
-
-
-  filename = str_c(directory,
-                   prefix,
-                   division,
-                   "_rcp85",
-                   sep = "")
-
-  shell_command = str_c("tail -n 1  ",
-                        filename,
-                        ".csv",
-                        sep = "")
-
-  a8 = system(shell_command, intern = TRUE)
-
-
-  print(a8)
-
-  if (str_detect(ah,"bcc-csm1-1-m_r1i1p1,historical,MEAN") &
-      str_detect(a4,"bcc-csm1-1-m_r1i1p1,rcp45,MEAN") &
-      str_detect(a8,"bcc-csm1-1-m_r1i1p1,rcp85,MEAN") &
-      str_detect(ah,"2005-12-31" ) &
-      str_detect(a4,"2099-12-31" ) &
-      str_detect(a8,"2099-12-31" )) {
-
 
 
 
@@ -123,8 +67,9 @@ for (division in Divisions)
                          "historical",
                          sep = "")
 
-        loca_daily = read_csv(str_c(filename,".csv",sep=""))
-        loca_daily[nrow(loca_daily), ]
+        load(str_c(filename,".RData",sep=""))
+        loca_hist = loca_daily
+        loca_hist[nrow(loca_hist), ]
 
         filename = str_c(directory,
                          prefix,
@@ -132,34 +77,31 @@ for (division in Divisions)
                          "_",
                          "rcp45",
                          sep = "")
-
-        loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
-
-        loca_daily = rbind(loca_daily,
-                           loca_dailyrcp)
-
-        loca_dailyrcp[nrow(loca_dailyrcp), ]
-
-
-        remove(loca_dailyrcp)
-
-
-         filename = str_c(directory,
-                          prefix,
-                          division,
-                          "_",
-                          "rcp85",
-                          sep = "")
-
-         loca_dailyrcp = read_csv(str_c(filename,".csv",sep=""))
-         loca_dailyrcp[nrow(loca_dailyrcp), ]
-
-         loca_daily = rbind(loca_daily,
-                            loca_dailyrcp)
-
-         remove(loca_dailyrcp)
-
-         print(loca_daily$Division[1])
+        
+        load(str_c(filename,".RData",sep=""))
+        loca_45 = loca_daily
+        loca_45[nrow(loca_45), ]
+        
+        filename = str_c(directory,
+                         prefix,
+                         division,
+                         "_",
+                         "rcp45",
+                         sep = "")
+        
+        load(str_c(filename,".RData",sep=""))
+        loca_85 = loca_daily
+        loca_85[nrow(loca_85), ]        
+        
+        loca_daily = rbind(loca_hist,  loca_45)
+        loca_daily = rbind(loca_daily, loca_85)
+        
+        remove(loca_hist)
+        remove(loca_45)
+        remove(loca_85)
+        
+  
+        print(loca_daily$Division[1])
         if (is.numeric(loca_daily$Division[1]))
         {
              loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
@@ -191,21 +133,8 @@ for (division in Divisions)
                                                   "MEAN"))
 
         last_record = loca_daily[nrow(loca_daily), ]
+        last_record
 
-        if ( ((last_record$Scenario == "Historical") & (last_record$Time != "2005-12-31")) |
-             ((last_record$Scenario != "Historical") & (last_record$Time != "2099-12-31")) )
-        {
-            print(str_c("  truncating",
-                        last_record$Ensemble,
-                        last_record$Scenario,
-                        last_record$Time,
-                        sep = " "))
-
-            loca_daily = loca_daily %>%
-                filter( ! ((loca_daily$Scenario   == last_record$Scenario)   &
-                           (loca_daily$Ensemble   == last_record$Ensemble)   &
-                           (year(loca_daily$Time) == year(last_record$Time)) ) )
-        }
 
         filename = str_c(directory,
                          outpref,
@@ -261,10 +190,6 @@ for (division in Divisions)
                                           sep=""))
 
 
-
-  } else {
-    print("nope!")
-  }
 
 
 

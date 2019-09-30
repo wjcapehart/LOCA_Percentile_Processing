@@ -15,18 +15,18 @@
 
 # Pulling Hucs for Zone Lookup Tables
 
-  HUC_LUT_URL = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"
+  CD_LUT_URL = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"
 
-  load(file = url(HUC_LUT_URL))
+  load(file = url(CD_LUT_URL))
 
-  remove(HUC_LUT_URL)
+  remove(CD_LUT_URL)
 
   HUC08_MRB_LUT
 
 
 
 
-  HUC_AVAIL_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_basins/Completed_HUCS.RData"
+  HUC_AVAIL_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/Completed_Zones.RData"
 
   load(file = url(HUC_AVAIL_URL))
 
@@ -51,8 +51,8 @@ Periods = tibble(start_years   = start_years,
                  end_years     = end_years,
                  period_length = period_length) 
 
-Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/HUC08/",
-                      "NGP_LOCA_HUC08_",
+Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/climate_divisions/",
+                      "NGP_LOCA_nClimDivs_",
                       "_Available_Return_Periods.RData",
                       sep = "")
 print(Periods)
@@ -63,9 +63,9 @@ remove(Periods)
 
 
 
-huc_zone_lut = Completed_HUCS[1]
+huc_zone_lut = Completed_Divisions[1]
 
-for (huc_zone_lut in Completed_HUCS)
+for (huc_zone_lut in Completed_Divisions)
 {  # huc
 
   # LOCA Data Extraction from SD Mines Thredds Server
@@ -76,10 +76,10 @@ for (huc_zone_lut in Completed_HUCS)
   loca_location_data = HUC08_MRB_LUT %>%
     filter(HUC08_Code_ID == huc_zone_lut)
 
-  root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_regions/"
-  root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
+  root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/"
+  root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/"
 
-  loca_filename = str_c("NGP_LOCA_HUC08_",
+  loca_filename = str_c("NGP_LOCA_nClimDivs_",
                         huc_zone_lut,
                         ".RData",
                         sep = "")
@@ -205,8 +205,8 @@ for (huc_zone_lut in Completed_HUCS)
   } # years
 
 
-  loca_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/HUC08/",
-                         "NGP_LOCA_HUC08_",
+  loca_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/climate_divisions/",
+                         "NGP_LOCA_nClimDivs_",
                          huc_zone_lut,
                          "_Daily_Rainfall_Returns.RData",
                          sep = "")
