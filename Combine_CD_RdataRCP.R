@@ -9,13 +9,14 @@ directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/"
 prefix    = "NGP_LOCA_nCLIMDIV_"
 outpref   = "NGP_LOCA_nCLIMDIV_"
 
-csv_files = intersect(list.files(path    = directory,
-                                 pattern = prefix),
-                      list.files(path    = directory,
-                                 pattern = "rcp85.csv"))
+
+
+csv_files = list.files(path    = str_c(directory,
+                                       "/done/",
+                                       sep = ""),
+                       pattern = "rcp85.RData")
 
 load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"))
-
 
 Divisions_factor = Climate_Zones_Name_LUT$Full_Zone_Code
 
@@ -47,50 +48,61 @@ Ensembles = c("ACCESS1-0_r1i1p1",
               "NorESM1-M_r1i1p1",
               "bcc-csm1-1-m_r1i1p1")
 
+splitStrings = str_split(string   = csv_files, 
+                         pattern  = "_", 
+                         n        = Inf, 
+                         simplify = TRUE)
 
-Divisions = str_sub(string = csv_files,
-                    start  = str_length(string = prefix) + 1,
-                    end    = str_length(string = prefix) + 4)
+Divisions = unique(splitStrings[,4])
 
 division=Divisions[1]
 
 for (division in Divisions)
 {
   {
-    
-    
-    
-    
+
     filename = str_c(directory,
+                     "/done/",
                      prefix,
                      division,
                      "_",
                      "historical",
                      sep = "")
     
-    load(str_c(filename,".RData",sep=""))
+    load(file    = str_c(filename,
+                         ".RData",
+                         sep=""),
+         verbose = TRUE)
     loca_hist = loca_daily
     loca_hist[nrow(loca_hist), ]
     
     filename = str_c(directory,
+                     "/done/",
                      prefix,
                      division,
                      "_",
                      "rcp45",
                      sep = "")
     
-    load(str_c(filename,".RData",sep=""))
+    load(file    = str_c(filename,
+                         ".RData",
+                         sep=""),
+         verbose = TRUE)
     loca_45 = loca_daily
     loca_45[nrow(loca_45), ]
     
     filename = str_c(directory,
+                     "/done/",
                      prefix,
                      division,
                      "_",
-                     "rcp45",
+                     "rcp85",
                      sep = "")
     
-    load(str_c(filename,".RData",sep=""))
+    load(file    = str_c(filename,
+                         ".RData",
+                         sep=""),
+         verbose = TRUE)
     loca_85 = loca_daily
     loca_85[nrow(loca_85), ]        
     
@@ -102,36 +114,6 @@ for (division in Divisions)
     remove(loca_85)
     
     
-    print(loca_daily$Division[1])
-    if (is.numeric(loca_daily$Division[1]))
-    {
-      loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
-    }
-    loca_daily = loca_daily %>%
-      mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
-                                  Scenario == "rcp45"      ~ "RCP 4.5",
-                                  Scenario == "rcp85"      ~ "RCP 8.5"))
-    
-    loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
-    
-    loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
-                                   levels = c("Historical",
-                                              "RCP 4.5",
-                                              "RCP 8.5"))
-    
-    loca_daily$Division   = factor(x    = loca_daily$Division,
-                                   levels = Divisions_factor)
-    
-    loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
-                                   levels = Ensembles)
-    
-    loca_daily$Percentile = factor(x      = loca_daily$Percentile,
-                                   levels = c("P000",
-                                              "P025",
-                                              "P050",
-                                              "P075",
-                                              "P100",
-                                              "MEAN"))
     
     last_record = loca_daily[nrow(loca_daily), ]
     last_record
@@ -198,13 +180,18 @@ for (division in Divisions)
 }
 
 rData_files = intersect(list.files(path    = directory,
-                                   pattern = "NGP_LOCA_nCLIMDIV_"),
+                                   pattern = outpref),
                         list.files(path    = directory,
                                    pattern = "_Yearly.RData"))
 
-Completed_Divisions = str_sub(string = rData_files,
-                              start  = str_length(string = prefix) + 1,
-                              end    = str_length(string = prefix) + 4)
+splitStrings = str_split(string   = rData_files, 
+                         pattern  = "_", 
+                         n        = Inf, 
+                         simplify = TRUE)
+
+Completed_Divisions = unique(splitStrings[,4])
+
+
 
 save(Completed_Divisions, file = str_c(directory,
                               "Completed_Divisions",

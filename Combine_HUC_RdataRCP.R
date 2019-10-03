@@ -9,9 +9,13 @@ directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
 prefix    = "NGP_LOCA_HUCS_"
 outpref   = "NGP_LOCA_HUC08_"
 
-csv_files = intersect(list.files(path    = directory,
+csv_files = intersect(list.files(path    = str_c(directory,
+                                                 "/done/",
+                                                 sep = ""),
                                  pattern = prefix),
-                      list.files(path    = directory,
+                      list.files(path    = str_c(directory,
+                                                 "/done/",
+                                                 sep = ""),
                                  pattern = "rcp85.Rdata"))
 
 load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
@@ -61,6 +65,7 @@ for (division in Divisions)
 
 
         filename = str_c(directory,
+                         "/done/",
                          prefix,
                          division,
                          "_",
@@ -72,6 +77,7 @@ for (division in Divisions)
         loca_hist[nrow(loca_hist), ]
 
         filename = str_c(directory,
+                         "/done/",
                          prefix,
                          division,
                          "_",
@@ -83,10 +89,11 @@ for (division in Divisions)
         loca_45[nrow(loca_45), ]
         
         filename = str_c(directory,
+                         "/done/",
                          prefix,
                          division,
                          "_",
-                         "rcp45",
+                         "rcp85",
                          sep = "")
         
         load(str_c(filename,".RData",sep=""))
@@ -101,37 +108,6 @@ for (division in Divisions)
         remove(loca_85)
         
   
-        print(loca_daily$Division[1])
-        if (is.numeric(loca_daily$Division[1]))
-        {
-             loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
-        }
-        loca_daily = loca_daily %>%
-            mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
-                                        Scenario == "rcp45"      ~ "RCP 4.5",
-                                        Scenario == "rcp85"      ~ "RCP 8.5"))
-
-        loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
-
-        loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
-                                       levels = c("Historical",
-                                                  "RCP 4.5",
-                                                  "RCP 8.5"))
-
-        loca_daily$Division   = factor(x    = loca_daily$Division,
-                                       levels = Divisions_factor)
-
-        loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
-                                       levels = Ensembles)
-
-        loca_daily$Percentile = factor(x      = loca_daily$Percentile,
-                                       levels = c("P000",
-                                                  "P025",
-                                                  "P050",
-                                                  "P075",
-                                                  "P100",
-                                                  "MEAN"))
-
         last_record = loca_daily[nrow(loca_daily), ]
         last_record
 
@@ -196,9 +172,11 @@ for (division in Divisions)
 }
 
 rData_files = intersect(list.files(path    = directory,
-                                   pattern = "NGP_LOCA_HUC08_"),
+                                   pattern = outpref),
                         list.files(path    = directory,
                                    pattern = "_Yearly.RData"))
+
+
 
 Completed_HUCS = str_sub(string = rData_files,
                               start  = str_length(string = outpref) + 1,
