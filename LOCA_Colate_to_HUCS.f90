@@ -20,8 +20,8 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: start_scen = 2
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 10170000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10179999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10150000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10159999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
