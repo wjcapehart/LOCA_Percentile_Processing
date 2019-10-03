@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# Open MS Documents
+~*.xlsx
+
 # Compiled Object files
 *.slo
 *.lo
