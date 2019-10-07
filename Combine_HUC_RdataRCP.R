@@ -16,7 +16,7 @@ csv_files = intersect(list.files(path    = str_c(directory,
                       list.files(path    = str_c(directory,
                                                  "/done/",
                                                  sep = ""),
-                                 pattern = "rcp85.Rdata"))
+                                 pattern = "rcp85.RData"))
 
 load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
 
@@ -56,6 +56,9 @@ Divisions = str_sub(string = csv_files,
                     start  = str_length(string = prefix) + 1,
                     end    = str_length(string = prefix) + 8)
 
+print(csv_files)
+print(Divisions)
+
 division=Divisions[1]
 
 for (division in Divisions)
@@ -83,11 +86,11 @@ for (division in Divisions)
                          "_",
                          "rcp45",
                          sep = "")
-        
+
         load(str_c(filename,".RData",sep=""))
         loca_45 = loca_daily
         loca_45[nrow(loca_45), ]
-        
+
         filename = str_c(directory,
                          "/done/",
                          prefix,
@@ -95,19 +98,19 @@ for (division in Divisions)
                          "_",
                          "rcp85",
                          sep = "")
-        
+
         load(str_c(filename,".RData",sep=""))
         loca_85 = loca_daily
-        loca_85[nrow(loca_85), ]        
-        
+        loca_85[nrow(loca_85), ]
+
         loca_daily = rbind(loca_hist,  loca_45)
         loca_daily = rbind(loca_daily, loca_85)
-        
+
         remove(loca_hist)
         remove(loca_45)
         remove(loca_85)
-        
-  
+
+
         last_record = loca_daily[nrow(loca_daily), ]
         last_record
 

@@ -48,9 +48,9 @@ Ensembles = c("ACCESS1-0_r1i1p1",
               "NorESM1-M_r1i1p1",
               "bcc-csm1-1-m_r1i1p1")
 
-splitStrings = str_split(string   = csv_files, 
-                         pattern  = "_", 
-                         n        = Inf, 
+splitStrings = str_split(string   = csv_files,
+                         pattern  = "_",
+                         n        = Inf,
                          simplify = TRUE)
 
 Divisions = unique(splitStrings[,4])
@@ -68,14 +68,14 @@ for (division in Divisions)
                      "_",
                      "historical",
                      sep = "")
-    
+
     load(file    = str_c(filename,
                          ".RData",
                          sep=""),
          verbose = TRUE)
     loca_hist = loca_daily
     loca_hist[nrow(loca_hist), ]
-    
+
     filename = str_c(directory,
                      "/done/",
                      prefix,
@@ -83,14 +83,14 @@ for (division in Divisions)
                      "_",
                      "rcp45",
                      sep = "")
-    
+
     load(file    = str_c(filename,
                          ".RData",
                          sep=""),
          verbose = TRUE)
     loca_45 = loca_daily
     loca_45[nrow(loca_45), ]
-    
+
     filename = str_c(directory,
                      "/done/",
                      prefix,
@@ -98,40 +98,40 @@ for (division in Divisions)
                      "_",
                      "rcp85",
                      sep = "")
-    
+
     load(file    = str_c(filename,
                          ".RData",
                          sep=""),
          verbose = TRUE)
     loca_85 = loca_daily
-    loca_85[nrow(loca_85), ]        
-    
+    loca_85[nrow(loca_85), ]
+
     loca_daily = rbind(loca_hist,  loca_45)
     loca_daily = rbind(loca_daily, loca_85)
-    
+
     remove(loca_hist)
     remove(loca_45)
     remove(loca_85)
-    
-    
-    
+
+
+
     last_record = loca_daily[nrow(loca_daily), ]
     last_record
 
-    
+
     filename = str_c(directory,
                      outpref,
                      division,
                      sep = "")
-    
+
     save(loca_daily, file = str_c(filename,
                                   ".RData",
                                   sep=""))
-    
-    
-    
-    
-    
+
+
+
+
+
     loca_monthly = loca_daily %>%
       mutate(Time  = as.Date(str_c(year(Time),
                                    month(Time),
@@ -148,12 +148,12 @@ for (division in Divisions)
                 tasavg = mean(tasavg),
                 tasmin = mean(tasmin),
                 pr     = sum(pr))
-    
+
     save(loca_monthly, file = str_c(filename,
                                     "_Monthly",
                                     ".RData",
                                     sep=""))
-    
+
     loca_yearly = loca_daily %>%
       mutate(Year  = year(Time),
              tasavg = (tasmin + tasmax)/2)   %>%
@@ -166,16 +166,16 @@ for (division in Divisions)
                 tasavg = mean(tasavg),
                 tasmin = mean(tasmin),
                 pr     = sum(pr))
-    
+
     save(loca_yearly, file = str_c(filename,
                                    "_Yearly",
                                    ".RData",
                                    sep=""))
-    
-    
-    
-    
-    
+
+
+
+
+
   }
 }
 
@@ -184,9 +184,9 @@ rData_files = intersect(list.files(path    = directory,
                         list.files(path    = directory,
                                    pattern = "_Yearly.RData"))
 
-splitStrings = str_split(string   = rData_files, 
-                         pattern  = "_", 
-                         n        = Inf, 
+splitStrings = str_split(string   = rData_files,
+                         pattern  = "_",
+                         n        = Inf,
                          simplify = TRUE)
 
 Completed_Divisions = unique(splitStrings[,4])
