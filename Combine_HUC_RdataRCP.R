@@ -174,6 +174,71 @@ for (division in Divisions)
 
 }
 
+
+
+
+library(stringr)
+library(forcats)
+library(readr)
+library(tidyverse)
+library(lubridate)
+
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
+
+prefix    = "NGP_LOCA_HUCS_"
+outpref   = "NGP_LOCA_HUC08_"
+
+csv_files = intersect(list.files(path    = str_c(directory,
+                                                 "/done/",
+                                                 sep = ""),
+                                 pattern = prefix),
+                      list.files(path    = str_c(directory,
+                                                 "/done/",
+                                                 sep = ""),
+                                 pattern = "rcp85.RData"))
+
+load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
+
+
+Divisions_factor = factor(HUC08_MRB_LUT$HUC08_Code_ID)
+
+Ensembles = c("ACCESS1-0_r1i1p1",
+              "ACCESS1-3_r1i1p1",
+              "CCSM4_r6i1p1",
+              "CESM1-BGC_r1i1p1",
+              "CESM1-CAM5_r1i1p1",
+              "CMCC-CMS_r1i1p1",
+              "CMCC-CM_r1i1p1",
+              "CNRM-CM5_r1i1p1",
+              "CSIRO-Mk3-6-0_r1i1p1",
+              "CanESM2_r1i1p1",
+              "FGOALS-g2_r1i1p1",
+              "GFDL-CM3_r1i1p1",
+              "GFDL-ESM2G_r1i1p1",
+              "GFDL-ESM2M_r1i1p1",
+              "HadGEM2-AO_r1i1p1",
+              "HadGEM2-CC_r1i1p1",
+              "HadGEM2-ES_r1i1p1",
+              "IPSL-CM5A-LR_r1i1p1",
+              "IPSL-CM5A-MR_r1i1p1",
+              "MIROC-ESM_r1i1p1",
+              "MIROC-ESM-CHEM_r1i1p1",
+              "MIROC5_r1i1p1",
+              "MPI-ESM-LR_r1i1p1",
+              "MPI-ESM-MR_r1i1p1",
+              "MRI-CGCM3_r1i1p1",
+              "NorESM1-M_r1i1p1",
+              "bcc-csm1-1-m_r1i1p1")
+
+
+Divisions = str_sub(string = csv_files,
+                    start  = str_length(string = prefix) + 1,
+                    end    = str_length(string = prefix) + 8)
+
+print(csv_files)
+print(Divisions)
+
+
 rData_files = intersect(list.files(path    = directory,
                                    pattern = outpref),
                         list.files(path    = directory,

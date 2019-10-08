@@ -17,7 +17,7 @@
 
   HUC_LUT_URL = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"
 
-  load(file = url(HUC_LUT_URL))
+  load(file = url(HUC_LUT_URL), verbose=TRUE)
 
   remove(HUC_LUT_URL)
 
@@ -28,11 +28,11 @@
 
   HUC_AVAIL_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_basins/Completed_HUCS.RData"
 
-  load(file = url(HUC_AVAIL_URL))
+  load(file = url(HUC_AVAIL_URL), verbose=TRUE)
 
   remove(HUC_AVAIL_URL)
 
-
+bigger_table =
 
 # Select Periods
 
@@ -49,7 +49,7 @@ center_years
 Periods = tibble(start_years   = start_years,
                  center_years  = center_years,
                  end_years     = end_years,
-                 period_length = period_length) 
+                 period_length = period_length)
 
 Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/HUC08/",
                       "NGP_LOCA_HUC08_",
@@ -58,7 +58,6 @@ Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/
 print(Periods)
 
 save(Periods, file=Periods_filename)
-remove(Periods)
 
 
 
