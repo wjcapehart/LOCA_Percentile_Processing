@@ -58,7 +58,6 @@ Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/
 print(Periods)
 
 save(Periods, file=Periods_filename)
-remove(Periods)
 
 
 
@@ -71,7 +70,8 @@ for (huc_zone_lut in Completed_Divisions)
   # LOCA Data Extraction from SD Mines Thredds Server
 
   # URL Information
-
+  FIRST = TRUE
+  
 
   loca_location_data = HUC08_MRB_LUT %>%
     filter(HUC08_Code_ID == huc_zone_lut)
@@ -102,12 +102,17 @@ for (huc_zone_lut in Completed_Divisions)
 
 
 # Period Extraction (using the zone maximum daily event)
-  for (start_year in start_years)
+  for (i in seq(from = 1,
+                to   = number_of_periods,
+                by   = 1))
   { # Start Year
-
-    end_year = start_year + 29
-
-
+    
+    start_year = Periods$start_years[i]
+    end_year = Periods$end_years[i]
+    
+    
+    
+    
 
       loca_period = loca_daily %>%
         filter((year(Time) >= start_year) &
@@ -121,13 +126,6 @@ for (huc_zone_lut in Completed_Divisions)
                                 end_year,
                                 ")",
                                 sep = ""))
-
-
-
-
-
-
-
 
 
 
@@ -167,20 +165,22 @@ for (huc_zone_lut in Completed_Divisions)
           return_ci = ci(x             = fit_GP_daily,
                          return.period = year_return)
 
-
-          if ((scenario == Period_Scenarios[1]) & (ensemble == Ensembles[1]) & (start_year == start_years[1]))
+          
+          if (FIRST)
           {
+            FIRST = FALSE
             return_events = tibble(HUC                = unique(loca_daily$Division),
                                    Scenario           = scenario,
                                    start_year         = start_year,
                                    center_year        = 0.5 * (start_year + end_year) - 0.5,
                                    end_year           = end_year,
+                                   period_length      = Periods$period_length[i],
                                    Ensemble           = ensemble,
                                    Return_Period      = year_return,
                                    Return_Estimate_05 = return_ci[,1],
                                    Return_Estimate    = return_ci[,2],
                                    Return_Estimate_95 = return_ci[,3])
-
+            
           } else # first run
           {
             delete_me     = tibble(HUC                = unique(loca_daily$Division),
@@ -188,6 +188,7 @@ for (huc_zone_lut in Completed_Divisions)
                                    start_year         = start_year,
                                    center_year        = 0.5 * (start_year + end_year) - 0.5,
                                    end_year           = end_year,
+                                   period_length      = Periods$period_length[i],
                                    Ensemble           = ensemble,
                                    Return_Period      = year_return,
                                    Return_Estimate_05 = return_ci[,1],
@@ -195,9 +196,9 @@ for (huc_zone_lut in Completed_Divisions)
                                    Return_Estimate_95 = return_ci[,3])
             return_events = rbind(return_events,
                                   delete_me)
-
+            
           } # not the first run
-
+          
         } # ensemble
 
       } # scenario
@@ -211,10 +212,10 @@ for (huc_zone_lut in Completed_Divisions)
                          "_Daily_Rainfall_Returns.RData",
                          sep = "")
   print(loca_filename)
-
+  
   save(Periods, return_events, file=loca_filename)
   remove(return_events)
-
+  
   print("---------")
 
 } # huc

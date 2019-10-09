@@ -57,7 +57,6 @@ Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/
 print(Periods)
 
 save(Periods, file=Periods_filename)
-remove(Periods)
 
 
 
@@ -127,13 +126,6 @@ for (huc_zone_lut in Completed_HUCS)
                                 end_year,
                                 ")",
                                 sep = ""))
-
-
-
-
-
-
-
 
 
 
