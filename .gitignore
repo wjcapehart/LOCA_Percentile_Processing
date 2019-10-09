@@ -29,6 +29,10 @@
 *.a
 *.lib
 
+.RData
+.Rdata
+.Rhistory
+
 # Executables
 *.exe
 *.out
@@ -37,5 +41,3 @@ LOCA_Colate_to_HUCS
 test_for_time_lut.txt
 *.txt
 *.arch
-.RData
-.Rhistory
