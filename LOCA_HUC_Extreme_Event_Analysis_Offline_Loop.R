@@ -48,7 +48,7 @@ center_years
 Periods = tibble(start_years   = start_years,
                  center_years  = center_years,
                  end_years     = end_years,
-                 period_length = period_length) 
+                 period_length = period_length)
 
 Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/HUC08/",
                       "NGP_LOCA_HUC08_",
@@ -66,6 +66,9 @@ huc_zone_lut = Completed_HUCS[1]
 
 for (huc_zone_lut in Completed_HUCS)
 {  # huc
+
+
+  FIRST = TRUE
 
   # LOCA Data Extraction from SD Mines Thredds Server
 
@@ -101,11 +104,11 @@ for (huc_zone_lut in Completed_HUCS)
 
 
 # Period Extraction (using the zone maximum daily event)
-  for (i in seq(from = 1, 
+  for (i in seq(from = 1,
                 to   = number_of_periods,
                 by   = 1))
   { # Start Year
-    
+
     start_year = Periods$start_years[i]
     end_year = Periods$end_years[i]
 
@@ -171,8 +174,9 @@ for (huc_zone_lut in Completed_HUCS)
                          return.period = year_return)
 
 
-          if ((scenario == Period_Scenarios[1]) & (ensemble == Ensembles[1]) & (start_year == start_years[1]))
+          if (FIRST)
           {
+            FIRST = FALSE
             return_events = tibble(HUC                = unique(loca_daily$Division),
                                    Scenario           = scenario,
                                    start_year         = start_year,
