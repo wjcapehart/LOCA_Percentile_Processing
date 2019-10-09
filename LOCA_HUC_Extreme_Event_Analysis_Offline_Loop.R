@@ -79,7 +79,7 @@ for (huc_zone_lut in Completed_HUCS)
     filter(HUC08_Code_ID == huc_zone_lut)
 
   root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_regions/"
- # root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
+  root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
 
   loca_filename = str_c("NGP_LOCA_HUC08_",
                         huc_zone_lut,
