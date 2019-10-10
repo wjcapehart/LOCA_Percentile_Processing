@@ -52,7 +52,7 @@ Periods = tibble(start_years   = start_years,
 
 Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/climate_divisions/",
                       "NGP_LOCA_nClimDivs_",
-                      "_Available_Return_Periods.RData",
+                      "Available_Return_Periods.RData",
                       sep = "")
 print(Periods)
 
@@ -72,13 +72,13 @@ for (huc_zone_lut in Completed_Divisions)
   FIRST = TRUE
 
 
-  loca_location_data = HUC08_MRB_LUT %>%
-    filter(HUC08_Code_ID == huc_zone_lut)
+  loca_location_data = Avail_NGP_nClimDiv_LUT %>%
+    filter(US_CAN_Zones == huc_zone_lut)
 
   root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/"
   root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/"
 
-  loca_filename = str_c("NGP_LOCA_nClimDivs_",
+  loca_filename = str_c("NGP_LOCA_nCLIMDIV_",
                         huc_zone_lut,
                         ".RData",
                         sep = "")
