@@ -17,22 +17,21 @@
 
   CD_LUT_URL = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"
 
-  load(file = url(CD_LUT_URL))
+  load(file = url(CD_LUT_URL), verbose = TRUE)
 
   remove(CD_LUT_URL)
 
-  HUC08_MRB_LUT
+Avail_NGP_nClimDiv_LUT
 
 
 
+  HUC_AVAIL_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/Completed_Divisions.RData"
 
-  HUC_AVAIL_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/Completed_Zones.RData"
-
-  load(file = url(HUC_AVAIL_URL))
+  load(file = url(HUC_AVAIL_URL), verbose = TRUE)
 
   remove(HUC_AVAIL_URL)
 
-
+Completed_Divisions
 
 # Select Periods
 
@@ -49,7 +48,7 @@ center_years
 Periods = tibble(start_years   = start_years,
                  center_years  = center_years,
                  end_years     = end_years,
-                 period_length = period_length) 
+                 period_length = period_length)
 
 Periods_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ExtRemes/climate_divisions/",
                       "NGP_LOCA_nClimDivs_",
@@ -71,7 +70,7 @@ for (huc_zone_lut in Completed_Divisions)
 
   # URL Information
   FIRST = TRUE
-  
+
 
   loca_location_data = HUC08_MRB_LUT %>%
     filter(HUC08_Code_ID == huc_zone_lut)
@@ -106,13 +105,13 @@ for (huc_zone_lut in Completed_Divisions)
                 to   = number_of_periods,
                 by   = 1))
   { # Start Year
-    
+
     start_year = Periods$start_years[i]
     end_year = Periods$end_years[i]
-    
-    
-    
-    
+
+
+
+
 
       loca_period = loca_daily %>%
         filter((year(Time) >= start_year) &
@@ -165,7 +164,7 @@ for (huc_zone_lut in Completed_Divisions)
           return_ci = ci(x             = fit_GP_daily,
                          return.period = year_return)
 
-          
+
           if (FIRST)
           {
             FIRST = FALSE
@@ -180,7 +179,7 @@ for (huc_zone_lut in Completed_Divisions)
                                    Return_Estimate_05 = return_ci[,1],
                                    Return_Estimate    = return_ci[,2],
                                    Return_Estimate_95 = return_ci[,3])
-            
+
           } else # first run
           {
             delete_me     = tibble(HUC                = unique(loca_daily$Division),
@@ -196,9 +195,9 @@ for (huc_zone_lut in Completed_Divisions)
                                    Return_Estimate_95 = return_ci[,3])
             return_events = rbind(return_events,
                                   delete_me)
-            
+
           } # not the first run
-          
+
         } # ensemble
 
       } # scenario
@@ -212,10 +211,10 @@ for (huc_zone_lut in Completed_Divisions)
                          "_Daily_Rainfall_Returns.RData",
                          sep = "")
   print(loca_filename)
-  
+
   save(Periods, return_events, file=loca_filename)
   remove(return_events)
-  
+
   print("---------")
 
 } # huc
