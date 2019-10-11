@@ -39,6 +39,7 @@ start_years    = c(1951, 1961, 1976, 2011, 2036, 2061, 2070, 1956, 2006, 2026, 2
 period_length  = c(  30,  30,    30,   30,   30,   30,   30,   50,   50,   50,  50)
 end_years      = start_years + period_length -1
 
+number_of_periods = length(start_years)
 
 
 
@@ -94,7 +95,6 @@ for (huc_zone_lut in Completed_Divisions)
 
   Ensembles = unique(loca_daily$Ensemble)
   Scenarios = unique(loca_daily$Scenario)
-
 
 
 
