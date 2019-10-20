@@ -13,7 +13,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
 
-  integer, parameter :: nhucs      =   248
+  integer, parameter :: nhucs      =   179
   integer, parameter :: len_hucstr =     4
   integer, parameter :: len_outbuf =   100
 
