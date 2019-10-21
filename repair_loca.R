@@ -221,7 +221,6 @@ for (huc_zone_lut in Completed_HUCS)
       
       loca_filename = str_c("NGP_LOCA_HUC08_",
                             huc_zone_lut,
-                            ".RData",
                             sep = "")
       
       
@@ -234,5 +233,67 @@ for (huc_zone_lut in Completed_HUCS)
            file = str_c(LOCA_URL,
                         sep=""))
       
+      
+      filename = str_c(directory,
+                       outpref,
+                       division,
+                       sep = "")
+      
+      save(loca_daily, file = str_c(LOCA_URL, 
+                                    ".RData",
+                                    sep=""))
+      
+      
+      
+      
+      
+      loca_monthly = loca_daily %>%
+        mutate(Time  = as.Date(str_c(year(Time),
+                                     month(Time),
+                                     "15",
+                                     sep="-"),
+                               tryFormats = c("%Y-%m-%d")),
+               tasavg = (tasmin + tasmax)/2)   %>%
+        group_by(Time,
+                 Division,
+                 Ensemble,
+                 Scenario,
+                 Percentile) %>%
+        summarize(tasmax = mean(tasmax),
+                  tasavg = mean(tasavg),
+                  tasmin = mean(tasmin),
+                  pr     = sum(pr))
+      
+      save(loca_monthly, file = str_c(LOCA_URL,
+                                      "_Monthly",
+                                      ".RData",
+                                      sep=""))
+      
+      loca_yearly = loca_daily %>%
+        mutate(Year  = year(Time),
+               tasavg = (tasmin + tasmax)/2)   %>%
+        group_by(Year,
+                 Division,
+                 Ensemble,
+                 Scenario,
+                 Percentile) %>%
+        summarize(tasmax = mean(tasmax),
+                  tasavg = mean(tasavg),
+                  tasmin = mean(tasmin),
+                  pr     = sum(pr))
+      
+      save(loca_yearly, file = str_c(LOCA_URL,
+                                     "_Yearly",
+                                     ".RData",
+                                     sep=""))
+      
+      
+      
+      
+      
+      
+      
 
 } # huc
+
+print("Outahere like Vladimir")
