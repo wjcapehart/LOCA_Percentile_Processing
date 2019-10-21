@@ -209,14 +209,14 @@ for (huc_zone_lut in Completed_HUCS)
       
       
 
-      if (length(missing_time)     > 0 ) { print(loca_daily[c(missing_time,missing_time+1), ])  }     
-      if (length(missing_huc)      > 0 ) { print(loca_daily[c(missing_huc,missing_huc+1), ])  }     
-      if (length(missing_ensemble) > 0 ) { print(loca_daily[c(missing_ensemble,missing_ensemble+1), ])  }     
-      if (length(missing_scenario) > 0 ) { print(loca_daily[c(missing_scenario,missing_scenario+1), ])  }     
-      if (length(missing_precent)  > 0 ) { print(loca_daily[c(missing_precent,missing_precent+1), ])  }     
-      if (length(missing_tasmax)   > 0 ) { print(loca_daily[c(missing_tasmax,missing_tasmax+1), ])  }     
-      if (length(missing_tasmin)   > 0 ) { print(loca_daily[c(missing_tasmin,missing_tasmin+1), ])  }     
-      if (length(missing_pr)       > 0 ) { print(loca_daily[c(missing_pr,missing_pr+1), ])  }     
+      if (length(missing_time)     > 0 ) { print(loca_daily[c(missing_time,     missing_time+1),     ])  }     
+      if (length(missing_huc)      > 0 ) { print(loca_daily[c(missing_huc,      missing_huc+1),      ])  }     
+      if (length(missing_ensemble) > 0 ) { print(loca_daily[c(missing_ensemble, missing_ensemble+1), ])  }     
+      if (length(missing_scenario) > 0 ) { print(loca_daily[c(missing_scenario, missing_scenario+1), ])  }     
+      if (length(missing_precent)  > 0 ) { print(loca_daily[c(missing_precent,  missing_precent+1),  ])  }     
+      if (length(missing_tasmax)   > 0 ) { print(loca_daily[c(missing_tasmax,   missing_tasmax+1),   ])  }     
+      if (length(missing_tasmin)   > 0 ) { print(loca_daily[c(missing_tasmin,   missing_tasmin+1),   ])  }     
+      if (length(missing_pr)       > 0 ) { print(loca_daily[c(missing_pr,       missing_pr+1),       ])  }     
       
       
       loca_filename = str_c("NGP_LOCA_HUC08_",
@@ -228,10 +228,7 @@ for (huc_zone_lut in Completed_HUCS)
                        loca_filename,
                        sep = "")
       
-      
-      save(loca_daily, 
-           file = str_c(LOCA_URL,
-                        sep=""))
+
       
 
       
