@@ -65,6 +65,7 @@
                                              (HUC08_Code_ID  < 10030000))
   
   
+  target_scenario = "rcp85"
   
   Completed_HUCS = HUC08_MRB_LUT$HUC08_Code_ID
   
