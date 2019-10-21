@@ -106,7 +106,7 @@ for (huc_zone_lut in Completed_HUCS)
   
   
   print(str_c("loca file rows:",
-              length(loca_daily)))
+              nrow(loca_daily)))
   
 
 
@@ -128,7 +128,7 @@ for (huc_zone_lut in Completed_HUCS)
         
         
         print(str_c(" csv file rows:",
-                    length(newcsv)))
+                    nrow(newcsv)))
         
         if (is.numeric(newcsv$Division[1]))
         {
@@ -185,7 +185,7 @@ for (huc_zone_lut in Completed_HUCS)
     loca_daily[nrow(loca_daily), ]
     
     print(str_c("RData file rows:",
-                length(loca_daily)))
+                nrow(loca_daily)))
     
     
     
