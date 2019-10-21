@@ -231,7 +231,7 @@ for (huc_zone_lut in Completed_HUCS)
       
       
       save(loca_daily,
-           file = str_c(filename,
+           file = str_c(LOCA_URL,
                         ".RData",
                         sep=""))
       
