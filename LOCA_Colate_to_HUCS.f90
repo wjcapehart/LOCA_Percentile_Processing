@@ -17,7 +17,7 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: len_hucstr =     8
   integer, parameter :: len_outbuf =   100
 
-  integer, parameter :: start_scen = 1
+  integer, parameter :: start_scen =     1
   integer, parameter :: end_scen   = nscen
 
   integer (kind=4) :: myhuc_low    = 10070000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
