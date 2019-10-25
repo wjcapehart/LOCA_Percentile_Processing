@@ -1,6 +1,6 @@
 program LOCA_Colate_to_HUCS
 
-  use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
+  use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod 
   use omp_lib
 
   implicit none
