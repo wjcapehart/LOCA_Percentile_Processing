@@ -15,7 +15,9 @@ program LOCA_Colate_to_HUCS
 
   integer, parameter :: nhucs      =   307
   integer, parameter :: len_hucstr =     8
-  integer, parameter :: len_outbuf =   120
+  integer, parameter :: len_outbuf =   100
+
+  integer, parameter ::      npull = 365    ! 2, 3, 7, 487
 
   integer, parameter :: start_scen =     1
   integer, parameter :: end_scen   = nscen
@@ -30,7 +32,6 @@ program LOCA_Colate_to_HUCS
   character (len=*), PARAMETER  :: file_output_root =  &
             "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
 
-  integer, parameter ::      npull = 90    ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
@@ -656,7 +657,6 @@ program LOCA_Colate_to_HUCS
               caldate = caldate_futr(t_in_tt)
             end if
 
-
 !print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
@@ -670,7 +670,6 @@ program LOCA_Colate_to_HUCS
               allocate ( sort_tasmax(nhuccells(h)) )
               allocate ( sort_tasmin(nhuccells(h)) )
               allocate (     sort_pr(nhuccells(h)) )
-
 
               !!! tasmax
 
@@ -711,9 +710,7 @@ program LOCA_Colate_to_HUCS
 
                 sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
 
-
               !!! output
-
 
                 write(output_buffer(t_buffer),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
@@ -769,7 +766,6 @@ program LOCA_Colate_to_HUCS
                             "MEAN",  &
                             (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
 
-
               !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
 
               deallocate (sort_tasmax)
@@ -780,17 +776,13 @@ program LOCA_Colate_to_HUCS
 
             end do  !!  Internal Time Loop (t)
 
-
             open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
             write(unit_huc(h),"(A)") output_buffer(:)
             close(unit_huc(h))
 
-
-
         end do  !! HUCS loop (h)
 
 !$OMP END PARALLEL DO
-
 
       if ((tt .eq. n_reads-1)) then
         print*, "=="
@@ -807,7 +799,6 @@ program LOCA_Colate_to_HUCS
 
       end if
 
-
   end do  !!  NetCDF Time Loop (tt)
 
   print*, "=="
@@ -821,27 +812,20 @@ program LOCA_Colate_to_HUCS
     deallocate (        map_pr )
     deallocate ( output_buffer )
 
-
   end do  !! Ensemble Loop (e)
-
 
       print*, "== "
       print*, "== De-Allocating arrays at the end of scenario (span_t,start_t,end_t)"
       print*, "== "
-
 
       deallocate(span_t)
       deallocate(start_t)
       deallocate(end_t)
       deallocate(csv_filename)
 
-
-
   print*, "== "
   print*, "== "
   print*, "==============================="
-
-
 
 end do   !! Scenario Loop (s)
 
