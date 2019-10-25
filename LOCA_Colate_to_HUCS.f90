@@ -1,6 +1,6 @@
 program LOCA_Colate_to_HUCS
 
-  use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod 
+  use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   use omp_lib
 
   implicit none
@@ -22,8 +22,8 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: start_scen =     1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 10230000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10239999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10280000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10289999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
