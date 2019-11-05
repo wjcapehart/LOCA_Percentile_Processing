@@ -28,7 +28,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: end_scen   = nscen
 
   integer (kind=4) :: myhuc_low    = 2902 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 2902 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 2901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
 
