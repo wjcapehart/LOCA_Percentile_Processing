@@ -27,10 +27,10 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 1500 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 1499 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 2501 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 2501 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
-  integer, parameter :: npull = 90    ! 2, 3, 7, 487
+  integer, parameter :: npull = 365    ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
