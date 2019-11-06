@@ -4,4 +4,4 @@ git pull
 ./buildme
 nohup ./LOCA_Colate_to_HUCS.exe >& log.txt &
 
-git pull && ./buildme && nohup ./LOCA_Colate_to_HUCS.exe >& milk12.txt &
+git pull && ./buildme && nohup ./LOCA_Colate_to_HUCS.exe >& lowerplatte_01.txt &
