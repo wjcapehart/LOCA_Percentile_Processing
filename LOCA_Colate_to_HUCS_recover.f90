@@ -131,8 +131,9 @@ program LOCA_Colate_to_HUCS
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   first_huc = .TRUE.
-
-  num_procs = omp_get_max_threads()
+  
+  !  num_procs = omp_get_max_threads()
+     num_procs = 1
 
 
 
