@@ -3,3 +3,5 @@ cd /maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_Percentile_Processing
 git pull
 ./buildme
 nohup ./LOCA_Colate_to_HUCS.exe >& log.txt &
+
+git pull && ./buildme && nohup ./LOCA_Colate_to_HUCS.exe >& milk12.txt &
