@@ -1,7 +1,7 @@
 program LOCA_Colate_to_ClimDivs_CAN
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
-  use omp_lib
+!  use omp_lib
 
   implicit none
 

@@ -1,7 +1,7 @@
 program LOCA_Colate_to_ClimDivs
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
-  use omp_lib
+!  use omp_lib
 
   implicit none
 
@@ -27,7 +27,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 2902 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 2901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
   integer (kind=4) :: myhuc_high   = 2901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
