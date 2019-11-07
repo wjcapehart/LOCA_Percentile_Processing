@@ -22,14 +22,16 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = 3
 
-  integer (kind=4) :: myhuc_low    = 10190001   ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10190001   ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10190001
+  integer (kind=4) :: myhuc_high   = 10190001
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
-  character (len=*), PARAMETER  :: filename_map      = "./HUC08_Missouri_River_Basin.nc"
-  character (len=*), PARAMETER  :: file_front_root =  "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
-  character (len=*), PARAMETER  :: file_output_root =  &
+  character (len=*), PARAMETER  :: filename_map      =  &
+            "./HUC08_Missouri_River_Basin.nc"
+  character (len=*), PARAMETER  :: file_front_root   =  &
+            "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
+  character (len=*), PARAMETER  :: file_output_root  =  &
             "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
 
 
@@ -180,21 +182,38 @@ program LOCA_Colate_to_HUCS
 
 
 
-  ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
+  ncstat = NF90_OPEN(filename_map,   &
+                     NF90_NOWRITE,   &
+                     netcdf_id_file_map)
+
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_variable_name, netcdf_id_map)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
-      ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_map,  huc_map)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_INQ_VARID(netcdf_id_file_map, &
+                              map_variable_name,  &
+                              netcdf_id_map)
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_values_name,   netcdf_id_hucs)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_hucs, hucs)
+      ncstat = NF90_GET_VAR(netcdf_id_file_map,   &
+                            netcdf_id_map,        &
+                            huc_map)
+
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+      ncstat = NF90_INQ_VARID(netcdf_id_file_map, &
+                              map_values_name,  &
+                              netcdf_id_hucs)
+
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+      ncstat = NF90_GET_VAR(netcdf_id_file_map, &
+                            netcdf_id_hucs,     &
+                            hucs)
+
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
   ncstat = NF90_CLOSE(netcdf_id_file_map)
+
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
@@ -255,11 +274,12 @@ program LOCA_Colate_to_HUCS
       nhuccells(t) = sum(mask_map)
 
       write(basin_file_name,'(A, I8.8)') trim(file_output_root), myhucs(t)
-      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') t, &
-                                                                       unit_huc(t), &
-                                                                       myhucs(t), &
-                                                                       nhuccells(t), &
-                                                                       trim(basin_file_name)
+      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') &
+                t, &
+                unit_huc(t), &
+                myhucs(t), &
+                nhuccells(t), &
+                trim(basin_file_name)
 
     end if
 
@@ -270,33 +290,64 @@ program LOCA_Colate_to_HUCS
 
   filename_times  = "./LOCA_Calendar_Lookup_Table.nc"
 
-  ncstat = NF90_OPEN(filename_times, NF90_NOWRITE, netcdf_id_file_dates)
+  ncstat = NF90_OPEN(filename_times, &
+                     NF90_NOWRITE,   &
+                     netcdf_id_file_dates)
+
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "time_hist", netcdf_id_time_hist)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
-      ncstat = NF90_GET_VAR(netcdf_id_file_dates,  netcdf_id_time_hist, time_cord_hist)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+    ncstat = NF90_INQ_VARID(netcdf_id_file_dates,   &
+                            "time_hist",            &
+                            netcdf_id_time_hist)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+    ncstat = NF90_GET_VAR(netcdf_id_file_dates, &
+                          netcdf_id_time_hist,  &
+                          time_cord_hist)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "time_futr", netcdf_id_time_futr)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
-      ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_time_futr, time_cord_futr)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+    ncstat = NF90_INQ_VARID(netcdf_id_file_dates, &
+                            "time_futr",          &
+                            netcdf_id_time_futr)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+    ncstat = NF90_GET_VAR(netcdf_id_file_dates, &
+                          netcdf_id_time_futr,  &
+                          time_cord_futr)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
     print*, "got the times"
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "calendar_date_hist", netcdf_id_cal_hist)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
-      ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_cal_hist, caldate_hist)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+    ncstat = NF90_INQ_VARID(netcdf_id_file_dates, &
+                            "calendar_date_hist", &
+                            netcdf_id_cal_hist)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+    ncstat = NF90_GET_VAR(netcdf_id_file_dates, &
+                          netcdf_id_cal_hist,   &
+                          caldate_hist)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-      ncstat = NF90_INQ_VARID(netcdf_id_file_dates, "calendar_date_futr", netcdf_id_cal_futr)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
-      ncstat = NF90_GET_VAR(netcdf_id_file_dates, netcdf_id_cal_futr, caldate_futr)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
+    ncstat = NF90_INQ_VARID(netcdf_id_file_dates, &
+                            "calendar_date_futr", &
+                            netcdf_id_cal_futr)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+    ncstat = NF90_GET_VAR(netcdf_id_file_dates, &
+                          netcdf_id_cal_futr,   &
+                          caldate_futr)
+
+      if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
         print*, "got the calendar"
@@ -304,24 +355,16 @@ program LOCA_Colate_to_HUCS
   ncstat = NF90_CLOSE(netcdf_id_file_dates)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-
-
-
-
-
-          if (nmyhucs .lt. num_procs) then
-            call omp_set_num_threads(nmyhucs)
-            num_procs = nmyhucs
-            print*, "adjusting total number of cores to ",num_procs
-          else
-            print*, "using default number of cores: ",num_procs
-          end if
-          print*, "myhucs: ", myhucs
-
+  if (nmyhucs .lt. num_procs) then
+    call omp_set_num_threads(nmyhucs)
+    num_procs = nmyhucs
+    print*, "adjusting total number of cores to ",num_procs
+  else
+    print*, "using default number of cores: ",num_procs
+  end if
+  print*, "myhucs: ", myhucs
 
   !!!!!!!!!!!!!!!!!!
-
-
 
   do s =   start_scen,  end_scen
 
@@ -354,16 +397,21 @@ program LOCA_Colate_to_HUCS
 
     do h = 1, nmyhucs
 
-      write(csv_filename(h),'(A, I8.8,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
-      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') h, &
-                                                                       unit_huc(h), &
-                                                                       myhucs(h), &
-                                                                       nhuccells(h), &
-                                                                       trim(csv_filename(h))
+      write(csv_filename(h),'(A, I8.8,"_",A,".csv")') &
+            trim(file_output_root),                   &
+            myhucs(h),                                &
+            trim(scenarios(s))
+      write(*,'("h:",I3.3," u:",I3.3," HUC:",I8.8," size:",I8," ",A)') &
+            h, &
+            unit_huc(h), &
+            myhucs(h), &
+            nhuccells(h), &
+            trim(csv_filename(h))
 
 
       open(unit_huc(h), FILE=trim(csv_filename(h)), form="FORMATTED")
-      write(unit_huc(h),*) "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
+      write(unit_huc(h),*) &
+            "Time,Division,Ensemble,Scenario,Percentile,tasmax,tasmin,pr"
       close(unit_huc(h))
 
     end do
@@ -394,7 +442,10 @@ program LOCA_Colate_to_HUCS
 
     do e = 1, nens
 
-      print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s))
+      print*, "== processing ensemble ", &
+              trim(ensembles(e)),        &
+              ", scenario " ,            &
+              trim(scenarios(s))
       print*, "==  "
 
 
@@ -403,28 +454,54 @@ program LOCA_Colate_to_HUCS
       tasmax_variable_name = "tasmax_" // trim(ensembles(e)) // "_" // trim(scenarios(s))
       tasmin_variable_name = "tasmin_" // trim(ensembles(e)) // "_" // trim(scenarios(s))
 
-      filename_pr     = trim(file_front_root)  // trim(scenarios(s)) //     "/pr/NGP_LOCA_" //     trim(pr_variable_name) // ".nc"
-      filename_tasmax = trim(file_front_root)  // trim(scenarios(s)) // "/tasmax/NGP_LOCA_" // trim(tasmax_variable_name) // ".nc"
-      filename_tasmin = trim(file_front_root)  // trim(scenarios(s)) // "/tasmin/NGP_LOCA_" // trim(tasmin_variable_name) // ".nc"
-
+      filename_pr     = trim(file_front_root)  // &
+                        trim(scenarios(s))     // &
+                        "/pr/NGP_LOCA_"        // &
+                        trim(pr_variable_name) // &
+                        ".nc"
+      filename_tasmax = trim(file_front_root)  // &
+                        trim(scenarios(s))     // &
+                        "/tasmax/NGP_LOCA_"        // &
+                        trim(pr_variable_name) // &
+                        ".nc"
+      filename_tasmin = trim(file_front_root)  // &
+                        trim(scenarios(s))     // &
+                        "/tasmin/NGP_LOCA_"        // &
+                        trim(pr_variable_name) // &
+                        ".nc"
 
 
       ncstat = NF90_OPEN(filename_pr, NF90_NOWRITE, netcdf_id_file_pr)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_INQ_VARID(netcdf_id_file_pr, trim(pr_variable_name), netcdf_id_pr)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_INQ_VARID(netcdf_id_file_pr,      &
+                                  trim(pr_variable_name), &
+                                  netcdf_id_pr)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "scale_factor",  pr_scale_factor)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "add_offset",  pr_add_offset)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_pr,      &
+                                netcdf_id_pr,           &
+                                "scale_factor",         &
+                                pr_scale_factor)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   netcdf_id_pr, "_FillValue",  pr_FillValue)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   &
+                                netcdf_id_pr,        &
+                                "add_offset",        &
+                                pr_add_offset)
+
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+          ncstat = NF90_GET_ATT(netcdf_id_file_pr,   &
+                                netcdf_id_pr,        &
+                                "_FillValue",        &
+                                pr_FillValue)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
       ncstat = NF90_CLOSE(netcdf_id_file_pr)
+
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
         print*, "==         PR:",trim(filename_pr)
@@ -438,25 +515,25 @@ program LOCA_Colate_to_HUCS
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
           ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, trim(tasmax_variable_name), netcdf_id_tasmax)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
           ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "scale_factor",  tasmax_scale_factor)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
           ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
           ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-       ncstat = NF90_CLOSE(netcdf_id_file_tasmax)
-         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+      ncstat = NF90_CLOSE(netcdf_id_file_tasmax)
+        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-         print*, "==     TASMAX:",trim(filename_tasmin)
-         print*, "==          scale:",tasmax_scale_factor
-         print*, "==         offset:",tasmax_add_offset
-         print*, "==      FillValue:",tasmax_FillValue
-         print*, "== "
+      print*, "==     TASMAX:",trim(filename_tasmin)
+      print*, "==          scale:",tasmax_scale_factor
+      print*, "==         offset:",tasmax_add_offset
+      print*, "==      FillValue:",tasmax_FillValue
+      print*, "== "
 
 
       ncstat = NF90_OPEN(filename_tasmin, NF90_NOWRITE, netcdf_id_file_tasmin)
@@ -474,14 +551,14 @@ program LOCA_Colate_to_HUCS
           ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-     ncstat = NF90_CLOSE(netcdf_id_file_tasmin)
+      ncstat = NF90_CLOSE(netcdf_id_file_tasmin)
        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        print*, "==     TASMIN:",trim(filename_tasmin)
-        print*, "==          scale:",tasmin_scale_factor
-        print*, "==         offset:",tasmin_add_offset
-        print*, "==      FillValue:",tasmin_FillValue
-        print*, "== "
+      print*, "==     TASMIN:",trim(filename_tasmin)
+      print*, "==          scale:",tasmin_scale_factor
+      print*, "==         offset:",tasmin_add_offset
+      print*, "==      FillValue:",tasmin_FillValue
+      print*, "== "
 
 
 
@@ -528,7 +605,9 @@ program LOCA_Colate_to_HUCS
         ! Read Precip Block
         !
 
-        ncstat = NF90_OPEN(filename_pr, NF90_NOWRITE, netcdf_id_file_pr)
+        ncstat = NF90_OPEN(filename_pr,  &
+                           NF90_NOWRITE, &
+                           netcdf_id_file_pr)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
             ncstat = NF90_INQ_VARID(netcdf_id_file_pr, trim(pr_variable_name), netcdf_id_pr)
@@ -556,14 +635,20 @@ program LOCA_Colate_to_HUCS
         ! Read Tasmax Block
         !
 
-        ncstat = NF90_OPEN(filename_tasmax, NF90_NOWRITE, netcdf_id_file_tasmax)
+        ncstat = NF90_OPEN(filename_tasmax, &
+                           NF90_NOWRITE,    &
+                           netcdf_id_file_tasmax)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, trim(tasmax_variable_name), netcdf_id_tasmax)
+            ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, &
+                                    trim(tasmax_variable_name), &
+                                    netcdf_id_tasmax)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-            ncstat = NF90_GET_VAR(netcdf_id_file_tasmax,   netcdf_id_tasmax,  input_map,  &
+            ncstat = NF90_GET_VAR(netcdf_id_file_tasmax,   &
+                                  netcdf_id_tasmax,  &
+                                  input_map,  &
                                   start = netcdf_dims_3d_start, &
                                   count = netcdf_dims_3d_count  )
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -583,20 +668,28 @@ program LOCA_Colate_to_HUCS
         ! Read Tasmin Block
         !
 
-        ncstat = NF90_OPEN(filename_tasmin, NF90_NOWRITE, netcdf_id_file_tasmin)
+        ncstat = NF90_OPEN(filename_tasmin, &
+                           NF90_NOWRITE, &
+                           netcdf_id_file_tasmin)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin, trim(tasmin_variable_name), netcdf_id_tasmin)
+            ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin, &
+                                    trim(tasmin_variable_name), &
+                                    netcdf_id_tasmin)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-            ncstat = NF90_GET_VAR(netcdf_id_file_tasmin,   netcdf_id_tasmin,  input_map,  &
+            ncstat = NF90_GET_VAR(netcdf_id_file_tasmin,  &
+                                  netcdf_id_tasmin,  &
+                                  input_map,  &
                                   start = netcdf_dims_3d_start, &
                                   count = netcdf_dims_3d_count  )
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
             map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
-            where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
+
+            where (input_map .eq. tasmin_FillValue)   &
+               map_tasmin = tasmin_FillValue
 
         ncstat = NF90_CLOSE(netcdf_id_file_tasmin)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -712,15 +805,19 @@ program LOCA_Colate_to_HUCS
 
               !!! output
 
-                write(output_buffer(t_buffer),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer), &
+                      '(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P000",  &
-                            minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
+                            minval(sort_tasmax), &
+                            minval(sort_tasmin), &
+                            minval(sort_pr)
 
-                write(output_buffer(t_buffer+1),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+1), &
+                      '(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -730,7 +827,8 @@ program LOCA_Colate_to_HUCS
                             quantile7(sort_tasmin, 0.25, nhuccells(h)), &
                             quantile7(sort_pr,     0.25, nhuccells(h))
 
-                write(output_buffer(t_buffer+2),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+2), &
+                      '(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -740,7 +838,8 @@ program LOCA_Colate_to_HUCS
                             quantile7(sort_tasmin, 0.50, nhuccells(h)), &
                             quantile7(sort_pr,     0.50, nhuccells(h))
 
-                write(output_buffer(t_buffer+3),'(A,",",I8.8,3(",",A),3(",",F8.2))')   &
+                write(output_buffer(t_buffer+3), &
+                      '(A,",",I8.8,3(",",A),3(",",F8.2))')   &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
@@ -750,21 +849,27 @@ program LOCA_Colate_to_HUCS
                             quantile7(sort_tasmin, 0.75, nhuccells(h)), &
                             quantile7(sort_pr,     0.75, nhuccells(h))
 
-                write(output_buffer(t_buffer+4),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+4), &
+                      '(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "P100",  &
-                            maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
+                            maxval(sort_tasmax), &
+                            maxval(sort_tasmin), &
+                            maxval(sort_pr)
 
-                write(output_buffer(t_buffer+5),'(A,",",I8.8,3(",",A),3(",",F8.2))')  &
+                write(output_buffer(t_buffer+5), &
+                      '(A,",",I8.8,3(",",A),3(",",F8.2))')  &
                             trim(caldate), &
                             myhucs(h), &
                             trim(ensembles(e)), &
                             trim(scenarios(s)), &
                             "MEAN",  &
-                            (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
+                            (/ sum(sort_tasmax), &
+                               sum(sort_tasmin), &
+                               sum(sort_pr) /) / nhuccells(h)
 
               !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
 
@@ -776,7 +881,12 @@ program LOCA_Colate_to_HUCS
 
             end do  !!  Internal Time Loop (t)
 
-            open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
+            open(unit_huc(h),    &
+                 FILE=trim(csv_filename(h)), &
+                 status="old",               &
+                 position="append",          &
+                 form="formatted",           &
+                 action="write")
             write(unit_huc(h),"(A)") output_buffer(:)
             close(unit_huc(h))
 
@@ -786,8 +896,9 @@ program LOCA_Colate_to_HUCS
 
       if ((tt .eq. n_reads-1)) then
         print*, "=="
-        print*, "== De-Allocating OMP Arrays for large bulk Reads inside tt loop ", &
-              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",  &
+        print*, "== De-Allocating OMP Arrays for large bulk Reads " // &
+              "inside tt loop " // &
+              "(input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",  &
               tt,n_reads-1, n_reads
         print*, "=="
 
@@ -802,7 +913,8 @@ program LOCA_Colate_to_HUCS
   end do  !!  NetCDF Time Loop (tt)
 
   print*, "=="
-  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble ", &
+  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull " // &
+        "for end of ensemble " // &
         "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
   print*, "=="
 
@@ -815,7 +927,8 @@ program LOCA_Colate_to_HUCS
   end do  !! Ensemble Loop (e)
 
       print*, "== "
-      print*, "== De-Allocating arrays at the end of scenario (span_t,start_t,end_t)"
+      print*, "== De-Allocating arrays at the end of scenario " // &
+              "(span_t,start_t,end_t)"
       print*, "== "
 
       deallocate(span_t)
@@ -834,7 +947,8 @@ end do   !! Scenario Loop (s)
 
   !!!!!!!!!!!!!!!!!!
 
-  print*, "Deallocating arrays at the end of program (my hucs,nhuccells,unit_huc,csv_filename)"
+  print*, "Deallocating arrays at the end of program " // &
+          "(my hucs,nhuccells,unit_huc,csv_filename)"
 
   deallocate(    myhucs )
   deallocate( nhuccells )
@@ -884,7 +998,7 @@ recursive subroutine QSort(A,nA)
     if (nA > 1) then
 
         call random_number(random)
-        pivot = A(int(random*real(nA-1))+1)  ! random pivor (not best performance, but avoids worst-case)
+        pivot = A(int(random*real(nA-1))+1)
         left = 0
         right = nA + 1
 
