@@ -19,7 +19,7 @@ program LOCA_Colate_to_HUCS
 
   integer, parameter ::      npull = 365    ! 2, 3, 7, 487
 
-  integer, parameter :: start_scen = 1
+  integer, parameter :: start_scen = 3
   integer, parameter :: end_scen   = 3
 
   integer (kind=4) :: myhuc_low    = 10300101
