@@ -134,7 +134,7 @@ program LOCA_Colate_to_ClimDivs_CAN
 
   !  num_procs = omp_get_max_threads()
      num_procs = 1
-     
+
   variables = (/ "pr    ", &
                  "tasmax", &
                  "tasmin"  /)
@@ -308,7 +308,7 @@ program LOCA_Colate_to_ClimDivs_CAN
 
 
           if (nmyhucs .lt. num_procs) then
-            call omp_set_num_threads(nmyhucs)
+            ! call omp_set_num_threads(nmyhucs)
             num_procs = nmyhucs
             print*, "adjusting total number of cores to ",num_procs
           else

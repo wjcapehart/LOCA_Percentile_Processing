@@ -131,7 +131,7 @@ program LOCA_Colate_to_HUCS
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   first_huc = .TRUE.
-  
+
   !  num_procs = omp_get_max_threads()
      num_procs = 1
 
@@ -310,7 +310,7 @@ program LOCA_Colate_to_HUCS
 
 
           if (nmyhucs .lt. num_procs) then
-            call omp_set_num_threads(nmyhucs)
+            ! call omp_set_num_threads(nmyhucs)
             num_procs = nmyhucs
             print*, "adjusting total number of cores to ",num_procs
           else

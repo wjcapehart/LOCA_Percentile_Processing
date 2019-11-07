@@ -356,7 +356,7 @@ program LOCA_Colate_to_HUCS
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
   if (nmyhucs .lt. num_procs) then
-    call omp_set_num_threads(nmyhucs)
+    ! call omp_set_num_threads(nmyhucs)
     num_procs = nmyhucs
     print*, "adjusting total number of cores to ",num_procs
   else
