@@ -462,12 +462,12 @@ program LOCA_Colate_to_HUCS
       filename_tasmax = trim(file_front_root)  // &
                         trim(scenarios(s))     // &
                         "/tasmax/NGP_LOCA_"        // &
-                        trim(pr_variable_name) // &
+                        trim(tasmax_variable_name) // &
                         ".nc"
       filename_tasmin = trim(file_front_root)  // &
                         trim(scenarios(s))     // &
                         "/tasmin/NGP_LOCA_"        // &
-                        trim(pr_variable_name) // &
+                        trim(tasmin_variable_name) // &
                         ".nc"
 
 
