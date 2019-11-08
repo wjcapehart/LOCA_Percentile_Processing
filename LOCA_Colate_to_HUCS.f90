@@ -17,7 +17,7 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: len_hucstr =     8
   integer, parameter :: len_outbuf =   100
 
-  integer, parameter ::      npull = 365    ! 2, 3, 7, 487
+  integer, parameter ::      npull = 365
 
   integer, parameter :: start_scen = 3
   integer, parameter :: end_scen   = 3
@@ -32,7 +32,7 @@ program LOCA_Colate_to_HUCS
   character (len=*), PARAMETER  :: file_front_root   =  &
             "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
   character (len=*), PARAMETER  :: file_output_root  =  &
-            "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
+      "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
 
 
   integer (kind=4) :: t_buffer
@@ -135,7 +135,7 @@ program LOCA_Colate_to_HUCS
 
   first_huc = .TRUE.
 
-!  num_procs = omp_get_max_threads()
+   !  num_procs = omp_get_max_threads()
    num_procs = 1
 
 
@@ -227,6 +227,7 @@ program LOCA_Colate_to_HUCS
   print*, " "
   print*, "--- Pass One for Polygons ---"
   print*, " "
+
   do h = 1, nhucs
 
     if ((hucs(h) .ge. myhuc_low) .and. (hucs(h) .le. myhuc_high)) then
@@ -248,7 +249,7 @@ program LOCA_Colate_to_HUCS
   allocate( nhuccells( nmyhucs ) )
   allocate(  unit_huc( nmyhucs ) )
 
-    !Pass 2
+  !Pass 2
 
   t = 0
   print*, " "
@@ -450,9 +451,20 @@ program LOCA_Colate_to_HUCS
 
 
 
-      pr_variable_name     = "pr_"     // trim(ensembles(e)) // "_" // trim(scenarios(s))
-      tasmax_variable_name = "tasmax_" // trim(ensembles(e)) // "_" // trim(scenarios(s))
-      tasmin_variable_name = "tasmin_" // trim(ensembles(e)) // "_" // trim(scenarios(s))
+      pr_variable_name     = "pr_"              // &
+                             trim(ensembles(e)) // &
+                             "_"                // &
+                             trim(scenarios(s))
+
+      tasmax_variable_name = "tasmax_"          // &
+                             trim(ensembles(e)) // &
+                             "_"                // &
+                             trim(scenarios(s))
+
+      tasmin_variable_name = "tasmin_"          // &
+                             trim(ensembles(e)) // &
+                             "_"                // &
+                             trim(scenarios(s))
 
       filename_pr     = trim(file_front_root)  // &
                         trim(scenarios(s))     // &
@@ -504,60 +516,86 @@ program LOCA_Colate_to_HUCS
 
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        print*, "==         PR:",trim(filename_pr)
-        print*, "==          scale:",pr_scale_factor
-        print*, "==         offset:",pr_add_offset
-        print*, "==      FillValue:",pr_FillValue
-        print*, "== "
+      print*, "==         PR:",     trim(filename_pr)
+      print*, "==          scale:", pr_scale_factor
+      print*, "==         offset:", pr_add_offset
+      print*, "==      FillValue:", pr_FillValue
+      print*, "== "
 
 
-      ncstat = NF90_OPEN(filename_tasmax, NF90_NOWRITE, netcdf_id_file_tasmax)
+      ncstat = NF90_OPEN(filename_tasmax, &
+                         NF90_NOWRITE,    &
+                         netcdf_id_file_tasmax)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax, trim(tasmax_variable_name), netcdf_id_tasmax)
+          ncstat = NF90_INQ_VARID(netcdf_id_file_tasmax,      &
+                                  trim(tasmax_variable_name), &
+                                  netcdf_id_tasmax)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "scale_factor",  tasmax_scale_factor)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   &
+                                netcdf_id_tasmax,        &
+                                "scale_factor",          &
+                                tasmax_scale_factor)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   &
+                                netcdf_id_tasmax,        &
+                                "add_offset",            &
+                                tasmax_add_offset)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmax,   &
+                                netcdf_id_tasmax,        &
+                                "_FillValue",            &
+                                tasmax_FillValue)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
       ncstat = NF90_CLOSE(netcdf_id_file_tasmax)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      print*, "==     TASMAX:",trim(filename_tasmin)
-      print*, "==          scale:",tasmax_scale_factor
-      print*, "==         offset:",tasmax_add_offset
-      print*, "==      FillValue:",tasmax_FillValue
+      print*, "==     TASMAX:",     trim(filename_tasmin)
+      print*, "==          scale:", tasmax_scale_factor
+      print*, "==         offset:", tasmax_add_offset
+      print*, "==      FillValue:", tasmax_FillValue
       print*, "== "
 
 
-      ncstat = NF90_OPEN(filename_tasmin, NF90_NOWRITE, netcdf_id_file_tasmin)
+      ncstat = NF90_OPEN(filename_tasmin,       &
+                         NF90_NOWRITE,          &
+                         netcdf_id_file_tasmin)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin, trim(tasmin_variable_name), netcdf_id_tasmin)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "scale_factor",  tasmin_scale_factor)
+          ncstat = NF90_INQ_VARID(netcdf_id_file_tasmin,      &
+                                  trim(tasmin_variable_name), &
+                                  netcdf_id_tasmin)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, netcdf_id_tasmin, "add_offset",  tasmin_add_offset)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, &
+                                netcdf_id_tasmin,      &
+                                "scale_factor",        &
+                                tasmin_scale_factor)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin,  &
+                                netcdf_id_tasmin,       &
+                                "add_offset",           &
+                                tasmin_add_offset)
+            if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+          ncstat = NF90_GET_ATT(netcdf_id_file_tasmin, &
+                                netcdf_id_tasmin,      &
+                                "_FillValue",          &
+                                tasmin_FillValue)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
       ncstat = NF90_CLOSE(netcdf_id_file_tasmin)
        if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-      print*, "==     TASMIN:",trim(filename_tasmin)
-      print*, "==          scale:",tasmin_scale_factor
-      print*, "==         offset:",tasmin_add_offset
-      print*, "==      FillValue:",tasmin_FillValue
+      print*, "==     TASMIN:",     trim(filename_tasmin)
+      print*, "==          scale:", tasmin_scale_factor
+      print*, "==         offset:", tasmin_add_offset
+      print*, "==      FillValue:", tasmin_FillValue
       print*, "== "
 
 
@@ -590,9 +628,9 @@ program LOCA_Colate_to_HUCS
           allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
         end if
 
-
-
-        write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
+        write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  &
+                    trim(caldate_pull), &
+                    trim(caldate_end),  &
                     trim(ensembles(e)), &
                     trim(scenarios(s)), &
                     num_procs
@@ -610,10 +648,14 @@ program LOCA_Colate_to_HUCS
                            netcdf_id_file_pr)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            ncstat = NF90_INQ_VARID(netcdf_id_file_pr, trim(pr_variable_name), netcdf_id_pr)
+            ncstat = NF90_INQ_VARID(netcdf_id_file_pr,      &
+                                    trim(pr_variable_name), &
+                                    netcdf_id_pr)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            ncstat = NF90_GET_VAR(netcdf_id_file_pr,   netcdf_id_pr,  input_map,  &
+            ncstat = NF90_GET_VAR(netcdf_id_file_pr,            &
+                                  netcdf_id_pr,                 &
+                                  input_map,                    &
                                   start = netcdf_dims_3d_start, &
                                   count = netcdf_dims_3d_count  )
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -698,49 +740,47 @@ program LOCA_Colate_to_HUCS
         !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!$OMP PARALLEL DO PRIVATE (h,                   &
-!$OMP&                     t,                   &
-!$OMP&                     linear_array,        &
-!$OMP&                     mask_map,            &
-!$OMP&                     t_buffer,            &
-!$OMP&                     masked_variable_map, &
-!$OMP&                     caldate,             &
-!$OMP&                     output_buffer,       &
-!$OMP&                     sort_tasmax,         &
-!$OMP&                     sort_tasmin,         &
+!$OMP PARALLEL DO PRIVATE (h,                      &
+!$OMP&                     t,                      &
+!$OMP&                     linear_array,           &
+!$OMP&                     mask_map,               &
+!$OMP&                     t_buffer,               &
+!$OMP&                     masked_variable_map,    &
+!$OMP&                     caldate,                &
+!$OMP&                     output_buffer,          &
+!$OMP&                     sort_tasmax,            &
+!$OMP&                     sort_tasmin,            &
 !$OMP&                     sort_pr              ), &
 !$OMP&             SHARED (e, tt,                  &
-!$OMP&                     s,  n_reads,                 &
-!$OMP&                     csv_filename,        &
-!$OMP&                     ensembles,           &
-!$OMP&                     scenarios,           &
-!$OMP&                     nhuccells,           &
-!$OMP&                     start_t,             &
-!$OMP&                     span_t,              &
-!$OMP&                     t_in_tt,             &
-!$OMP&                     huc_map,             &
-!$OMP&                     caldate_hist,        &
-!$OMP&                     caldate_futr,        &
-!$OMP&                     map_pr,              &
-!$OMP&                     map_tasmax,          &
-!$OMP&                     map_tasmin,          &
-!$OMP&                     pr_FillValue,        &
-!$OMP&                     tasmax_FillValue,    &
-!$OMP&                     tasmin_FillValue,    &
-!$OMP&                     unit_huc,            &
-!$OMP&                     num_procs,           &
-!$OMP&                     nmyhucs,             &
+!$OMP&                     s,  n_reads,            &
+!$OMP&                     csv_filename,           &
+!$OMP&                     ensembles,              &
+!$OMP&                     scenarios,              &
+!$OMP&                     nhuccells,              &
+!$OMP&                     start_t,                &
+!$OMP&                     span_t,                 &
+!$OMP&                     t_in_tt,                &
+!$OMP&                     huc_map,                &
+!$OMP&                     caldate_hist,           &
+!$OMP&                     caldate_futr,           &
+!$OMP&                     map_pr,                 &
+!$OMP&                     map_tasmax,             &
+!$OMP&                     map_tasmin,             &
+!$OMP&                     pr_FillValue,           &
+!$OMP&                     tasmax_FillValue,       &
+!$OMP&                     tasmin_FillValue,       &
+!$OMP&                     unit_huc,               &
+!$OMP&                     num_procs,              &
+!$OMP&                     nmyhucs,                &
 !$OMP&                     myhucs               ), &
 !$OMP&            DEFAULT (NONE)                 , &
 !$OMP&           SCHEDULE (STATIC)
 
         do h = 1, nmyhucs, 1
 
-
           t_buffer = 1
 
           do t = 1,  span_t(tt), 1
-
 
             t_in_tt = start_t(tt) + t - 1
 
@@ -750,7 +790,14 @@ program LOCA_Colate_to_HUCS
               caldate = caldate_futr(t_in_tt)
             end if
 
-!print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+              !print*, "proc:(",  &
+              !         omp_get_thread_num(),  &
+              !         ":",  &
+              !         num_procs,  &
+              !         ") caldat: ",  &
+              !         trim(caldate),  &
+              !         " HUC:",  &
+              !         myhucs(h)
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
@@ -1040,7 +1087,8 @@ end subroutine QSort
 real (kind=4) function   quantile7(x,quart,nx)
     implicit none
     ! Excel's method to calculate quartiles.
-    ! Based on discussion in this paper http://www.haiweb.org/medicineprices/manual/quartiles_iTSS.pdf
+    ! Based on discussion in this paper
+    !  http://www.haiweb.org/medicineprices/manual/quartiles_iTSS.pdf
     !
     integer (kind=4), intent(in) :: nx
     real (kind=4), intent (in), dimension(nx)  :: x
@@ -1070,7 +1118,8 @@ end function quantile7
 
 
 subroutine getgp(a,b,c)
-    ! Subroutine to that returns the Right hand and Left hand side digits of a decimal number
+    ! Subroutine to that returns the Right hand and
+    !   Left hand side digits of a decimal number
     real (kind=4), intent(in)  :: a
     real (kind=4), intent(out) :: b,c
 
