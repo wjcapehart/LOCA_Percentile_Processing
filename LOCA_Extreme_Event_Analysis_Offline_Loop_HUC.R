@@ -11,7 +11,7 @@
 
   library(package = "extRemes") # NCEI  Data Retrieval Package
 
-
+  library(package = "RCurl") # General Network (HTTP/FTP/...) Client Interface for R
 
 # Pulling Hucs for Zone Lookup Tables
 
@@ -31,7 +31,18 @@
   load(file = url(HUC_AVAIL_URL), verbose=TRUE)
 
   remove(HUC_AVAIL_URL)
-
+  
+  available_extreme_files = list.files(path = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/climatology/LOCA_ExtRemes/HUC08/",
+                                       pattern = "_Daily_Rainfall_Returns.RData")
+  
+  available_raw_files = list.files(path = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/",
+                                   pattern = "_Yearly.RData")
+  
+  available_extreme_hucs = str_sub(string = available_extreme_files, start = 16, end= 16+7)
+  available_raw_hucs     = str_sub(string = available_raw_files, start = 16, end= 16+7)
+  needed_hucs = setdiff(available_raw_hucs,available_extreme_hucs)
+   
+  
 
 # Select Periods
 
@@ -61,9 +72,9 @@ save(Periods, file=Periods_filename)
 
 
 
-huc_zone_lut = Completed_HUCS[1]
+huc_zone_lut = needed_hucs[1]
 
-for (huc_zone_lut in Completed_HUCS)
+for (huc_zone_lut in needed_hucs)
 {  # huc
 
 
