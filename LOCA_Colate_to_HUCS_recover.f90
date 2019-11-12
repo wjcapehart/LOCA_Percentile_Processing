@@ -18,10 +18,10 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: len_outbuf =   100
 
   integer, parameter :: start_scen = 1
-  integer, parameter :: end_scen   = nscen
+  integer, parameter :: end_scen   = 1
 
-  integer (kind=4) :: myhuc_low    = 10070000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 10089999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 10210007 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_high   = 10210010 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
@@ -51,7 +51,7 @@ program LOCA_Colate_to_HUCS
   character (len=180) :: filename_tasmin
   character (len=180) :: basin_file_name
 
-  integer (kind=4) :: t_in_tt
+  integer (kind=4) :: t_in_tt, repair_ens
 
   integer (kind=2), allocatable :: input_map(:,:,:)
   real    (kind=4), allocatable :: map_pr(:,:,:)
@@ -141,39 +141,42 @@ program LOCA_Colate_to_HUCS
                  "tasmax", &
                  "tasmin"  /)
 
+
+
   scenarios = (/ "historical", &
                  "rcp45     ", &
                  "rcp85     " /)
 
-  ensembles = (/ "ACCESS1-0_r1i1p1     ", &
-                 "ACCESS1-3_r1i1p1     ", &
-                 "CCSM4_r6i1p1         ", &
-                 "CESM1-BGC_r1i1p1     ", &
-                 "CESM1-CAM5_r1i1p1    ", &
-                 "CMCC-CMS_r1i1p1      ", &
-                 "CMCC-CM_r1i1p1       ", &
-                 "CNRM-CM5_r1i1p1      ", &
-                 "CSIRO-Mk3-6-0_r1i1p1 ", &
-                 "CanESM2_r1i1p1       ", &
-                 "FGOALS-g2_r1i1p1     ", &
-                 "GFDL-CM3_r1i1p1      ", &
-                 "GFDL-ESM2G_r1i1p1    ", &
-                 "GFDL-ESM2M_r1i1p1    ", &
-                 "HadGEM2-AO_r1i1p1    ", &
-                 "HadGEM2-CC_r1i1p1    ", &
-                 "HadGEM2-ES_r1i1p1    ", &
-                 "IPSL-CM5A-LR_r1i1p1  ", &
-                 "IPSL-CM5A-MR_r1i1p1  ", &
-                 "MIROC-ESM-CHEM_r1i1p1", &
-                 "MIROC-ESM_r1i1p1     ", &
-                 "MIROC5_r1i1p1        ", &
-                 "MPI-ESM-LR_r1i1p1    ", &
-                 "MPI-ESM-MR_r1i1p1    ", &
-                 "MRI-CGCM3_r1i1p1     ", &
-                 "NorESM1-M_r1i1p1     ", &
-                 "bcc-csm1-1-m_r1i1p1  " /)
+  ensembles = (/ "ACCESS1-0_r1i1p1     ", & ! 01
+                 "ACCESS1-3_r1i1p1     ", & ! 02
+                 "CCSM4_r6i1p1         ", & ! 03
+                 "CESM1-BGC_r1i1p1     ", & ! 04
+                 "CESM1-CAM5_r1i1p1    ", & ! 05
+                 "CMCC-CMS_r1i1p1      ", & ! 06
+                 "CMCC-CM_r1i1p1       ", & ! 07
+                 "CNRM-CM5_r1i1p1      ", & ! 08
+                 "CSIRO-Mk3-6-0_r1i1p1 ", & ! 09
+                 "CanESM2_r1i1p1       ", & ! 10
+                 "FGOALS-g2_r1i1p1     ", & ! 11
+                 "GFDL-CM3_r1i1p1      ", & ! 12
+                 "GFDL-ESM2G_r1i1p1    ", & ! 13
+                 "GFDL-ESM2M_r1i1p1    ", & ! 14
+                 "HadGEM2-AO_r1i1p1    ", & ! 15
+                 "HadGEM2-CC_r1i1p1    ", & ! 16
+                 "HadGEM2-ES_r1i1p1    ", & ! 17
+                 "IPSL-CM5A-LR_r1i1p1  ", & ! 18
+                 "IPSL-CM5A-MR_r1i1p1  ", & ! 19
+                 "MIROC-ESM-CHEM_r1i1p1", & ! 20
+                 "MIROC-ESM_r1i1p1     ", & ! 21
+                 "MIROC5_r1i1p1        ", & ! 22
+                 "MPI-ESM-LR_r1i1p1    ", & ! 23
+                 "MPI-ESM-MR_r1i1p1    ", & ! 24
+                 "MRI-CGCM3_r1i1p1     ", & ! 25
+                 "NorESM1-M_r1i1p1     ", & ! 26
+                 "bcc-csm1-1-m_r1i1p1  " /) ! 27
 
-
+repair_ens = 20
+print("Repairing ",ensembles(repair_ens))
 
 !!!!!!!!!!!!!!!!  Get input_map
 
@@ -392,7 +395,7 @@ program LOCA_Colate_to_HUCS
 
     print*, "---------------------"
 
-    do e = 1, 1 ! nens
+    do e = repair_ens, repair_ens ! nens
 
       print*, "== processing ensemble ", trim(ensembles(e)), ", scenario " , trim(scenarios(s))
       print*, "==  "

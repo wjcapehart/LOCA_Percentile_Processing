@@ -77,10 +77,12 @@ save(Periods, file=Periods_filename)
 
 huc_zone_lut = needed_hucs[1]
 
+print()
+
 for (huc_zone_lut in needed_hucs)
 {  # huc
 
-
+  
   FIRST = TRUE
 
   # LOCA Data Extraction from SD Mines Thredds Server
