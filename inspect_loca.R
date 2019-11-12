@@ -61,8 +61,7 @@
   
   remove(HUC_LUT_URL)
   
-  HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Code_ID >= 10020000) & 
-                                             (HUC08_Code_ID  < 10030000))
+  HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID == "10210007")
   
   
   target_scenario = "rcp85"
@@ -73,6 +72,8 @@
   
   
   huc_zone_lut = Completed_HUCS[1]
+  
+  
 
 for (huc_zone_lut in Completed_HUCS)
 {  # huc

@@ -37,9 +37,13 @@
   available_raw_files = list.files(path = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/",
                                    pattern = "_Yearly.RData")
   
-  available_extreme_hucs = str_sub(string = available_extreme_files, start = 16, end= 16+7)
-  available_raw_hucs     = str_sub(string = available_raw_files, start = 16, end= 16+7)
-  needed_hucs = setdiff(available_raw_hucs,available_extreme_hucs)
+  available_extreme_hucs = str_sub(string = available_extreme_files, 
+                                   start  = 16, 
+                                   end    = 16+7)
+  available_raw_hucs     = str_sub(string = available_raw_files, 
+                                   start  = 16, 
+                                   end    = 16+7)
+  needed_hucs            = setdiff(available_raw_hucs,available_extreme_hucs)
    
   
 
