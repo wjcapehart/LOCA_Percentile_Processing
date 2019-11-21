@@ -9,7 +9,6 @@
 
   # NCAR Libraries
 
-  library(package = "extRemes") # NCEI  Data Retrieval Package
 
 
 
@@ -58,11 +57,15 @@
   
   
   remove(HUC_LUT_URL)
+  
+  HUC08_MRB_LUT$HUC08_Code_ID
+  
+  HUC08_MRB_LUT$HUC08_Number = as.numeric(as.character(HUC08_MRB_LUT$HUC08_Code_ID))
 
-  HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Code_ID >= 10020000) & 
-                                           (HUC08_Code_ID  < 10030000))
+  HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Number >= 10210007) &
+                                           (HUC08_Number <= 10219999))
 
-  target_scenario = "rcp85"
+  target_scenario = "historical"
   
 
   Completed_HUCS = HUC08_MRB_LUT$HUC08_Code_ID
@@ -100,13 +103,16 @@ for (huc_zone_lut in Completed_HUCS)
                    sep = "")
 
 
-  load(file    =(LOCA_URL))
+  load(file    =LOCA_URL, verbose = TRUE)
+  
+  LOCA_DAILY = loca_daily
+  remove(loca_daily)
   
   print(LOCA_URL)
   
   
   print(str_c("loca file rows:",
-              nrow(loca_daily)))
+              nrow(LOCA_DAILY)))
   
 
 
@@ -117,50 +123,22 @@ for (huc_zone_lut in Completed_HUCS)
                                huc_zone_lut,
                                "_",
                                target_scenario,
-                               ".csv",
+                               ".RData",
                                sep = "")
         
         CSV_URL  = str_c(root_LOCA_URL,
                          loca_csvname,
                          sep = "") 
         
-        newcsv = read.csv(CSV_URL)
+        load(CSV_URL, verbose = TRUE)
         
+        newcsv     = loca_daily
+        loca_daily = LOCA_DAILY
+        remove(LOCA_DAILY)
         
         print(str_c(" csv file rows:",
                     nrow(newcsv)))
-        
-        if (is.numeric(newcsv$Division[1]))
-        {
-          newcsv$Division = as.character(sprintf("%0d",newcsv$Division))
-        }
-        
-        newcsv = newcsv %>%
-          mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
-                                      Scenario == "rcp45"      ~ "RCP 4.5",
-                                      Scenario == "rcp85"      ~ "RCP 8.5"))
-        
-        newcsv$Time       = as.Date( sub("\uFEFF", "", newcsv$Time))
-        
-        newcsv$Scenario   = factor(x      = newcsv$Scenario,
-                                       levels = c("Historical",
-                                                  "RCP 4.5",
-                                                  "RCP 8.5"))
-        
-        newcsv$Division   = factor(x    = newcsv$Division,
-                                       levels = Divisions_factor)
-        
-        newcsv$Ensemble   = factor(x      = newcsv$Ensemble,
-                                       levels = Ensembles)
-        
-        newcsv$Percentile = factor(x      = newcsv$Percentile,
-                                       levels = c("P000",
-                                                  "P025",
-                                                  "P050",
-                                                  "P075",
-                                                  "P100",
-                                                  "MEAN"))
-        
+
         last_record = newcsv[nrow(newcsv), ]
         
         replaced_Scenario = unique(newcsv$Scenario)
@@ -174,8 +152,10 @@ for (huc_zone_lut in Completed_HUCS)
   
   {
     
-    loca_daily = loca_daily %>% filter(!( (Scenario == replaced_Scenario) & 
-                                          (Ensemble == replaced_Ensemble) ))
+    loca_daily = loca_daily %>% filter(!( (Scenario == replaced_Scenario)  ))
+
+    #loca_daily = loca_daily %>% filter(!( (Scenario == replaced_Scenario) & 
+    #                                        (Ensemble == replaced_Ensemble) ))
     
     
     loca_daily = rbind(loca_daily,newcsv)
@@ -289,4 +269,55 @@ for (huc_zone_lut in Completed_HUCS)
 
 } # huc
 
+
+
 print("Outahere like Vladimir")
+
+
+library(package = "tidyverse") # Multiple Tidyverse Resources
+library(package = "lubridate") # Date-Time Control
+
+
+
+root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/problems/"
+
+
+case = "10210007"
+
+scen = "historical"
+
+
+# get main
+
+loca_filename = str_c("NGP_LOCA_HUC08_",
+                      huc_zone_lut,
+                      ".RData",
+                      sep = "")
+
+
+LOCA_URL = str_c(root_LOCA_URL,
+                 loca_filename,
+                 sep = "")
+
+load( LOCA_URL , verbose = TRUE)
+
+loca_daily_main = loca_daily %>% filter(Scenario != "Historical")
+remove(loca_daily)
+
+load( str_c(root_LOCA_URL, 
+            "NGP_LOCA_HUCS_",
+            case,
+            "_",
+            scen,
+            ".RData",
+            sep = "")  , verbose = TRUE)
+
+loca_daily_short = loca_daily 
+remove(loca_daily)
+
+loca_daily = rbind(loca_daily_short,loca_daily_main)
+
+
+
+
+
