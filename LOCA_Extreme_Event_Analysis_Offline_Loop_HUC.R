@@ -31,21 +31,32 @@
 
   remove(HUC_AVAIL_URL)
   
-  available_extreme_files = list.files(path = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/climatology/LOCA_ExtRemes/HUC08/",
-                                       pattern = "_Daily_Rainfall_Returns.RData")
   
-  available_raw_files = list.files(path = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/",
-                                   pattern = "_Yearly.RData")
+  
+  
+  available_extreme_files = list.files(path    = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/climatology/LOCA_ExtRemes/HUC08/",
+                                       pattern = "Daily_Rainfall_Returns.RData")
+  
+  available_raw_files = list.files(path    = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/",
+                                   pattern = ".RData")
+  
+
   
   available_extreme_hucs = str_sub(string = available_extreme_files, 
                                    start  = 16, 
                                    end    = 16+7)
-  available_raw_hucs     = str_sub(string = available_raw_files, 
-                                   start  = 16, 
-                                   end    = 16+7)
+  
+  available_raw_hucs     = unique(str_sub(string = available_raw_files, 
+                                          start  = 16, 
+                                          end    = 16+7))
+  
+  available_extreme_hucs = unique(available_extreme_hucs)
+  available_raw_hucs     = unique(available_raw_hucs)
+  
+  
   needed_hucs            = setdiff(available_raw_hucs,available_extreme_hucs)
    
-  
+  needed_hucs = needed_hucs[!needed_hucs %in% "RData"]
 
 # Select Periods
 
@@ -77,7 +88,8 @@ save(Periods, file=Periods_filename)
 
 huc_zone_lut = needed_hucs[1]
 
-print()
+print("Processing the following HUCS")
+print(needed_hucs)
 
 for (huc_zone_lut in needed_hucs)
 {  # huc

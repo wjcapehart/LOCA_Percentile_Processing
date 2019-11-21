@@ -60,11 +60,35 @@ print(Periods)
 save(Periods, file=Periods_filename)
 
 
+available_extreme_files = list.files(path    = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/climatology/LOCA_ExtRemes/climate_divisions/",
+                                     pattern = "Daily_Rainfall_Returns.RData")
+
+available_raw_files = list.files(path    = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/",
+                                 pattern = ".RData")
 
 
-huc_zone_lut = Completed_Divisions[1]
 
-for (huc_zone_lut in Completed_Divisions)
+available_extreme_hucs = str_sub(string = available_extreme_files, 
+                                 start  = 16+3+1, 
+                                 end    = 16+1+3+3)
+
+available_raw_hucs     = unique(str_sub(string = available_raw_files, 
+                                        start  = 16+3, 
+                                        end    = 16+3+3))
+
+available_extreme_hucs = unique(available_extreme_hucs)
+available_raw_hucs     = unique(available_raw_hucs)
+
+
+needed_hucs            = setdiff(available_raw_hucs,available_extreme_hucs)
+
+needed_hucs = needed_hucs[!needed_hucs %in% "s.RD"]
+
+needed_hucs
+
+huc_zone_lut = needed_hucs[1]
+
+for (huc_zone_lut in needed_hucs)
 {  # huc
 
   # LOCA Data Extraction from SD Mines Thredds Server
