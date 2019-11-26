@@ -2,6 +2,5 @@
 rm -frv  ./*.exe
 
 ${FC} -o ./LOCA_Colate_to_HUCS.exe    -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_HUCS.f90
-${FC} -o ./LOCA_Colate_to_HUCS_recover.exe    -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_HUCS_recover.f90
 ${FC} -o ./LOCA_Colate_to_ClimDivs.exe  -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_ClimDivs.f90
 ${FC} -o ./LOCA_Colate_to_ClimDivs_CAN.exe  -I./ -I${NETCDFINC} -L${NETCDFLIB} -lnetcdff -L./ ./LOCA_Colate_to_ClimDivs_CAN.f90

@@ -27,8 +27,8 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 2901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 2901 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 2901
+  integer (kind=4) :: myhuc_high    
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
 
@@ -176,8 +176,9 @@ program LOCA_Colate_to_ClimDivs
 
 !!!!!!!!!!!!!!!!  Get input_map
 
+      first_huc = .TRUE.
 
-
+     myhuc_high = myhuc_low
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)

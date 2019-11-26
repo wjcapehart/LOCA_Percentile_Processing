@@ -25,12 +25,12 @@ program LOCA_Colate_to_ClimDivs_CAN
                     "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_nCLIMDIV_"
 
   integer, parameter :: start_scen = 1
-  integer, parameter :: end_scen   = nscen
+  integer, parameter :: end_scen   = 3
 
-  integer (kind=4) :: myhuc_low    = 40000 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
-  integer (kind=4) :: myhuc_high   = 49999 ! 10170000 (Big Sioux) !  10120000 (Chey)  !  10160000 (James)
+  integer (kind=4) :: myhuc_low    = 40000
+  integer (kind=4) :: myhuc_high  
 
-  integer, parameter :: npull = 90    ! 2, 3, 7, 487
+  integer, parameter :: npull = 365    ! 2, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
@@ -175,7 +175,7 @@ program LOCA_Colate_to_ClimDivs_CAN
 
 !!!!!!!!!!!!!!!!  Get input_map
 
-
+      myhuc_high = myhuc_low
 
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
