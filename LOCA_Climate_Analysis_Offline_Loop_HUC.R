@@ -47,7 +47,7 @@
   
   huc_zone_lut = Completed_HUCS[1]
 NAFF_Completed_HUCS = c("10030101")
-for (huc_zone_lut in rev(Completed_HUCS[9:99]))
+for (huc_zone_lut in Completed_HUCS[19])
 {  # huc
   
   print(str_c(" - ", huc_zone_lut))
