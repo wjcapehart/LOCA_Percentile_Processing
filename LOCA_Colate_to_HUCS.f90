@@ -22,7 +22,7 @@ program LOCA_Colate_to_HUCS
   integer, parameter :: start_scen = 2
   integer, parameter :: end_scen   = 2
 
-  integer (kind=4) :: myhuc_low    = 10030105
+  integer (kind=4) :: myhuc_low    = 10030201
   integer (kind=4) :: myhuc_high
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
