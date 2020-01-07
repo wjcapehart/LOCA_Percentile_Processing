@@ -46,7 +46,6 @@
   
   
   huc_zone_lut = Completed_HUCS[1]
-
 for (huc_zone_lut in Completed_HUCS)
 {  # huc
   
