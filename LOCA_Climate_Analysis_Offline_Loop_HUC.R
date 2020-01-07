@@ -77,9 +77,7 @@ for (huc_zone_lut in Completed_HUCS)
                    loca_filename,
                    sep = "")
 
-  my.connection = url(description = LOCA_URL)
-    load(file = my.connection)
-    close(con = my.connection)
+    load(file = LOCA_URL)
 
   remove(LOCA_URL)
   
