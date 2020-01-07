@@ -46,8 +46,8 @@
   
   
   huc_zone_lut = Completed_HUCS[1]
-Completed_HUCS = c("10030101")
-for (huc_zone_lut in Completed_HUCS)
+NAFF_Completed_HUCS = c("10030101")
+for (huc_zone_lut in Completed_HUCS[9:307])
 {  # huc
   
   print(str_c(" - ", huc_zone_lut))
@@ -281,7 +281,9 @@ for (huc_zone_lut in Completed_HUCS)
       } # not First
       
       
-      
+      remove(climdexInput)
+      remove(temp)
+      remove(climdex)
       
   }  # Scenarios
     
@@ -298,10 +300,14 @@ for (huc_zone_lut in Completed_HUCS)
        loca_etccdi_monthly, 
        file = loca_filename)
   
-  
+   
   
   
   print(1)
+  
 
+  remove(loca_etccdi_annual)
+  remove(loca_etccdi_monthly)
+  
 
 } # huc
