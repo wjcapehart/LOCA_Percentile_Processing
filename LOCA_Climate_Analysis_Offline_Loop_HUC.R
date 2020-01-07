@@ -47,7 +47,7 @@
   
   huc_zone_lut = Completed_HUCS[1]
 NAFF_Completed_HUCS = c("10030101")
-for (huc_zone_lut in Completed_HUCS[9:307])
+for (huc_zone_lut in rev(Completed_HUCS[9:99]))
 {  # huc
   
   print(str_c(" - ", huc_zone_lut))
@@ -120,7 +120,7 @@ for (huc_zone_lut in Completed_HUCS[9:307])
     {  # Scenarios
       loca_rcp=loca_ens %>% filter((Scenario == scenario))
       
-      print(str_c(" --- ", scenario,"     ",min(loca_rcp$Time)," ",max(loca_rcp$Time)))
+      print(str_c(" --- ", scenario,"    ",min(loca_rcp$Time)," ",max(loca_rcp$Time)))
       
       
       loca_sub = loca_ens %>% filter((Scenario == "Historical") | (Scenario == scenario))
