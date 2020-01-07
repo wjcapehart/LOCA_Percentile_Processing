@@ -288,7 +288,7 @@ for (huc_zone_lut in Completed_HUCS)
     
   }   # Ensembles
       
-  loca_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/HUC08/",
+  loca_filename = str_c("/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_ETCCDI/HUC08/",
                         "NGP_LOCA_ETCCDI_HUC08_",
                         huc_zone_lut,
                         ".RData",
