@@ -46,6 +46,7 @@
   
   
   huc_zone_lut = Completed_HUCS[1]
+Completed_HUCS = c("10030101")
 for (huc_zone_lut in Completed_HUCS)
 {  # huc
   
