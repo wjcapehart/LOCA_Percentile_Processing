@@ -19,11 +19,11 @@ program LOCA_Colate_to_HUCS
 
   integer, parameter ::      npull = 365
 
-  integer, parameter :: start_scen = 3
-  integer, parameter :: end_scen   = 3
+  integer, parameter :: start_scen = 2
+  integer, parameter :: end_scen   = 2
 
-  integer (kind=4) :: myhuc_low    = 10300200
-  integer (kind=4) :: myhuc_high  
+  integer (kind=4) :: myhuc_low    = 10030101
+  integer (kind=4) :: myhuc_high
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
   character (len=*), PARAMETER  :: map_values_name   = "HUC08_Code_ID"
