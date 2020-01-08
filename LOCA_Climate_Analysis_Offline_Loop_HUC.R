@@ -103,6 +103,7 @@ for (huc_zone_lut in Completed_HUCS[18])
   Ensembles = unique(loca_daily$Ensemble)
   Scenarios = unique(loca_daily$Scenario)
 
+
   ensemble = Ensembles[1]
   for (ensemble in Ensembles)
   {  # Ensembles
@@ -151,6 +152,7 @@ for (huc_zone_lut in Completed_HUCS[18])
          loc_etccdi_annual$Time = temp$Time
       loc_etccdi_annual$Ensemble = ensemble
       loc_etccdi_annual$Scenario = scenario
+      loc_etccdi_annual$Division  = huc_zone_lut
       
       loc_etccdi_annual$cdd =  climdex.cdd(climdexInput)
       loc_etccdi_annual$csdi =  climdex.csdi(climdexInput)
@@ -202,6 +204,7 @@ for (huc_zone_lut in Completed_HUCS[18])
       loc_etccdi_monthly$Month = as.factor(month(loc_etccdi_monthly$Time))
       loc_etccdi_monthly$Ensemble = ensemble
       loc_etccdi_monthly$Scenario = scenario
+      loc_etccdi_monthly$Division  = huc_zone_lut
       
       
       

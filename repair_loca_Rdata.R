@@ -62,10 +62,10 @@
 
   HUC08_MRB_LUT$HUC08_Number = as.numeric(as.character(HUC08_MRB_LUT$HUC08_Code_ID))
 
-  HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Number >= 10210007) &
-                                           (HUC08_Number <= 10219999))
+  HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Number >= 10030000) &
+                                           (HUC08_Number <= 10049999))
 
-  target_scenario = "historical"
+  target_scenario = "RCP45"
 
 
   Completed_HUCS = HUC08_MRB_LUT$HUC08_Code_ID
