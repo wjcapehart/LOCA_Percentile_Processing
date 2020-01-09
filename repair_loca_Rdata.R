@@ -65,7 +65,7 @@
   HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Number >= 10030000) &
                                            (HUC08_Number <= 10049999))
 
-  target_scenario = "RCP45"
+  target_scenario = "rcp45"
 
 
   Completed_HUCS = HUC08_MRB_LUT$HUC08_Code_ID
@@ -146,6 +146,8 @@ for (huc_zone_lut in Completed_HUCS)
 
 
         print(last_record)
+
+
 
   }
 
