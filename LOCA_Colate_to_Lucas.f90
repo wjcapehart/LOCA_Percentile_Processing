@@ -22,7 +22,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: filename_map      = "./Lucas_2019_12_08_all.nc"
   character (len=*), PARAMETER  :: file_front_root   = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
   character (len=*), PARAMETER  :: file_output_root  = &
-                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/l/NGP_LOCA_LUCAS_"
+                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/NGP_LOCA_LUCAS_"
 
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
