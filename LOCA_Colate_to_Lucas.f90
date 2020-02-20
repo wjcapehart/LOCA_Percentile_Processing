@@ -673,7 +673,7 @@ program LOCA_Colate_to_ClimDivs
 
 !print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
 
-              mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
+              mask_map = merge(1,0, (mask_map          .eq.        1) .and. &
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
