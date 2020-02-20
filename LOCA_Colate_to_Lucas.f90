@@ -275,9 +275,7 @@ program LOCA_Colate_to_ClimDivs
     end if
 
   end do
-  print*, minval(mask_map)
-
-  print*, maxval(mask_map)
+  print*,"min_max_sum_mask", minval(mask_map),  maxval(mask_map), sum(mask_map)
 
   !!!!!!!!!!!!!!!!!!
 
@@ -679,6 +677,7 @@ program LOCA_Colate_to_ClimDivs
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
+              print*,"min_max_sum_mask", minval(mask_map),  maxval(mask_map), sum(mask_map)
 
               nhuccells(h) = sum(mask_map)
 
