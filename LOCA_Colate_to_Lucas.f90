@@ -699,7 +699,7 @@ program LOCA_Colate_to_ClimDivs
                 call QSort(linear_array, nlon*nlat)
 
                 sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
-                print(sort_tasmax(:))
+                print*, sort_tasmax(:)
 
               !!! tasmin
 
