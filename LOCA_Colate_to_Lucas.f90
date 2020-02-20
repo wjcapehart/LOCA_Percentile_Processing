@@ -255,7 +255,7 @@ program LOCA_Colate_to_ClimDivs
       mask_map = huc_map_3d(:,:,myhucs(t))
 
       print*, myhucs(t)
-      print*, max(mask_map)
+      print*, maxval(mask_map)
 
       where( mask_map .eq. hucs(h) )
         mask_map = 1
@@ -276,7 +276,7 @@ program LOCA_Colate_to_ClimDivs
 
   end do
 
-  print*, mask_map(:,:) 
+  print*, mask_map(:,:)
 
   !!!!!!!!!!!!!!!!!!
 
