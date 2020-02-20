@@ -275,8 +275,9 @@ program LOCA_Colate_to_ClimDivs
     end if
 
   end do
+  print*, minval(mask_map)
 
-  print*, mask_map(:,:)
+  print*, maxval(mask_map)
 
   !!!!!!!!!!!!!!!!!!
 
@@ -699,7 +700,7 @@ program LOCA_Colate_to_ClimDivs
                 call QSort(linear_array, nlon*nlat)
 
                 sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
-                print*, sort_tasmax(:)
+                !print*, sort_tasmax(:)
 
               !!! tasmin
 
