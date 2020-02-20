@@ -276,7 +276,7 @@ program LOCA_Colate_to_ClimDivs
 
   end do
 
-  print*, mask_map(:,:)
+  print*, mask_map(:,:) 
 
   !!!!!!!!!!!!!!!!!!
 
