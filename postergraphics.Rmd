@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+
+  library(package = "tidyverse") # Multiple Tidyverse Resources
+  library(package = "lubridate") # Date-Time Control
+
+  # NCAR Libraries
+
+  library(package = "extRemes") # NCEI  Data Retrieval Package
+
+
+```
+
+
+```{r}
+
+myhuc = 10120110
+
+start_year = 1976
+end_year   = 2005
+
+data_url = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_basins/NGP_LOCA_HUC08_10120110.RData"
+
+
+load(url(data_url))
+
+loca_daily =  loca_daily %>% filter( ( year(Time) >= start_year ) & ( year(Time) <= end_year ) )
+
+
+```
+
+
+```{r}
+
+loca_daily =  loca_daily %>% filter( Percentile == "P100"  ) %>% select(- c( tasmin, tasmax))
+
+
+```
+
+
+```{r}
+
+
+loca_scen_ens = loca_daily %>% group_by(Time) %>% summarize(pr = mean(pr))
+threshold = quantile(loca_scen_ens$pr, 0.95)
+
+
+
+          fit_GP_daily = fevd(x          = loca_scen_ens$pr,
+                              threshold  = threshold,
+                              units      = "mm",
+                              time.units = "365/year",
+                              type       = "GP"
+                           )
+
+plot(fit_GP_daily, type= "density")
+
+plot(fit_GP_daily, type= "rl")
+
+
+```
+
+

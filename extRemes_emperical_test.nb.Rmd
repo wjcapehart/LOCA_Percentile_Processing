@@ -1,0 +1,434 @@
+---
+title: "R/extRemes plot.fevd Return Level Replication Test"
+output: html_notebook
+---
+
+# 1. Goal 
+
+Test replication of the plot.fevd.rl Return Lenght Plot using the output from R/extRemes package [fevd()](https://www.rdocumentation.org/packages/extRemes/versions/2.0-11/topics/fevd). 
+
+In executing these tests we found that while we can replicate methods for creating emperical return intervals for analyses using the Generalized Pareto (GP) distributiuon, the Generalized Extreme Value distribution did not yeild satisfactory results.  
+
+# 2. Libraries
+
+The following libraries are needed for this exercise.
+
+  + [tidyverse](https://www.tidyverse.org) : Set of commonly-used Data Science packages for R that it can install and load all at once. In the long-run you probably also want to install the tidyverse package suite anyway. For this exercise this will include...   
+    - [ggplot2](https://ggplot2.tidyverse.org) : Create Elegant Data Visualizations Using the Grammar of Graphics
+    - [tibble](https://tibble.tidyverse.org) : Simple Data Frames
+    - [tidyr](https://tidyr.tidyverse.org) : Tools for shepherding data in data frames.
+    - [readr](https://readr.tidyverse.org) : Read Rectangular Text Data
+    - [purr](https://purrr.tidyverse.org) : Functional Programming Tools
+    - [dplyr](https://dplyr.tidyverse.org) : A grammar of data manipulation
+    - [stringr](https://stringr.tidyverse.org) : Simple, Consistent Wrappers for Common String Operations
+    - [forcats](https://forcats.tidyverse.org) : Tools for Working with Categorical Variables (Factors)
+    
+  + [lubridate](https://lubridate.tidyverse.org) : Time and Date Management 
+  
+  + [extRemes](https://www.rdocumentation.org/packages/extRemes) : NCAR Extreme Value Analysis Package
+
+
+
+```{r}
+# Libraries
+
+  library(package = "tidyverse") # Multiple Tidyverse Resources
+  library(package = "lubridate") # Date-Time Control
+  library(package = "extRemes")  # NCAR Extreme Value Analysis Package
+
+```
+
+
+# 2. Local Functions
+
+To pull the empircal return intervals from from the R/extRemes package [fevd()](https://www.rdocumentation.org/packages/extRemes/versions/2.0-11/topics/fevd), I am using a [function](https://ulysse-pasquier.com/post/r-plotting-results-from-extremes-package-extreme-value-analysis/) developed by Ulysse Pasquier @ U of E. Anglia that he developed for similar purposes for the Generalized Pareto distribution.
+
+The return period for a magnutude exceding $x$ is defined for the Generalized Extreme Value (GEV - Annual) distribution is calculated in the support software as ...
+
+$$T_{annual}(x) =  -  \frac{  1  }{   \ln{ \left [P\left ( x \right )  \right ] } } $$
+The return period for a magnutude exceding $x$ is defined for the Genralized Pareto (GP - Daily) distribution is calculated in the support software as ...
+
+$$T_{daily}(x) =  -  \frac{  1  }{ n_{daysPerYear}  \ln{ \left [P\left ( x \right )  \right ] } }$$
+
+(This function appears to correctly replicate the emperical points used in the plot.fevd function)
+
+
+```{r}
+#########################################################
+#
+#  Ulysse Pasquier Function to extract return 
+#  periods and return levels from the fevd() 
+#  function
+#
+
+  getrlpoints = function(fit)
+  {
+    
+    xp2        =  ppoints(n = fit$n, 
+                          a = 0)
+    ytmp       =  datagrabber(x = fit)
+    y          =  c(ytmp[, 1])
+    sdat       =  sort(x = y)
+    
+    if (fit$type == "GEV")
+    {
+      
+      # Patch to accomodate the GEV distribution 
+      return_period = -1/log(xp2)
+      return_level  = sdat
+
+      
+    } else {
+      
+      # Patch to accomodate the GP distribution 
+      npy           =  fit$npy
+      u             =  fit$threshold
+      return_period = -1/log(xp2)[sdat > u]/npy
+      return_level  = sdat[sdat > u]
+
+    }
+    
+    rlpoints      = tibble(return_period, 
+                           return_level)
+    
+    # Keep only return periods greater than one year
+    #  This is needed for the GP distribution which 
+    #  sources gp
+    
+    rlpoints = rlpoints %>% 
+       filter(return_period >=1)
+    
+    return(rlpoints)
+    
+  }
+
+#
+#########################################################
+```
+
+# 3.  Data Ingestion
+
+Data is from the CMIP 5 LOCA Downscaled Ensembles.  This script is specifically isolating a single downscaled GCM member (ACCESS1-0_r1i1p1) for the Historical Period for the years from 1976 to 2005.
+
+Data is for a the daily maximum over a single USGS HUC8 polygon: 10020001 (Red Rock Catchment, Missouri Headwaters, Missouri River Basin)
+
+The data is held on the SDSMT AES THREDDS Server.  
+
+```{r}
+#########################################################
+#
+# Data Ingestion
+#
+# Data is from the CMIP 5 LOCA Downscaled Ensembles.  
+# This script is specifically isolating a single 
+# downscaled GCM member (ACCESS1-0_r1i1p1) for the 
+# Historical Period for the years from 1976 to 2005.
+#
+
+  # Data URL
+
+  Data_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_basins/NGP_LOCA_HUC08_10020001.RData"
+
+  # Opening and Loading The Data Set
+
+  my.connection = url(description = Data_URL)
+    load(file = my.connection)
+    close(con = my.connection)
+    remove(my.connection)
+    
+  # Tiddy-up as we go.
+
+  remove(Data_URL)
+   
+#
+#########################################################
+```
+
+# 4. Extracting Subset
+
+The original dataset opened here is the LOCAL downscaled GCM output for 27 CMIP 5 ensembles aggregated for a single USGS HUC-8 polygon, and also includes the daily maximum, minumum, median, mean and 25- and 75-percentiles for daily precipitation, max & min temperature.  
+
+We will need to extract a single ensemble member (for this test, ACCESS1-0_r1i1p1), and a specific period (the last 30 years of the CMIP 5 "historical" period from 1976-2005).  
+
+We will also extract the daily maximum precip over the HUC polygon. This will provide a single observation for a single day.  This time series can be fied directly into the fevd() function for the Generalized Pareto distrubution. 
+
+This test also uses precipitation.  
+
+A second aggretation will be performed on the extracted time series to collect the maximum daily rainfall for the year, aka., the Annual Maximum Series (AMS) for precipitation.  The 
+
+```{r}
+#########################################################
+#
+# Isolating Subsets for Calculating Probabilities
+#
+
+  # Brackets Isolating Sampling Period
+    
+  start_hist = 1976
+  end_hist   = 2005
+  
+  # Selection of Ensemble Member and Scenario Period
+
+  Selected_Ensemble = "ACCESS1-0_r1i1p1"
+  Selected_Scenario = "Historical"
+  
+  #######################################################
+  #
+  # Extraction of 30-year period of one ensemble member
+  #   for maximum rainfall for HUC polygon.
+  #
+  # This first filtering of the original dataset will 
+  #   extract the daily time series for the GP distribution
+  
+  subset_gp = loca_daily %>%       
+    filter(Scenario   == Selected_Scenario) %>%
+    filter(Ensemble   == Selected_Ensemble) %>%
+    filter(Percentile == "P100") %>%
+    mutate(Year = year(Time)) %>%
+    filter((year(Time) >= start_hist) &
+           (year(Time) <=  end_hist ) ) 
+  
+
+  
+  #
+  #######################################################
+
+  #######################################################
+  #
+  # Further Aggregation and Reduction of the dataset for 
+  #   use in the GEV Distribution by aggregating by 
+  #   Max Annual Series (AMS)
+  
+  subset_gev = subset_gp %>% 
+    group_by(Year,
+             Division,
+             Ensemble,
+             Scenario) %>%
+    summarize(yearly_max_pr = max(pr)) 
+
+  #
+  #######################################################
+  
+  # Tiddy-up as we go.
+
+  remove(start_hist)
+  remove(end_hist)
+  remove(loca_daily)
+
+#  
+#########################################################
+```
+
+# 5. Calculating and Processing Extreme Events Using the Generalized Pareto (GP) Distribution
+
+This analysis satisfactorally replicates the original plot.fevd() function.
+
+A GP distribution is applied to the time series.  
+
+The output is plotted using plot.fevd for the "rl" (return level) option.
+
+  + Calculated Mean Expected Return Level by Return Period
+  + Calculated 95% Confidence Limit to the Mean Expected Return Level by Return Period
+  + Calculated 05% Confidence Limit to the Mean Expected Return Level by Return Period
+  
+  + Emperically-Derived Return Levels by Return Period
+
+```{r}
+#########################################################
+#
+# GP Extreme Value Analyses 
+#
+
+  #######################################################
+  #
+  # Produce the fevd object for a GP distribution
+  #
+
+  # Use a 95 daily rainfall percentile threshold for
+  #  GP distribution
+
+  threshold = quantile(x     = subset_gp$pr,
+                       probs = 0.95)
+
+  # Crunch the data to produce the distribution
+
+  fit_GP_daily = fevd(x          = subset_gp$pr,
+                      threshold  = threshold,
+                      units      = "mm",
+                      time.units = "365.25/year",
+                      type       = "GP")
+  
+  #
+  #######################################################
+
+  #######################################################
+  #
+  # Extract Emperical Return Levels and Return Periods from
+  #  the input time series
+
+  rl_GP  = getrlpoints(fit_GP_daily)
+  
+  #
+  #######################################################
+  
+  #######################################################
+  #
+  # Calculate return levels and intervals, and the 
+  #   associated 5% and 95% 
+  #
+  
+  temp = return.level(x             = fit_GP_daily,
+                      return.period = rl_GP$return_period,
+                      type          = "return.level", 
+                      do.ci         = TRUE)
+
+
+  rl_GP$calc_rl    = temp[,2] # mean calculated return level
+  rl_GP$calc_rl_lo = temp[,1] # 05% CI
+  rl_GP$calc_rl_hi = temp[,3] # 95% CI
+
+  remove(temp)
+  
+  #
+  #######################################################
+
+    
+  #######################################################
+  #
+  # Plot Results
+  #
+
+  # Plot the return level plot from the fevd object
+  
+  plot.fevd(x    = fit_GP_daily, 
+            type = "rl")
+  
+  # Plot calculated return levels & confidence limits
+  
+  lines(x   = rl_GP$return_period,
+        y   = rl_GP$calc_rl, 
+        col = "green")
+  lines(x   = rl_GP$return_period,
+        y   = rl_GP$calc_rl_lo, 
+        col = "green")
+  lines(x   = rl_GP$return_period,
+        y   = rl_GP$calc_rl_hi, 
+        col = "green")
+  
+  # Plot emperical points
+  
+  points(x   = rl_GP$return_period,
+         y   = rl_GP$return_level, 
+         col = "blue")
+
+  #
+  #######################################################
+  
+
+
+#  
+#########################################################
+```
+The separate methods (colored) used to emulate the original plot.fevd plot (black) are shown above.
+
+The separate methods match the plot.fevd plot fairly well.
+
+
+# 6. Calculating and Processing Extreme Events Using the Generalized Extreme Value (GEV) Distribution
+
+This analysis satisfactorally replicates the original plot.fevd() function for the GEV distribution.
+
+These steps are nearly identical to the above analysis of the GP analysis with the exception of the need for a threshold value and options needed to execute the fevd() function.
+  
+```{r}
+#########################################################
+#
+# GEV Extreme Value Analyses 
+#
+
+  #######################################################
+  #
+  # Produce the fevd object for a GEV distribution
+  #
+
+  # Crunch the data to produce the distribution
+
+  fit_GEV_annual = fevd(x          = subset_gev$yearly_max_pr,
+                        threshold  = threshold,
+                        time.units = "year",
+                        type       = "GEV")
+  
+  #
+  #######################################################
+
+  #######################################################
+  #
+  # Extract Emperical Return Levels and Return Periods from
+  #  the input time series
+
+  rl_GEV = getrlpoints(fit = fit_GEV_annual)
+  
+  #
+  #######################################################
+  
+  #######################################################
+  #
+  # Calculate return levels and intervals, and the 
+  #   associated 5% and 95% 
+  #
+  
+  temp = return.level(x             = fit_GEV_annual,
+                      return.period = rl_GEV$return_period,
+                      type          = "return.level", 
+                      do.ci         = TRUE)
+
+  rl_GEV$calc_rl    = temp[,2] # mean calculated return level
+  rl_GEV$calc_rl_lo = temp[,1] # 05% CI
+  rl_GEV$calc_rl_hi = temp[,3] # 95% CI
+
+  remove(temp)
+  
+  #
+  #######################################################
+
+    
+  #######################################################
+  #
+  # Plot Results
+  #
+
+  # Plot the return level plot from the fevd object
+  
+  plot.fevd(x    = fit_GEV_annual, 
+            type = "rl")
+  
+  # Plot calculated return levels & confidence limits
+  
+  lines(x   = rl_GEV$return_period,
+        y   = rl_GEV$calc_rl, 
+        col = "orange")
+  lines(x   = rl_GEV$return_period,
+        y   = rl_GEV$calc_rl_lo, 
+        col = "orange")
+  lines(x   = rl_GEV$return_period,
+        y   = rl_GEV$calc_rl_hi, 
+        col = "orange")
+  
+  # Plot emperical points
+  
+  points(x   = rl_GEV$return_period,
+         y   = rl_GEV$return_level, 
+         col = "red")
+
+  #
+  #######################################################
+
+
+#  
+#########################################################
+```
+Here is where the colored external methods to draw the emperical and calculated return levels diverge.
+
+While the emperical return levels appear to the satisfactory when compared to the plot.fevd plot, the calculated return levels from the GEV distribution do NOT match those in the plot.fevd-generated plot.  Especially at shorter return periods.
+
+I have used multiple methods to calculate the GEV-dervied return intervals and all replicate the above _orange_ lines.

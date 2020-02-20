@@ -1,0 +1,190 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r libraries}
+
+  library(package = "tidyverse") # Multiple Tidyverse Resources
+  library(package = "lubridate") # Date-Time Control
+  library(package = "extRemes")  # NCEI  Data Retrieval Package
+
+```
+
+```{r}
+getrlpoints = function(fit){
+  
+  
+  xp2        =  ppoints(fit$n, a = 0)
+  ytmp       =  datagrabber(fit)
+  y          =  c(ytmp[, 1])
+  sdat       =  sort(y)
+  if (fit$type == "GEV")
+  {
+    npy           =  length(sdat)
+    u             =  0
+    return_period = -1/log(xp2)[sdat > u]/npy * npy
+  } else {
+    npy           =  fit$npy
+    u             =  fit$threshold
+    return_period = -1/log(xp2)[sdat > u]/npy
+  }
+
+  return_level  = sdat[sdat > u]
+  rlpoints      = tibble(return_period, 
+                         return_level)
+  
+  rlpoints = rlpoints %>% 
+    filter(return_period >=1)
+
+  return(rlpoints)
+  
+}
+```
+
+
+
+```{r load huc lookup tables}
+
+  HUC_LUT_URL = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"
+
+  load(file = url(HUC_LUT_URL), verbose=TRUE)
+
+  remove(HUC_LUT_URL)
+
+  HUC08_MRB_LUT
+
+```
+
+
+```{r period ranges}
+
+  start_hist = 1976
+  end_hist   = 2005
+  
+  start_futr = 2036
+  end_futr   = 2065
+  
+```
+
+```{r setup}
+
+  HUC08_MRB_LUT$GEV_RMSE = NA
+  HUC08_MRB_LUT$GEV_BIAS = NA
+  HUC08_MRB_LUT$GEV_CORR = NA
+
+  HUC08_MRB_LUT$GP_RMSE = NA
+  HUC08_MRB_LUT$GP_BIAS = NA
+  HUC08_MRB_LUT$GP_CORR = NA
+
+  hucs = unique(HUC08_MRB_LUT$HUC08_Code_ID)
+  thredds_root_url = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_basins/"
+  HTTP_on = str_detect(string  = thredds_root_url, 
+                       pattern = "http", 
+                       negate = FALSE)
+  
+  gp_quantile_thresh = 0.95
+
+  huc = hucs[1]
+  
+  #for (huc in hucs)
+  {
+    
+     loca_filename = str_c("NGP_LOCA_HUC08_",
+                        huc,
+                        ".RData",
+                        sep = "")
+     
+     print(loca_filename)
+
+     LOCA_URL = str_c(thredds_root_url,
+                      loca_filename,
+                      sep = "")
+     
+     if (HTTP_on) 
+     {
+          my.connection = url(description = LOCA_URL)
+          load(file = my.connection)
+          close(con = my.connection)
+     } else {
+          load(file = LOCA_URL)
+     }
+     
+     remove(LOCA_URL)
+
+     Ensembles = unique(loca_daily$Ensemble)
+     Scenarios = unique(loca_daily$Scenario)   
+     
+     scenario = "Historical"
+     {
+       
+       ensemble = Ensembles[1]
+       {
+       
+         subset_gp = loca_daily %>% 
+           filter(Scenario == scenario) %>%
+           filter(Ensemble == ensemble) %>%
+           filter(Percentile == "P100") %>%
+           mutate(Year = year(Time)) %>%
+           filter((year(Time) >= start_hist) &
+                  (year(Time) <=  end_hist ) ) 
+         
+         subset_gev = subset_gp %>% 
+           group_by(Year,
+                    Division,
+                    Ensemble,
+                    Scenario) %>%
+           summarize(yearly_max_pr = max(pr)) 
+         
+         
+          #
+          # GP Analysis
+          #
+         
+          threshold = quantile(x     = subset_gp$pr,
+                               probs = 0.95)
+
+          fit_GP_daily = fevd(x          = subset_gp$pr,
+                              threshold  = threshold,
+                              units      = "mm",
+                              time.units = "365/year",
+                              type       = "GP"
+                           )
+          
+          
+          fit_GEV_annual = fevd(x          = subset_gev$yearly_max_pr,
+                              units      = "mm",
+                              type       = "GEV"
+                           )
+         
+          rl_gev = getrlpoints(fit_GEV_annual)
+          rl_gp = getrlpoints(fit_GP_daily)
+
+          
+         
+
+
+          gev_rl = ci(x             = fit_GEV_annual,
+                      return.period = rl_gev$return_period)    
+          
+                
+         plot(fit_GEV_daily, type="rl")
+         points(sorted_yrly_p$rec_interval_gp,sorted_yrly_p$yearly_max_pr, col="blue" )
+
+         
+              
+         plot(fit_GP_daily, type="rl")
+         points(sorted_yrly_p$rec_interval_gp,sorted_yrly_p$yearly_max_pr, col="blue" )
+
+         
+       }
+      
+     }
+     
+     
+    
+  }
+
+```
+
+

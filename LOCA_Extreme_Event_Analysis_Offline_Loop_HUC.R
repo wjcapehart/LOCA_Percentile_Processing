@@ -30,32 +30,32 @@
   load(file = url(HUC_AVAIL_URL), verbose=TRUE)
 
   remove(HUC_AVAIL_URL)
-  
-  
-  
-  
+
+
+
+
   available_extreme_files = list.files(path    = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/climatology/LOCA_ExtRemes/HUC08/",
                                        pattern = "Daily_Rainfall_Returns.RData")
-  
+
   available_raw_files = list.files(path    = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/",
                                    pattern = ".RData")
-  
 
-  
-  available_extreme_hucs = str_sub(string = available_extreme_files, 
-                                   start  = 16, 
+
+
+  available_extreme_hucs = str_sub(string = available_extreme_files,
+                                   start  = 16,
                                    end    = 16+7)
-  
-  available_raw_hucs     = unique(str_sub(string = available_raw_files, 
-                                          start  = 16, 
+
+  available_raw_hucs     = unique(str_sub(string = available_raw_files,
+                                          start  = 16,
                                           end    = 16+7))
-  
+
   available_extreme_hucs = unique(available_extreme_hucs)
   available_raw_hucs     = unique(available_raw_hucs)
-  
-  
+
+
   needed_hucs            = setdiff(available_raw_hucs,available_extreme_hucs)
-   
+
   needed_hucs = needed_hucs[!needed_hucs %in% "RData"]
 
 # Select Periods
@@ -94,7 +94,7 @@ print(needed_hucs)
 for (huc_zone_lut in needed_hucs)
 {  # huc
 
-  
+
   FIRST = TRUE
 
   # LOCA Data Extraction from SD Mines Thredds Server
@@ -117,8 +117,9 @@ for (huc_zone_lut in needed_hucs)
                    loca_filename,
                    sep = "")
 
-  load(file    =(LOCA_URL),
-       verbose = TRUE)
+  my.connection = url(description = URL_Name)
+    load(file = my.connection)
+    close(con = my.connection)
 
   remove(LOCA_URL)
 
