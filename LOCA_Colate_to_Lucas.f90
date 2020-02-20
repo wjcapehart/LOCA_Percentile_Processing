@@ -22,7 +22,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: filename_map      = "./Lucas_2019_12_08_all.nc"
   character (len=*), PARAMETER  :: file_front_root   = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
   character (len=*), PARAMETER  :: file_output_root  = &
-                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/NGP_LOCA_LUCAS_"
+                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/NGP_LOCA_LUCAS_"
 
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
@@ -202,6 +202,7 @@ program LOCA_Colate_to_ClimDivs
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
+
   print*, "Listing Available Climate Divisions"
 
   huc_counter = 8
@@ -253,6 +254,9 @@ program LOCA_Colate_to_ClimDivs
 
       mask_map = huc_map_3d(:,:,myhucs(t))
 
+      print*, myhucs(t)
+      print*, max(mask_map)
+
       where( mask_map .eq. hucs(h) )
         mask_map = 1
       elsewhere
@@ -271,6 +275,8 @@ program LOCA_Colate_to_ClimDivs
     end if
 
   end do
+
+  print*, mask_map(:,:)
 
   !!!!!!!!!!!!!!!!!!
 
