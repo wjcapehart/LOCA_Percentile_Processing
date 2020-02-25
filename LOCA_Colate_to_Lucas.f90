@@ -24,8 +24,8 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: file_output_root  = &
                     "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/NGP_LOCA_LUCAS_"
 
-  integer, parameter :: start_scen = 2
-  integer, parameter :: end_scen   = nscen
+  integer, parameter :: start_scen = 1
+  integer, parameter :: end_scen   = 1 ! nscen
 
   integer (kind=4) :: myhuc_low    = 28
   integer (kind=4) :: myhuc_high
