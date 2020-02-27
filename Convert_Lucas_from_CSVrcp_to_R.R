@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/done/"
+directory = "/Volumes/nfsdrives/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/done/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 
@@ -20,10 +20,10 @@ csv_files = str_c(directory,csv_files,sep="")
 
 print(csv_files)
 
-load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"))
+load(file=("./Lucas_LUT.Rdata"))
 
 
-Divisions_factor = Climate_Zones_Name_LUT$Full_Zone_Code
+Divisions_factor = Lucas_LUT$Basin
 
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
@@ -54,7 +54,6 @@ Ensembles = c("ACCESS1-0_r1i1p1",
               "bcc-csm1-1-m_r1i1p1")
 
 Ensembles_factor = factor(Ensembles)
-
 
 for (filename in csv_files)
 {
