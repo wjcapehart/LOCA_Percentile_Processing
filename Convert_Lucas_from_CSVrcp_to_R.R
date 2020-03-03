@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/done/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/done/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 
