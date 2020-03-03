@@ -22,16 +22,7 @@ print(csv_files)
 
 load(file=("./Lucas_LUT.RData"))
 
-if (is.numeric(Lucas_LUT$Basin[1]))
-{
-  Lucas_LUT$Basin = as.character(sprintf("%04d",Lucas_LUT$Basin))
-}
 
-
-Divisions_factor = as.factor(Lucas_LUT$Basin)
-
-
-Lucas_LUT$Basin = Divisions_factor
 
 
 
