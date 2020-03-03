@@ -30,7 +30,10 @@ if (is.numeric(Lucas_LUT$Basin[1]))
 
 Divisions_factor = as.factor(Lucas_LUT$Basin)
 
+
 Lucas_LUT$Basin = Divisions_factor
+
+
 
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
@@ -108,9 +111,11 @@ for (filename in csv_files)
                                                   "P100",
                                                   "MEAN"))
         
-        loca_daily = left_join(x  = loca_daily,
-                               y  = Lucas_LUT,
-                               by = Basin)
+        loca_daily = rename(loca_daily, Basin = Division)
+        
+       # loca_daily = left_join(x  = loca_daily,
+      #                         y  = Lucas_LUT,
+      #                         by = "Basin")
 
         last_record = loca_daily[nrow(loca_daily), ]
         print(last_record)
