@@ -20,10 +20,15 @@ csv_files = str_c(directory,csv_files,sep="")
 
 print(csv_files)
 
-load(file=("./Lucas_LUT.Rdata"))
+load(file=("./Lucas_LUT.RData"))
+
+if (is.numeric(Lucas_LUT$Basin[1]))
+{
+  Lucas_LUT$Basin = as.character(sprintf("%04d",Lucas_LUT$Basin))
+}
 
 
-Divisions_factor = Lucas_LUT$Basin
+Divisions_factor = as.factor(Lucas_LUT$Basin)
 
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
@@ -55,7 +60,7 @@ Ensembles = c("ACCESS1-0_r1i1p1",
 
 Ensembles_factor = factor(Ensembles)
 
-for (filename in csv_files[3])
+for (filename in csv_files[1:3])
 {
   command = str_c("gunzip -v ",
                   filename,
