@@ -23,7 +23,7 @@ print(csv_files)
 load(file=("./Lucas_LUT.RData"))
 
 
-
+Divisions_Factor = Lucas_LUT$Basin
 
 
 Ensembles = c("ACCESS1-0_r1i1p1",
@@ -89,7 +89,7 @@ for (filename in csv_files)
                                                   "RCP 8.5"))
 
         loca_daily$Division   = factor(x    = loca_daily$Division,
-                                       levels = Divisions_factor)
+                                       levels = Lucas_LUT$Basin)
 
         loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
                                        levels = Ensembles)
