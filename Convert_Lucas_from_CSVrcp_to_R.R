@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/Volumes/nfsdrives/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/done/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/blackhills_domain/done/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 
@@ -55,7 +55,7 @@ Ensembles = c("ACCESS1-0_r1i1p1",
 
 Ensembles_factor = factor(Ensembles)
 
-for (filename in csv_files)
+for (filename in csv_files[3])
 {
   command = str_c("gunzip -v ",
                   filename,
