@@ -30,6 +30,8 @@ if (is.numeric(Lucas_LUT$Basin[1]))
 
 Divisions_factor = as.factor(Lucas_LUT$Basin)
 
+Lucas_LUT$Basin = Divisions_factor
+
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
               "CCSM4_r6i1p1",
@@ -60,7 +62,7 @@ Ensembles = c("ACCESS1-0_r1i1p1",
 
 Ensembles_factor = factor(Ensembles)
 
-for (filename in csv_files[1:3])
+for (filename in csv_files)
 {
   command = str_c("gunzip -v ",
                   filename,
@@ -105,9 +107,15 @@ for (filename in csv_files[1:3])
                                                   "P075",
                                                   "P100",
                                                   "MEAN"))
+        
+        loca_daily = left_join(x  = loca_daily,
+                               y  = Lucas_LUT,
+                               by = Basin)
 
         last_record = loca_daily[nrow(loca_daily), ]
         print(last_record)
+        
+        
 
         save(loca_daily,
              file = str_c(filename,
