@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/done/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 outpref   = "NGP_LOCA_LUCAS_"
@@ -18,10 +18,10 @@ csv_files = intersect(list.files(path    = str_c(directory,
                                                  sep = ""),
                                  pattern = "rcp85.RData"))
 
-load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
+load(file=("./Lucas_LUT.RData"))
 
 
-Basins_factor = factor(HUC08_MRB_LUT$HUC08_Code_ID)
+Basins_factor = factor(Lucas_LUT$Basin)
 
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
@@ -54,7 +54,7 @@ Ensembles = c("ACCESS1-0_r1i1p1",
 
 Basins = str_sub(string = csv_files,
                     start  = str_length(string = prefix) + 1,
-                    end    = str_length(string = prefix) + 8)
+                    end    = str_length(string = prefix) + 4)
 
 print(csv_files)
 print(Basins)
@@ -183,10 +183,10 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/done/"
 
-prefix    = "NGP_LOCA_HUCS_"
-outpref   = "NGP_LOCA_HUC08_"
+prefix    = "NGP_LOCA_LUCAS_"
+outpref   = "NGP_LOCA_LUCAS_"
 
 csv_files = intersect(list.files(path    = str_c(directory,
                                                  "/done/",
@@ -197,10 +197,12 @@ csv_files = intersect(list.files(path    = str_c(directory,
                                                  sep = ""),
                                  pattern = "rcp85.RData"))
 
-load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC08_Missouri_River_Basin.Rdata"))
+
+load(file=("./Lucas_LUT.RData"))
 
 
-Basins_factor = factor(HUC08_MRB_LUT$HUC08_Code_ID)
+Basins_factor = factor(Lucas_LUT$Basin)
+
 
 Ensembles = c("ACCESS1-0_r1i1p1",
               "ACCESS1-3_r1i1p1",
@@ -233,7 +235,7 @@ Ensembles = c("ACCESS1-0_r1i1p1",
 
 Basins = str_sub(string = csv_files,
                     start  = str_length(string = prefix) + 1,
-                    end    = str_length(string = prefix) + 8)
+                    end    = str_length(string = prefix) + 4)
 
 print(csv_files)
 print(Basins)
@@ -248,10 +250,10 @@ rData_files = intersect(list.files(path    = directory,
 
 Completed_HUCS = str_sub(string = rData_files,
                               start  = str_length(string = outpref) + 1,
-                              end    = str_length(string = outpref) + 8)
+                              end    = str_length(string = outpref) + 4)
 
 save(Completed_HUCS,   file = str_c(directory,
-                              "Completed_HUCS",
+                              "Completed_Basins",
                               ".RData",
                               sep=""))
 
