@@ -42,3 +42,5 @@ test_for_time_lut.txt
 *.txt
 *.arch
 .Rproj.user
+*.PCP
+*.TMP
