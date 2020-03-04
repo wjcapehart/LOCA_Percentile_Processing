@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/done/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 outpref   = "NGP_LOCA_LUCAS_"
@@ -59,7 +59,6 @@ Basins = str_sub(string = csv_files,
 print(csv_files)
 print(Basins)
 
-Basin=Basins[1]
 
 for (Basin in Basins)
 {
