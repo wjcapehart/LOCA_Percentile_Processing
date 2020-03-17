@@ -19,7 +19,7 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
 
   my.connection = (description = Inventory_URL)
        load(file = my.connection)
-       close(con = my.connection)
+  #     close(con = my.connection)
        remove( my.connection)
 
   remove(Inventory_URL)
@@ -46,7 +46,7 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
 
     my.connection = (description = File_URL)
       load(file = my.connection)
-      close(con = my.connection)
+    #  close(con = my.connection)
       remove( my.connection)
 
     ensemble = unique(loca_daily$Ensemble)[1]
