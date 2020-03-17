@@ -7,7 +7,7 @@
   library(package = "lubridate")
   library(package = "RCurl")
 
-
+dir.create("./swat_output")
 
 thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/"
 
@@ -69,7 +69,7 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
         # Write the Daily Max/Min Temperature File
         #
 
-        filename_tmp = str_c("./SWAT_LUCAS__",
+        filename_tmp = str_c("./swat_output/SWAT_LUCAS__",
                              ensemble,
                              "__",
                              str_replace(string      = scenario,
@@ -123,9 +123,9 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
 
         #
         # Write the Daily Rainfall File
-        #        
+        #
 
-        filename_pcp = str_c("./SWAT_LUCAS__",
+        filename_pcp = str_c("./swat_output/SWAT_LUCAS__",
                              ensemble,
                              "__",
                              str_replace(string      = scenario,
@@ -145,7 +145,7 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
         sink(filename_pcp)
 
           # Line 1 == Title
-          record =         
+          record =
             cat(record)
             cat("\n")
           # Line 2 == Latitude
@@ -188,5 +188,3 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
   remove(ensemble)
   remove(scenario)
   remove(basin)
-
-
