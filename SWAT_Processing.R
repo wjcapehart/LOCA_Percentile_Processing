@@ -7,6 +7,7 @@
   library(package = "lubridate")
   library(package = "RCurl")
 
+
 dir.create("./swat_output")
 
 thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/"
@@ -49,9 +50,9 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
     #  close(con = my.connection)
       remove( my.connection)
 
-    ensemble = unique(loca_daily$Ensemble)[1]
+    ensemble = unique(loca_daily$Ensemble)
 
-    for (ensemble in unique(loca_daily$Ensemble)[1])
+    for (ensemble in unique(loca_daily$Ensemble))
     {
 
       for (scenario in Output_Scenarios)
