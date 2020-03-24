@@ -131,6 +131,8 @@ program LOCA_Colate_to_ClimDivs
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  print*, "Starting"
+
   first_huc = .TRUE.
 
   !  num_procs = omp_get_max_threads()
@@ -180,6 +182,7 @@ program LOCA_Colate_to_ClimDivs
       first_huc = .TRUE.
 
      myhuc_high = myhuc_low
+     print*, "filename_map = ",filename_map
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
