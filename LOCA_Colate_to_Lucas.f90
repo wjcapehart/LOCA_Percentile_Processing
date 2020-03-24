@@ -366,7 +366,7 @@ program LOCA_Colate_to_ClimDivs
 
 
     do h = 1, nmyhucs
-
+print*, "h=",h, " nmyhucs=",nmyhucs
       write(csv_filename(h),'(A, I4.4,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
       write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') h, &
                                                                        unit_huc(h), &
