@@ -47,10 +47,10 @@ program LOCA_Colate_to_ClimDivs
   integer (kind=4), dimension(nhucs)     :: hucs
 
   character (len=090) :: filename_times
-  character (len=180) :: filename_pr
-  character (len=180) :: filename_tasmax
-  character (len=180) :: filename_tasmin
-  character (len=180) :: basin_file_name
+  character (len=255) :: filename_pr
+  character (len=255) :: filename_tasmax
+  character (len=255) :: filename_tasmin
+  character (len=255) :: basin_file_name
 
   integer (kind=4) :: t_in_tt
 
@@ -97,7 +97,7 @@ program LOCA_Colate_to_ClimDivs
   integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
   integer  (kind=4),         allocatable :: unit_huc(:) !nmyhucs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
-  character(len=100),        allocatable :: csv_filename(:)   ! \, nmyhucs
+  character(len=255),        allocatable :: csv_filename(:)   ! \, nmyhucs
 
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -361,13 +361,11 @@ program LOCA_Colate_to_ClimDivs
     print*, "==  Length of Final Time Record Pull ", last_read
     print*, "== "
     print*, "== Allocating csv_filename"
-    allocate(character(100) :: csv_filename(nmyhucs))
+    allocate(character(255) :: csv_filename(nmyhucs))
     print*, "== "
 
 
     do h = 1, nmyhucs
-print*, "h=",h, " nmyhucs=",nmyhucs, " outroot=",trim(file_output_root),"  myhucs(h)=", myhucs(h), " scenarios=",trim(scenarios(s))
-write(*,'(A, I4.4,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
       write(csv_filename(h),'(A, I4.4,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
       write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') h, &
                                                                        unit_huc(h), &
