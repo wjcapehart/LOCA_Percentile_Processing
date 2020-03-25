@@ -20,15 +20,15 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
   character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
   character (len=*), PARAMETER  :: filename_map      = "./USCAN_Climate_Divisions.nc"
-  character (len=*), PARAMETER  :: file_front_root   = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
+  character (len=*), PARAMETER  :: file_front_root   = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Northern_Great_Plains_Original_Subset/"
   character (len=*), PARAMETER  :: file_output_root  = &
-                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/climate_divisions/NGP_LOCA_nCLIMDIV_"
+     "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/climate_divisions/R_Daily_Files/work/NGP_LOCA_LUCAS_"
 
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
   integer (kind=4) :: myhuc_low    = 2901
-  integer (kind=4) :: myhuc_high    
+  integer (kind=4) :: myhuc_high
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
 
@@ -46,10 +46,10 @@ program LOCA_Colate_to_ClimDivs
   integer (kind=4), dimension(nhucs)     :: hucs
 
   character (len=090) :: filename_times
-  character (len=180) :: filename_pr
-  character (len=180) :: filename_tasmax
-  character (len=180) :: filename_tasmin
-  character (len=180) :: basin_file_name
+  character (len=255) :: filename_pr
+  character (len=255) :: filename_tasmax
+  character (len=255) :: filename_tasmin
+  character (len=255) :: basin_file_name
 
   integer (kind=4) :: t_in_tt
 

@@ -30,9 +30,9 @@ program LOCA_Colate_to_HUCS
   character (len=*), PARAMETER  :: filename_map      =  &
             "./HUC08_Missouri_River_Basin.nc"
   character (len=*), PARAMETER  :: file_front_root   =  &
-            "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
-  character (len=*), PARAMETER  :: file_output_root  =  &
-      "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/NGP_LOCA_HUCS_"
+            "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Northern_Great_Plains_Original_Subset/"
+  character (len=*), PARAMETER  :: file_output_root  = &
+            "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/work/NGP_LOCA_LUCAS_"
 
 
   integer (kind=4) :: t_buffer
@@ -49,10 +49,10 @@ program LOCA_Colate_to_HUCS
   integer (kind=4), dimension(nhucs)     :: hucs
 
   character (len=090) :: filename_times
-  character (len=180) :: filename_pr
-  character (len=180) :: filename_tasmax
-  character (len=180) :: filename_tasmin
-  character (len=180) :: basin_file_name
+  character (len=255) :: filename_pr
+  character (len=255) :: filename_tasmax
+  character (len=255) :: filename_tasmin
+  character (len=255) :: basin_file_name
 
   integer (kind=4) :: t_in_tt
 
