@@ -9,7 +9,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: nscen      =     3
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   450
-  integer, parameter :: nlat       =   302 
+  integer, parameter :: nlat       =   302
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
 
@@ -29,7 +29,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3904
+  integer (kind=4) :: myhuc_low    = 3905
   integer (kind=4) :: myhuc_high
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
