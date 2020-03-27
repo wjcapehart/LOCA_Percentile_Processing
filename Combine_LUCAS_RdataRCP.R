@@ -18,6 +18,8 @@ csv_files = intersect(list.files(path    = str_c(directory,
                                                  sep = ""),
                                  pattern = "rcp85.RData"))
 
+print(csv_files)
+
 load(file=("./Lucas_LUT.RData"))
 
 
