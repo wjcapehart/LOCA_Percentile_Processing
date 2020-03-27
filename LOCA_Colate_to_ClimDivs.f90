@@ -9,7 +9,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: nscen      =     3
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   450
-  integer, parameter :: nlat       =   302
+  integer, parameter :: nlat       =   302 
   integer, parameter :: ntime_hist = 20454
   integer, parameter :: ntime_futr = 34333
 
