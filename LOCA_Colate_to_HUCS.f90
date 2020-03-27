@@ -32,7 +32,8 @@ program LOCA_Colate_to_HUCS
   character (len=*), PARAMETER  :: file_front_root   =  &
             "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Northern_Great_Plains_Original_Subset/"
   character (len=*), PARAMETER  :: file_output_root  = &
-   "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/work/NGP_LOCA_LUCAS_"
+   "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/" // &
+   "Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/work/NGP_LOCA_LUCAS_"
 
 
   integer (kind=4) :: t_buffer
