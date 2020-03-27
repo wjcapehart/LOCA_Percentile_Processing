@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/"
 
 prefix    = "NGP_LOCA_HUCS_"
 outpref   = "NGP_LOCA_HUC08_"
@@ -175,15 +175,6 @@ for (division in Divisions)
 }
 
 
-
-
-library(stringr)
-library(forcats)
-library(readr)
-library(tidyverse)
-library(lubridate)
-
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
 
 prefix    = "NGP_LOCA_HUCS_"
 outpref   = "NGP_LOCA_HUC08_"

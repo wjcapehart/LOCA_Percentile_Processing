@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/work/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/R_Daily_Files/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 outpref   = "NGP_LOCA_LUCAS_"
@@ -173,16 +173,6 @@ for (Basin in Basins)
 
 }
 
-
-
-
-library(stringr)
-library(forcats)
-library(readr)
-library(tidyverse)
-library(lubridate)
-
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/work/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 outpref   = "NGP_LOCA_LUCAS_"
