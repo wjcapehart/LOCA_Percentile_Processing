@@ -23,7 +23,8 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: file_front_root   = &
                     "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Northern_Great_Plains_Original_Subset/"
   character (len=*), PARAMETER  :: file_output_root  = &
-                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/R_Daily_Files/work/NGP_LOCA_LUCAS_"
+                    "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/" // &
+                    "Specific_Regional_Aggregate_Sets/blackhills_domain/R_Daily_Files/work/NGP_LOCA_LUCAS_"
 
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
