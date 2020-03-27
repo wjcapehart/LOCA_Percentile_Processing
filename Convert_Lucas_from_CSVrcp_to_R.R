@@ -4,7 +4,7 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/done/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/work/"
 
 prefix    = "NGP_LOCA_LUCAS_"
 
@@ -101,17 +101,17 @@ for (filename in csv_files)
                                                   "P075",
                                                   "P100",
                                                   "MEAN"))
-        
+
         loca_daily = rename(loca_daily, Basin = Division)
-        
+
        # loca_daily = left_join(x  = loca_daily,
       #                         y  = Lucas_LUT,
       #                         by = "Basin")
 
         last_record = loca_daily[nrow(loca_daily), ]
         print(last_record)
-        
-        
+
+
 
         save(loca_daily,
              file = str_c(filename,

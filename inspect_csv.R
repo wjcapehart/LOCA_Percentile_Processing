@@ -58,7 +58,7 @@ Ensembles_factor = factor(Ensembles)
 
 remove(HUC_LUT_URL)
 
-HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Code_ID >= 10020000) & 
+HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter((HUC08_Code_ID >= 10020000) &
                                            (HUC08_Code_ID  < 10030000))
 
 target_scenario = "rcp85"
@@ -87,50 +87,50 @@ for (huc_zone_lut in Completed_HUCS)
   loca_location_data = HUC08_MRB_LUT %>%
     filter(HUC08_Code_ID == huc_zone_lut)
 
-    root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/huc_08_basins/problems/"
+    root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/problems/"
 
-    
+
     loca_csvname   = str_c("NGP_LOCA_HUCS_",
                            huc_zone_lut,
                            "_",
                            target_scenario,
                            ".csv",
                            sep = "")
-    
+
     CSV_URL  = str_c(root_LOCA_URL,
                      loca_csvname,
-                     sep = "") 
-    
+                     sep = "")
+
     loca_daily = read.csv(CSV_URL)
-  
+
   print(LOCA_URL)
-  
-  
+
+
   remove(LOCA_URL)
 
 
-      
+
       missing_time     = which(is.na(loca_daily$Time))
-      missing_huc      = which(is.na(loca_daily$Division)) 
+      missing_huc      = which(is.na(loca_daily$Division))
       missing_ensemble = which(is.na(loca_daily$Ensemble))
-      missing_scenario = which(is.na(loca_daily$Scenario)) 
+      missing_scenario = which(is.na(loca_daily$Scenario))
       missing_precent  = which(is.na(loca_daily$Percentile))
       missing_tasmax   = which(is.na(loca_daily$tasmax))
       missing_tasmin   = which(is.na(loca_daily$tasmin))
       missing_pr       = which(is.na(loca_daily$pr))
-      
-      
-      
 
-      if (length(missing_time)     > 0 ) { print(loca_daily[c(missing_time,missing_time+1), ])  }     
-      if (length(missing_huc)      > 0 ) { print(loca_daily[c(missing_huc,missing_huc+1), ])  }     
-      if (length(missing_ensemble) > 0 ) { print(loca_daily[c(missing_ensemble,missing_ensemble+1), ])  }     
-      if (length(missing_scenario) > 0 ) { print(loca_daily[c(missing_scenario,missing_scenario+1), ])  }     
-      if (length(missing_precent)  > 0 ) { print(loca_daily[c(missing_precent,missing_precent+1), ])  }     
-      if (length(missing_tasmax)   > 0 ) { print(loca_daily[c(missing_tasmax,missing_tasmax+1), ])  }     
-      if (length(missing_tasmin)   > 0 ) { print(loca_daily[c(missing_tasmin,missing_tasmin+1), ])  }     
-      if (length(missing_pr)       > 0 ) { print(loca_daily[c(missing_pr,missing_pr+1), ])  }     
-      
+
+
+
+      if (length(missing_time)     > 0 ) { print(loca_daily[c(missing_time,missing_time+1), ])  }
+      if (length(missing_huc)      > 0 ) { print(loca_daily[c(missing_huc,missing_huc+1), ])  }
+      if (length(missing_ensemble) > 0 ) { print(loca_daily[c(missing_ensemble,missing_ensemble+1), ])  }
+      if (length(missing_scenario) > 0 ) { print(loca_daily[c(missing_scenario,missing_scenario+1), ])  }
+      if (length(missing_precent)  > 0 ) { print(loca_daily[c(missing_precent,missing_precent+1), ])  }
+      if (length(missing_tasmax)   > 0 ) { print(loca_daily[c(missing_tasmax,missing_tasmax+1), ])  }
+      if (length(missing_tasmin)   > 0 ) { print(loca_daily[c(missing_tasmin,missing_tasmin+1), ])  }
+      if (length(missing_pr)       > 0 ) { print(loca_daily[c(missing_pr,missing_pr+1), ])  }
+
 
 
 } # huc

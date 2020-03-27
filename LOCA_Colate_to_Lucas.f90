@@ -15,7 +15,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer, parameter :: nhucs      =    42
   integer, parameter :: len_hucstr =     4
-  integer, parameter :: len_outbuf =   100
+  integer, parameter :: len_outbuf =   255
 
   character (len=*), PARAMETER  :: map_variable_name = "basin_map3d"
   character (len=*), PARAMETER  :: map_values_name   = "basins"

@@ -15,7 +15,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer, parameter :: nhucs      =   179
   integer, parameter :: len_hucstr =     4
-  integer, parameter :: len_outbuf =   100
+  integer, parameter :: len_outbuf =   255
 
   character (len=*), PARAMETER  :: map_variable_name = "US_CAN_Zones"
   character (len=*), PARAMETER  :: map_values_name   = "US_CAN_Zones_ID"
@@ -27,7 +27,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 2901
+  integer (kind=4) :: myhuc_low    = 3901
   integer (kind=4) :: myhuc_high
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
@@ -96,7 +96,7 @@ program LOCA_Colate_to_ClimDivs
   integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
   integer  (kind=4),         allocatable :: unit_huc(:) !nmyhucs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
-  character(len=100),        allocatable :: csv_filename(:)   ! \, nmyhucs
+  character(len=255),        allocatable :: csv_filename(:)   ! \, nmyhucs
 
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -346,7 +346,7 @@ program LOCA_Colate_to_ClimDivs
     print*, "==  Length of Final Time Record Pull ", last_read
     print*, "== "
     print*, "== Allocating csv_filename"
-    allocate(character(100) :: csv_filename(nmyhucs))
+    allocate(character(255) :: csv_filename(nmyhucs))
     print*, "== "
 
 

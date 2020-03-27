@@ -15,14 +15,14 @@ program LOCA_Colate_to_HUCS
 
   integer, parameter :: nhucs      =   307
   integer, parameter :: len_hucstr =     8
-  integer, parameter :: len_outbuf =   100
+  integer, parameter :: len_outbuf =   255
 
   integer, parameter ::      npull = 365
 
   integer, parameter :: start_scen = 2
   integer, parameter :: end_scen   = 2
 
-  integer (kind=4) :: myhuc_low    = 10040201
+  integer (kind=4) :: myhuc_low    = 25540201
   integer (kind=4) :: myhuc_high
 
   character (len=*), PARAMETER  :: map_variable_name = "HUC08_Code"
@@ -99,7 +99,7 @@ program LOCA_Colate_to_HUCS
   integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
   integer  (kind=4),         allocatable :: unit_huc(:) !nmyhucs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
-  character(len=100),        allocatable :: csv_filename(:)   ! \, nmyhucs
+  character(len=255),        allocatable :: csv_filename(:)   ! \, nmyhucs
 
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -398,7 +398,7 @@ program LOCA_Colate_to_HUCS
     print*, "== Allocating csv_filename"
     print*, "== "
 
-    allocate(character(100) :: csv_filename(nmyhucs))
+    allocate(character(255) :: csv_filename(nmyhucs))
 
 
     do h = 1, nmyhucs

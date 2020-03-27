@@ -4,17 +4,17 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/huc_08_basins/"
+directory = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/"
 
 prefix    = "NGP_LOCA_HUCS_"
 outpref   = "NGP_LOCA_HUC08_"
 
 csv_files = intersect(list.files(path    = str_c(directory,
-                                                 "/done/",
+                                                 "/work/",
                                                  sep = ""),
                                  pattern = prefix),
                       list.files(path    = str_c(directory,
-                                                 "/done/",
+                                                 "/work/",
                                                  sep = ""),
                                  pattern = "rcp85.RData"))
 
@@ -68,7 +68,7 @@ for (division in Divisions)
 
 
         filename = str_c(directory,
-                         "/done/",
+                         "/work/",
                          prefix,
                          division,
                          "_",
@@ -80,7 +80,7 @@ for (division in Divisions)
         loca_hist[nrow(loca_hist), ]
 
         filename = str_c(directory,
-                         "/done/",
+                         "/work/",
                          prefix,
                          division,
                          "_",
@@ -92,7 +92,7 @@ for (division in Divisions)
         loca_45[nrow(loca_45), ]
 
         filename = str_c(directory,
-                         "/done/",
+                         "/work/",
                          prefix,
                          division,
                          "_",
@@ -189,11 +189,11 @@ prefix    = "NGP_LOCA_HUCS_"
 outpref   = "NGP_LOCA_HUC08_"
 
 csv_files = intersect(list.files(path    = str_c(directory,
-                                                 "/done/",
+                                                 "/work/",
                                                  sep = ""),
                                  pattern = prefix),
                       list.files(path    = str_c(directory,
-                                                 "/done/",
+                                                 "/work/",
                                                  sep = ""),
                                  pattern = "rcp85.RData"))
 
