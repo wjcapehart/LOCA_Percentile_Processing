@@ -33,7 +33,8 @@ thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Ag
   Output_Scenarios = c("RCP 4.5",
                        "RCP 8.5")
 
-  for (basin in Lucas_LUT$Basin[1])
+#  for (basin in Lucas_LUT$Basin[1])
+  for (basin in c("0032"))
   {
 
     metadata = Lucas_LUT %>% filter(Basin == basin)
