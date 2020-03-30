@@ -24,7 +24,7 @@ program LOCA_Colate_to_ClimDivs_CAN
             "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Northern_Great_Plains_Original_Subset/"
   character (len=*), PARAMETER  :: file_output_root  = &
 "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/" // &
-"Specific_Regional_Aggregate_Sets/climate_divisions/R_Daily_Files/work/NGP_LOCA_LUCAS_"
+"Specific_Regional_Aggregate_Sets/climate_divisions/R_Daily_Files/work/NGP_LOCA_nCLIMDIV_"
 
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = 3

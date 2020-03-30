@@ -14,7 +14,7 @@ outpref   = "NGP_LOCA_nCLIMDIV_"
 csv_files = list.files(path    = str_c(directory,
                                        "/work/",
                                        sep = ""),
-                       pattern = "rcp85.RData")
+                       pattern = "rcp85.RData") 
 
 load(file=url("http://kyrill.ias.sdsmt.edu/wjc/eduresources/Climate_Zones_Name_LUT.Rdata"))
 
