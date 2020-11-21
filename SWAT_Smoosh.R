@@ -51,7 +51,7 @@ for (ens in Ensembles) {
   
  smoosh_me = str_c("gzip -9v ", tarball)
  
- print(bundle_me)
- print(smoosh_me)
+ system(bundle_me)
+ system(smoosh_me)
  
 }
