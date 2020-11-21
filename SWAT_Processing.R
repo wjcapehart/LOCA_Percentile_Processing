@@ -12,7 +12,7 @@ dir.create("./swat_output")
 
 thredds_root = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/"
 
-
+# older version
   Inventory_URL = str_c(thredds_root,
                         "Lucas_LUT.RData",
                         sep = "")
