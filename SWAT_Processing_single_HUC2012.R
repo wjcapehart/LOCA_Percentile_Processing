@@ -50,9 +50,9 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
       close(con = my.connection)
       remove( my.connection)
 
-    ensemble = unique(loca_daily$Ensemble)[1]
+    ensemble = unique(loca_daily$Ensemble)
 
-    for (ensemble in unique(loca_daily$Ensemble)[1])
+    for (ensemble in unique(loca_daily$Ensemble))
     {
 
       for (scenario in Output_Scenarios)
