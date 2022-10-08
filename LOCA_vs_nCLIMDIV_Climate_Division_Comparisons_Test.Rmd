@@ -1,0 +1,403 @@
+---
+title: "NCEI GHCN Extreme Value Analysis"
+output: html_notebook
+---
+
+
+# 1 Goal
+
+1) Access LOCA and nCLIMDIV Data
+2) Compare LOCA aggregated fields with nCLIMDIV data
+
+
+
+# 2  Libraries
+
+The following libraries are needed for this exercise.
+
+Tidyverse Packages
+
+  + [tidyverse](https://www.tidyverse.org) : Set of commonly-used Data Science packages for R that it can install and load all at once. In the long-run you probably also want to install the tidyverse package suite anyway. For this exercise this will include...   
+    - [ggplot2](https://ggplot2.tidyverse.org) : Create Elegant Data Visualizations Using the Grammar of Graphics
+    - [tibble](https://tibble.tidyverse.org) : Simple Data Frames
+    - [tidyr](https://tidyr.tidyverse.org) : Tools for shepherding data in data frames.
+    - [readr](https://readr.tidyverse.org) : Read Rectangular Text Data
+    - [purr](https://purrr.tidyverse.org) : Functional Programming Tools
+    - [dplyr](https://dplyr.tidyverse.org) : A grammar of data manipulation
+    - [stringr](https://stringr.tidyverse.org) : Simple, Consistent Wrappers for Common String Operations
+    - [forcats](https://forcats.tidyverse.org) : Tools for Working with Categorical Variables (Factors)
+    
+  + [lubridate](https://lubridate.tidyverse.org) : Time and Date Management
+  
+
+  
+Other Packages
+
+  + [rnoaa](https://www.rdocumentation.org/packages/rnoaa/) : Climate Data Online Services from NCEI 
+  
+
+```{r}
+
+# Libraries
+
+  # Tidyverse resources
+
+  library(package = "tidyverse") # Multiple Tidyverse Resources
+  library(package = "lubridate") # Date-Time Control
+  library(package = "ggridges")  # Ridgeline plots with ggplot2
+
+
+  # NOAA Libraries
+
+  library(package = "rnoaa") # NCEI  Data Retrieval Package
+
+  # NCAR Libraries
+
+  library(package = "extRemes") # NCEI  Data Retrieval Package
+
+
+```
+
+# 3 Extracting Data
+
+## 3.1. Pulling Climate Division
+
+Here the user needs to identify a 4 digit climate division
+
+
+```{r}
+
+# User Selection
+
+  # Climate Division Selection
+  
+  target_climate_zone = "3904"
+
+```
+
+## 3.2 Extracting LOCA data
+
+The LOCA dsata for this script is stored on a THREDDS server at SD Mines.  Each NCEI climate division has its own separate file  They can be accessed fairly easily with R using the [url()](https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/connections) command.
+
+```{r}
+
+# LOCA Data Extraction from SD Mines Thredds Server
+
+  # URL Information
+  
+  root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/"
+
+  loca_filename = str_c("NGP_LOCA_nCLIMDIV_",
+                        target_climate_zone,
+                        ".RData",
+                        sep = "")
+  
+  LOCA_URL     = str_c(root_LOCA_URL,
+                       loca_filename,
+                       sep = "")
+  
+  load(file    = url(LOCA_URL),
+       verbose = TRUE)
+  
+  
+  
+  
+  Ensembles = unique(loca_daily$Ensemble)
+  Scenarios = unique(loca_daily$Scenario)
+  
+  
+```
+
+
+## 3.2.1 aggreagate LOCA to monthly products.  
+
+While we work with this dataset ww will also be comparing the data to observed data using the nCLIMDIV monthly data.  This will require us to aggregate the data by month and year.
+
+For this we are using [group_by()]{https://dplyr.tidyverse.org/reference/group_by.html} and [summarize()](https://dplyr.tidyverse.org/reference/summarise.html) to aggregate the data to monthly and yearly values.
+
+```{r}
+
+# Create a master date comensurate with the nCLIMDIV date coordinate
+
+  loca_monthly = loca_daily %>% 
+    mutate(Center_of_Month = as.Date(str_c(year(Time),
+                                           month(Time),
+                                           "15",
+                                           sep="-"),
+                                     tryFormats = c("%Y-%m-%d")),
+           tasavg = (tasmin + tasmax)/2)
+                                                            
+  loca_monthly = loca_monthly %>% 
+    filter(Percentile == "P050") %>% 
+    group_by(Center_of_Month,
+             Division,
+             Ensemble,
+             Scenario) %>%
+    summarize(TMAX = mean(tasmax),
+              TMIN = mean(tasmin),
+              TMPC = mean(tasavg),
+              PCPN = sum(pr))
+                                           
+  loca_annual = loca_monthly %>% 
+    group_by(Year = year(Center_of_Month),
+             Division,
+             Ensemble,
+             Scenario) %>%
+    summarize(TMAX = mean(TMAX),
+              TMIN = mean(TMIN),
+              TMPC = mean(TMPC),
+              PCPN = sum(PCPN))
+
+
+  
+```
+
+
+
+## 3.3 Extracting nCLIMDIV data
+
+We also can pull the NCEI nCLIMDIV monthnly statistics for any US Climate Division.  As with the LOCA data it is also kept on our servers at SD Mines.
+
+We also need the dataset because it contains helpful metadata for the dataset
+
+The nCLIMDIV products are kept in classic US units so we have to convert things from deg F to deg C, and from inches to mm.
+
+We also only need here data from 1950 onward which as of this document takes us to calandar year 2018 for complete annual records.
+
+```{r}
+
+# Pulling nCLIMDIV
+
+  nCLIMDIV_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/CLASS_Examples/nCLIMDIV.Rdata"
+
+  load(file    = url(nCLIMDIV_URL),
+       verbose = TRUE)
+  
+  
+  
+  
+    
+  
+  #
+  # Create Pulldown Look-up-Tables 
+  #  
+  
+  state_zone_lut =  nCLIMDIV %>% 
+      select(c(Full_Zone_Code,State_Name,Zone_Name))   %>%
+      mutate(State_Code    = substring(text  = Full_Zone_Code,
+                                       first = 1,
+                                       last  = 2),
+             SubState_Code = substring(text  = Full_Zone_Code,
+                                       first = 3,
+                                       last  = 4)) %>%
+      mutate(Zone_Name_and_Code = str_c(SubState_Code,
+                                        Zone_Name,
+                                        sep = " : "),
+             Zones_Per_State    = max(SubState_Code) ) %>%
+      unique()
+  
+
+
+
+
+  
+
+
+#  Select Climate Division Data Only
+  
+  nCLIMDIV = nCLIMDIV %>% 
+    filter((Full_Zone_Code == target_climate_zone) & 
+           (year(Date)     >= 1950),
+           (year(Date)     <  2019))
+
+  State_Name    = unique(nCLIMDIV$State_Name)
+  Division_Name = unique(nCLIMDIV$Zone_Name)
+  
+  # convert to centigrade and mm
+  
+  nCLIMDIV = nCLIMDIV %>% 
+    mutate(TMAX = (TMAX - 32) * 5./9,
+           TMIN = (TMIN - 32) * 5./9,
+           TMPC = (TMPC - 32) * 5./9,
+           PCPN =  PCPN * 25.4)
+  
+  
+  
+  
+
+  
+```
+
+We can also aggregate this data for later to yearly intervals.  Alas, entropy doesn't let us shovel monthly data into a cow and get daily data out of its mouth.
+
+```{r}
+
+  # aggregate to calendar years
+  
+  nCLIMDIV_annual = nCLIMDIV %>%
+    group_by(Year = year(Date)) %>%
+    summarize(TMAX = mean(TMAX),
+              TMIN = mean(TMIN),
+              TMPC = mean(TMPC),
+              
+              PCPN = sum(PCPN))
+              
+``` 
+
+# 4 Comparing the LOCA to the nCLIMDIV data...
+
+We pulled the nCLIMDIV data for one primary reason -- develop confidence in the overall performance of the ensemble as a whoile.
+
+Ensemble are experiments that create multiple outcomes for a single case based on variations in model initial conditions, random forciongs and the differences in various climate models calculate certain complex processes.   Any individusl member may be able to predict one thing well while another thing may not be predicted with the same skill.  Ideally, as a group all the members together can better represent a future outcome than any individual member.  But mroe still, collectively the variations allow us insight as to the overall predictability of the system we are modeling.
+
+When comparing an ensemble to observations, we'd like to see the onservations inside the "envelope" of the ensemble or close to it.  So for this we are using the annual results for simplicity.
+
+## 4.1 Mean Annual Temperature
+
+```{r}
+
+ggplot(data = loca_annual) +
+  aes(x = Year,
+      y = TMPC,
+      color = Scenario) +
+  
+  theme_bw() + 
+  
+    
+  ggtitle(label    = "LOCA / GHCN Comparison",
+          subtitle = str_c(Division_Name,
+                           " Climate Division,",
+                           State_Name,
+                           sep = ""))  + 
+  
+  xlab(label = "Year")  + 
+
+  ylab(label = "Mean Annual Temperature (°C)")  + 
+  
+  labs(caption = "Black = NCEI nCLIMDIV Data") +
+  
+  scale_color_manual(breaks = c("Historical", "RCP 4.5", "RCP 8.5"),
+                     values = c("blue",       "green",   "red")) +
+  
+  geom_line(alpha = 0.1,
+            mapping = aes(group = Ensemble)) +
+  
+  geom_point(data = nCLIMDIV_annual,
+             color = "black")
+  
+
+```
+
+
+## 4.2 Mean Maximum Annual Temperature
+
+```{r}
+
+ggplot(data = loca_annual) +
+  aes(x = Year,
+      y = TMAX,
+      color = Scenario) +
+  
+  theme_bw() + 
+  
+    
+  ggtitle(label    = "LOCA / GHCN Comparison",
+          subtitle = str_c(Division_Name,
+                           " Climate Division,",
+                           State_Name,
+                           sep = "")) +   
+  
+  xlab(label = "Year")  + 
+
+  ylab(label = "Mean Maximum Annual Temperature (°C)")  + 
+  
+  labs(caption = "Black = NCEI nCLIMDIV Data") +
+  
+  scale_color_manual(breaks = c("Historical", "RCP 4.5", "RCP 8.5"),
+                     values = c("blue",       "green",  "red")) +
+  
+  geom_line(alpha = 0.1,
+            mapping = aes(group = Ensemble)) +
+  
+  geom_point(data = nCLIMDIV_annual,
+             color = "black")
+  
+
+```
+
+
+
+## 4.3 Mean Minimum Annual Temperature
+
+```{r}
+
+ggplot(data = loca_annual) +
+  aes(x = Year,
+      y = TMIN,
+      color = Scenario) +
+  
+  theme_bw() + 
+  
+    
+  ggtitle(label    = "LOCA / GHCN Comparison",
+          subtitle = str_c(Division_Name,
+                           " Climate Division,",
+                           State_Name,
+                           sep = "")) +  
+  
+  xlab(label = "Year")  + 
+
+  ylab(label = "Mean Minimum Annual Temperature (°C)")  + 
+  
+  labs(caption = "Black = NCEI nCLIMDIV Data") +
+  
+  scale_color_manual(breaks = c("Historical", "RCP 4.5", "RCP 8.5"),
+                     values = c("blue",       "green",  "red")) +
+  
+  geom_line(alpha = 0.1,
+            mapping = aes(group = Ensemble)) +
+  
+  geom_point(data = nCLIMDIV_annual,
+             color = "black")
+  
+
+```
+
+
+## 4.4 Total Annual Rainfall
+
+```{r}
+
+ggplot(data = loca_annual) +
+  aes(x = Year,
+      y = PCPN,
+      color = Scenario,
+      fill  = Scenario) +
+  
+  theme_bw() + 
+    
+  ggtitle(label    = "LOCA / GHCN Comparison",
+          subtitle = str_c(Division_Name,
+                           " Climate Division,",
+                           State_Name,
+                           sep = "")) + 
+  
+  xlab(label = "Year")  + 
+
+  ylab(label = "Total Annual Precipitation (mm)")  + 
+  
+  labs(caption = "Black = NCEI nCLIMDIV Data") +
+  
+  scale_color_manual(breaks = c("Historical", "RCP 4.5", "RCP 8.5"),
+                     values = c("blue",       "green",  "red")) +
+  
+  geom_point(alpha  = 0.2,
+            mapping = aes(group = Ensemble)) + 
+  
+  geom_point(data = nCLIMDIV_annual,
+             color = "black",
+             fill  = "black")
+  
+
+```
+

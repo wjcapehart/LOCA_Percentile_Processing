@@ -1,0 +1,712 @@
+```{r}
+
+  library(package = "tidyverse")
+
+  library(package = "lubridate")
+  library(package = "RCurl")
+  library(package = "e1071")
+  library(package = "ggridges")
+
+
+```
+
+```{r}
+
+thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/"
+
+
+get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
+
+load(url(get_metadata), verbose=TRUE)
+
+
+
+hucs_to_process = c("10120202")
+
+HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
+
+start_years = c(1976-2, 2036-2)
+delta_period  = 30+2
+
+n_periods = length(start_years)
+
+```
+```{r}
+
+deleteme= unique( month(seq(as.Date("2022-01-01"), by = "month", length.out = 20), label = TRUE))
+
+old_clim_dat = tibble(Month = deleteme,
+                      slr_ave=c(7.58000,11.44000,16.68000,20.03000,22.37000,24.80000,25.10000,22.58000,18.06000,12.95000,8.38000,6.49000),
+                      dew_ave=c(-11.16000,-9.44000,-6.56000,-2.01000,3.89000,9.89000,11.72000,10.17000,4.11000,-0.34000,-5.50000,-8.9400),
+                      wnd_ave=c( 5.03000,5.08000,5.65000,5.97000,5.61000,4.96000,4.69000,4.72000,5.01000,5.00000,5.26000,4.89000))
+```
+
+```{r}
+
+
+  Output_Scenarios = c("RCP 4.5",
+                       "RCP 8.5")
+
+  first = TRUE
+  firstrec = TRUE
+
+  for (basin in hucs_to_process)
+  {
+
+    metadata = HUC08_MRB_LUT %>% filter(HUC08_Code_ID == basin)
+    metadata$elevation = 1115.3359
+    
+    spatial = HUC08_MRB_Code_Frame %>% 
+      filter(HUC08_Code_ID == basin) %>% 
+      group_by(HUC08_Code_ID) %>% 
+      summarize(lat = mean(lat),
+                lon = mean(lon),
+                .groups = "drop")
+
+
+    File_URL = str_c(thredds_root,
+                     "NGP_LOCA_HUC08_",
+                     basin,
+                     ".RData",
+                     sep = "")
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection)
+      close(con = my.connection)
+      remove(my.connection)
+
+    ensembles =  unique(loca_daily$Ensemble)
+    print(ensembles)
+    print(length(ensembles))
+    for (ensemble in unique(loca_daily$Ensemble))
+    {
+
+      for (scenario in Output_Scenarios)
+      {
+
+        subset = loca_daily %>%
+          filter(((Scenario  == "Historical") |
+                  (Scenario  ==     scenario) ) &
+                 (Ensemble   ==       ensemble) &
+                 (Percentile ==         "P050") ) %>%
+          mutate(Year   = year(Time),
+                 Month  = month(Time, label = TRUE),
+                 pr     = ifelse(pr<0.1, 0, pr)) %>%
+          mutate(is_w   = ifelse(pr == 0,                   0, 1),
+                 is_d   = ifelse(pr == 0,                   1, 0),
+                 is_ww  = ifelse(lag(pr)*pr == 0,           0, 1),
+                 is_wd  = ifelse((lag(pr) > 0) & (pr == 0), 1, 0)) %>%
+          select(Time,
+                 Year,
+                 Month,
+                 tasmax,
+                 tasmin,
+                 pr,
+                 is_w,
+                 is_d,
+                 is_ww,
+                 is_wd)
+        
+        n = length(subset)
+        
+
+        
+        for (start_year in start_years) 
+        {
+          
+          end_year = start_year +  delta_period - 1
+
+          period_string = str_c(start_year, 
+                                "-",
+                                end_year, 
+                                sep="")
+          
+          
+          subperiod = subset %>%
+            filter( (Year >= start_year)  & 
+                    (Year <=   end_year)) 
+          
+          subperiod_orig = subperiod
+          
+          subperiod_mprec = subperiod %>%
+            group_by(Month,Year) %>%
+            summarize(pcp_ave    = sum(pr),
+                      .groups  = 'drop') %>%
+            ungroup() %>%
+            group_by(Month) %>%
+            summarize(pcp_ave = mean(pcp_ave),
+                      .groups  = 'drop') %>%
+            ungroup()
+          
+          subperiod = subperiod %>%
+            group_by(Month) %>%
+            summarize(tmp_max_ave =         mean(tasmax),
+                      tmp_min_ave =         mean(tasmin),
+                      tmp_max_sd  =           sd(tasmax),
+                      tmp_min_sd  =           sd(tasmin),
+                      pcp_sd      =               sd(pr),
+                      pcp_skew    =         skewness(pr),
+                      wet_dry     = sum(is_wd)/sum(is_d),
+                      wet_wet     = sum(is_ww)/sum(is_w),
+                      pcp_days    = sum(is_w)/delta_period,
+                      pcp_hhr     = max(pr),
+                      .groups     = 'drop') %>%
+            ungroup()
+          
+          subperiod = left_join(x =       subperiod,
+                                y = subperiod_mprec,
+                                by =        "Month") %>%
+            mutate(Region   = basin,
+                   Ensemble = ensemble,
+                   Period   = period_string,
+                   Scenario = ifelse(end_year < 2007, "Historical", scenario))
+          
+          subperiod = unique(subperiod)
+          
+          subperiod = left_join(x  = subperiod,
+                                y  = old_clim_dat,
+                                by = "Month")
+          
+          if (first)
+          {
+            wx_gen_stats = subperiod
+            first = FALSE
+          }
+          else
+          {
+            wx_gen_stats = rbind(wx_gen_stats,
+                                 subperiod)
+          }
+          
+          
+          if (str_detect(unique(subperiod$Scenario), "4.5") )
+          {
+            scen_string = "RCP45"    
+          } 
+          else
+          {
+            if (str_detect(unique(subperiod$Scenario), "8.5") ) 
+            {
+              scen_string = "RCP85"    
+            } 
+            else
+            {
+              scen_string = "HIST"    
+            }
+          }
+          
+ ################################################         
+          filename = str_c("./HUC__", 
+                           basin, 
+                           "__",
+                           ensemble,
+                           "__",
+                           scen_string,
+                           ".txt",
+                           sep = "")
+          
+          print(filename)
+          
+          subperiod_print = subperiod %>%
+            select("tmp_max_ave",
+                   "tmp_min_ave",
+                   "tmp_max_sd",
+                   "tmp_min_sd",
+                   "pcp_ave",
+                   "pcp_sd",
+                   "pcp_skew",
+                   "wet_dry",
+                   "wet_wet",
+                   "pcp_days",
+                   "pcp_hhr",
+                   "slr_ave",
+                   "dew_ave",
+                   "wnd_ave") %>%
+            mutate(tmp_max_ave = round(x = tmp_max_ave, digits=5),
+                   tmp_min_ave = round(x = tmp_min_ave, digits=5),
+                   tmp_max_sd  = round(x =  tmp_max_sd, digits=5),
+                   tmp_min_sd  = round(x =  tmp_min_sd, digits=5),
+                   pcp_ave     = round(x =     pcp_ave, digits=5),
+                   pcp_sd      = round(x =      pcp_sd, digits=5),
+                   pcp_skew    = round(x =    pcp_skew, digits=5),
+                   wet_dry     = round(x =     wet_dry, digits=5),
+                   wet_wet     = round(x =     wet_wet, digits=5),
+                   pcp_days    = round(x =    pcp_days, digits=5),
+                   pcp_hhr     = round(x =     pcp_hhr, digits=5),
+                   slr_ave     = round(x =     slr_ave, digits=5),
+                   dew_ave     = round(x =     dew_ave, digits=5),
+                   wnd_ave     = round(x =     wnd_ave, digits=5))
+          
+          line_1 = str_c("weather-wgn.cli: ", filename)
+          line_2 = "SDFORTMEADE                    44.40000    -103.47000    1005.79999        30"
+          line_3 = " tmp_max_ave tmp_min_ave tmp_max_sd tmp_min_sd pcp_ave pcp_sd pcp_skew wet_dry wet_wet pcp_days pcp_hhr slr_ave dew_ave wnd_ave"
+          fileConn<-file(filename)
+          writeLines(c(line_1,line_2,line_3), fileConn)
+          close(fileConn)
+          
+          
+          write_delim(x     = subperiod_print, 
+                      file  =  filename, 
+                      delim =       " ",
+                      append=TRUE) 
+          
+          
+                           
+ ################################################         
+          
+                    filename = str_c("./HUC__", 
+                           basin, 
+                           "__",
+                           ensemble,
+                           "__",
+                           scen_string,
+                           "_tmp.cli",
+                           sep = "")
+          
+                      line_1 = str_c("my_temps.tmp: ", filename)
+                      line_2 = "NBYR     TSTEP        LAT          LON          ELEV"
+                      line_3 = "150          0   44.40000   -103.47000    1005.79999"
+                      
+
+          
+          
+  ################################################         
+
+          
+          
+################################################         
+         
+          
+          
+          
+          
+          
+          remove(subperiod_mprec)
+          remove(subperiod)
+
+        }
+
+
+      } # scenario
+
+    } # ensemble
+    
+    remove(loca_daily)
+
+  } # basin
+
+  remove(ensemble)
+  remove(ensembles)
+  remove(Output_Scenarios)
+  remove(period_string)
+  remove(File_URL)
+  remove(scenario)
+  remove(basin)
+  remove(HUC08_MRB_Code_2D)
+  remove(HUC08_MRB_Code_Frame)
+  remove(delta_period)
+  remove(end_year)
+  remove(start_year)
+  remove(start_years)
+  remove(first)
+  remove(get_metadata)
+  remove(hucs_to_process)
+  remove(n)
+  remove(n_periods)
+  remove(thredds_root)
+
+
+  wx_gen_stats = wx_gen_stats %>%
+            select("Region",
+                   "Ensemble", 
+                   "Scenario",
+                   "Period",
+                   "Month",
+                   "tmp_max_ave",
+                   "tmp_min_ave",
+                   "tmp_max_sd",
+                   "tmp_min_sd",
+                   "pcp_ave",
+                   "pcp_sd",
+                   "pcp_skew",
+                   "wet_dry",
+                   "wet_wet",
+                   "pcp_days",
+                   "pcp_hhr",
+                   "slr_ave",
+                   "dew_ave",
+                   "wnd_ave")
+
+wx_gen_stats = unique(wx_gen_stats)
+```
+
+```{r}
+
+main_title_string = str_c(as.character(metadata$HUC08_Code_Name[1]),
+                          " Basin (",
+                          as.character(metadata$HUC08_Code_ID[1]) ,
+                          ")",
+                          sep = "")
+
+start_year = unique(wx_gen_stats$Period)[1]
+stop_year  = unique(wx_gen_stats$Period)[2]
+
+subtitle_string = str_c("Periods (",
+                      start_year,
+                      ") - (",
+                      stop_year,
+                      ")",
+                      sep = "")
+
+
+
+```
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = tmp_max_ave,
+      fill  = Scenario, 
+      color=NA) +
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  xlab("Mean Temperatures [deg C]") + 
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(x=tmp_max_ave, 
+                                    color = NA),
+                      alpha=0.5, size = 0) +
+  geom_density_ridges(mapping = aes(x=tmp_min_ave, 
+                                    color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+````{r}
+
+deleteme = wx_gen_stats %>% 
+  select("Month","Scenario","tmp_max_sd","tmp_min_sd") 
+
+deleteme = pivot_longer(deleteme, 
+                        cols=c("tmp_max_sd","tmp_min_sd"), 
+                        names_to = "Variables",
+                        values_to = "Values")
+
+ggplot(data = deleteme) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = Values,
+      fill  = Scenario, 
+      color=NA) +
+  
+  facet_wrap(facets = ~Variables) +
+  
+  scale_y_discrete(limits=rev) +
+  
+  theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Temperature Standard Deviation  [deg C]") + 
+  
+  ylab("Month") + 
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = pcp_ave,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  #theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Monthly Mean Total Precipitation  [mm]") + 
+  
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = pcp_sd,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  #theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Standard Deviation Daily Precipitation  [mm]") + 
+  
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = pcp_skew,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  #theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Precipitation Skewness") + 
+  
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+````{r}
+
+deleteme = wx_gen_stats %>% 
+  select("Month","Scenario","wet_dry","wet_wet") %>%
+  rename("p(W|D)" = "wet_dry",
+         "p(W|W)" = "wet_wet")
+
+deleteme = pivot_longer(deleteme, 
+                        cols=c("p(W|D)","p(W|W)"), 
+                        names_to = "Variables",
+                        values_to = "Values")
+
+
+ggplot(data = deleteme) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = Values,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  theme(strip.background=element_rect(fill="white")) +
+  
+  facet_wrap(facets = ~Variables)+
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab(" Wet-Dry v Wet-Wet Probability") + 
+  
+  ylab("Month") + 
+  
+  xlim(0,1) +
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = pcp_days,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  #theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Mean Rainy Days") + 
+  
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = pcp_days,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  #theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Average Rainy Days") + 
+  
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```
+
+
+
+````{r}
+
+
+ggplot(data = wx_gen_stats) +
+  theme_bw() +
+  aes(y     = Month,
+      x     = pcp_hhr,
+      fill  = Scenario, 
+      color=NA) +
+  
+
+  #theme(strip.background=element_rect(fill="white")) +
+
+  ggtitle(main_title_string,
+          subtitle = subtitle_string) +
+  
+  xlab("Record Daily Rain [mm]") + 
+  
+  ylab("Month") + 
+  
+  scale_y_discrete(limits=rev) +
+  
+
+  geom_density_ridges(mapping = aes(color = NA),
+                      alpha=0.5, size = 0) +
+  scale_fill_manual(values = c("blue", 
+                               "orange", 
+                               "red"))+
+  scale_color_manual(values = c("blue", 
+                                "orange", 
+                                "red"))
+
+
+```

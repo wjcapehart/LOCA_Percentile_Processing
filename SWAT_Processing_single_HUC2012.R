@@ -1,11 +1,4 @@
----
-title: "Processing Lucas's Basins for SWAT"
-output: html_notebook
----
 
-Libraries
-
-```{r}
 
   library(package = "stringr")
   library(package = "forcats")
@@ -15,55 +8,39 @@ Libraries
   library(package = "RCurl")
 
 
-```
+
+thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/"
 
 
-URLs and Directories
+get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
 
-```{r}
+load(url(get_metadata), verbose=TRUE)
 
-thredds_root = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/blackhills_domain/"
+hucs_to_process = c("10120110")
 
-
-```
-
-
-Get Static Data Lookup Table
-
-```{r}
-
-  Inventory_URL = str_c(thredds_root,
-                        "Lucas_LUT.RData",
-                        sep = "")
+HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
 
 
-  my.connection = url(description = Inventory_URL)
-       load(file = my.connection)
-       close(con = my.connection)
-       remove( my.connection)
 
-  remove(Inventory_URL)
-
-  print(Lucas_LUT)
-
-```
-
-Loop Through Files
-
-```{r}
 
 
   Output_Scenarios = c("RCP 4.5",
                        "RCP 8.5")
 
-  for (basin in Lucas_LUT$Basin[1])
+  for (basin in hucs_to_process)
   {
 
-    metadata = Lucas_LUT %>% filter(Basin == basin)
+    metadata = HUC08_MRB_LUT %>% filter(HUC08_Code_ID == basin)
+    
+    spatial = HUC08_MRB_Code_Frame %>% 
+      filter(HUC08_Code_ID == basin) %>% 
+      group_by(HUC08_Code_ID) %>% 
+      summarize(lat = mean(lat),
+                lon = mean(lon))
+
 
     File_URL = str_c(thredds_root,
-                     "R_Daily_Files/",
-                     "NGP_LOCA_LUCAS_",
+                     "NGP_LOCA_HUC08_",
                      basin,
                      ".RData",
                      sep = "")
@@ -93,7 +70,9 @@ Loop Through Files
         # Write the Daily Max/Min Temperature File
         #
 
-        filename_tmp = str_c("./SWAT_LUCAS__",
+        filename_tmp = str_c("./SWAT_LOCA_",
+                             basin,
+                             "__",
                              ensemble,
                              "__",
                              str_replace(string      = scenario,
@@ -116,13 +95,13 @@ Loop Through Files
             cat(record)
             cat("\n")
           # Line 2 == Latitude
-          record = sprintf("%17.6f\n", metadata$Latitude)
+          record = sprintf("%17.6f\n", 44.40000)     
             cat(record)
           # Line 3 == Longitude
-          record = sprintf("%17.5f\n", metadata$Longitude)
+          record = sprintf("%17.5f\n",  -103.47000)
             cat(record)
           # Line 4 == Elevation
-          record = sprintf("%17.5f\n", metadata$Mean_Elevation)
+          record = sprintf("%17.5f\n", 1005.79999 ) # metadata$Mean_Elevation)
             cat(record)
 
           for (time in subset$Time)
@@ -149,7 +128,9 @@ Loop Through Files
         # Write the Daily Rainfall File
         #        
 
-        filename_pcp = str_c("./SWAT_STURGIS__",
+        filename_pcp = str_c("./SWAT_LOCA_",
+                             basin,
+                             "__",
                              ensemble,
                              "__",
                              str_replace(string      = scenario,
@@ -173,13 +154,13 @@ Loop Through Files
             cat(record)
             cat("\n")
           # Line 2 == Latitude
-          record = sprintf("%17.6f\n", metadata$Latitude)
+          record = sprintf("%17.6f\n", spatial$lat)
             cat(record)
           # Line 3 == Longitude
-          record = sprintf("%17.5f\n", metadata$Longitude)
+          record = sprintf("%17.5f\n", spatial$lon)
             cat(record)
           # Line 4 == Elevation # Add me Lucas!
-          record = sprintf("%17.5f\n", metadata$Mean_Elevation)
+          record = sprintf("%17.5f\n", 1115.3359) # metadata$Mean_Elevation)
             cat(record)
 
 
@@ -213,4 +194,3 @@ Loop Through Files
   remove(scenario)
   remove(basin)
 
-```

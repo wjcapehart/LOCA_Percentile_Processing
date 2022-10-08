@@ -1,0 +1,766 @@
+---
+title: "NCEI GHCN Extreme Value Analysis"
+output: html_notebook
+---
+
+
+# 1 Goal
+
+1) Access NCEI Daily GHCN Data
+2) Explore Ways to Determine Return Periods for Extreme Events
+
+
+A reference for the extRemes package can be found here
+
+Gilleland, E., & Katz, R. (2016). extRemes 2.0: An Extreme Value Analysis Package in R. Journal of Statistical Software, 72(8), 1-39. doi:http://dx.doi.org/10.18637/jss.v072.i08 ( PDF Avaialble at https://www.jstatsoft.org/article/view/v072i08 )
+
+
+# 2  Libraries
+
+The following libraries are needed for this exercise.
+
+Tidyverse Packages
+
+  + [tidyverse](https://www.tidyverse.org) : Set of commonly-used Data Science packages for R that it can install and load all at once. In the long-run you probably also want to install the tidyverse package suite anyway. For this exercise this will include...   
+    - [ggplot2](https://ggplot2.tidyverse.org) : Create Elegant Data Visualizations Using the Grammar of Graphics
+    - [tibble](https://tibble.tidyverse.org) : Simple Data Frames
+    - [tidyr](https://tidyr.tidyverse.org) : Tools for shepherding data in data frames.
+    - [readr](https://readr.tidyverse.org) : Read Rectangular Text Data
+    - [purr](https://purrr.tidyverse.org) : Functional Programming Tools
+    - [dplyr](https://dplyr.tidyverse.org) : A grammar of data manipulation
+    - [stringr](https://stringr.tidyverse.org) : Simple, Consistent Wrappers for Common String Operations
+    - [forcats](https://forcats.tidyverse.org) : Tools for Working with Categorical Variables (Factors)
+    
+  + [lubridate](https://lubridate.tidyverse.org) : Time and Date Management
+  
+
+  
+Other Packages
+
+  + [rnoaa](https://www.rdocumentation.org/packages/rnoaa/) : Climate Data Online Services from NCEI 
+  
+  + [extRemes](https://www.rdocumentation.org/packages/extRemes) :  NCAR functions for performing extreme value analysis.
+  
+  + [Jan Gleixner's & Wouter van der Bijl's custom GeomSplitViolin() code](https://stackoverflow.com/questions/35717353/split-violin-plot-with-ggplot2/45614547#45614547)
+
+There are plots where you can see the shape of distributions side-by-side called ["violin plots"](https://en.wikipedia.org/wiki/Violin_plot).  Some people like to a pair of distributons.  This isn't officially part of any current R library but it was desirable enough for a air of saints from Max Plank Institute and Stockholm University to write a piece of code to emulate it.
+
+The custom code in the hidden block below was developed by Jan Gleixner (Max Plank Inst.) & Wouter van der Bijl (Stockholm Univ.) and creates a split violin plot similar to a split beanplot for the ggplot2 plotting framework.
+
+Source: [Stackoverflow](https://stackoverflow.com/questions/35717353/split-violin-plot-with-ggplot2/45614547#45614547)
+    
+```{r}
+
+# Libraries
+
+  # Tidyverse resources
+
+  library(package = "tidyverse") # Multiple Tidyverse Resources
+  library(package = "lubridate") # Date-Time Control
+  library(package = "ggridges")  # Ridgeline plots with ggplot2
+
+
+  # NOAA Libraries
+
+  library(package = "rnoaa") # NCEI  Data Retrieval Package
+
+  # NCAR Libraries
+
+  library(package = "extRemes") # NCEI  Data Retrieval Package
+
+
+```
+
+# 3 Extracting Data
+
+## 3.1. Pulling Climate Division
+
+Here the user needs to identify a 4 digit climate division
+
+
+```{r}
+
+# User Selection
+
+  # Climate Division Selection
+  
+  target_climate_zone = "3908"
+
+```
+
+
+
+## 3.2 Extracting nCLIMDIV data for Lookup Table Information
+
+We also can pull the NCEI nCLIMDIV monthnly statistics for any US Climate Division.  As with the LOCA data it is also kept on our servers at SD Mines.
+
+We also need this dataset because it contains helpful metadata for the dataset
+
+
+```{r}
+
+# Pulling nCLIMDIV for Zone Lookup Tables
+
+  nCLIMDIV_LUT_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/CLASS_Examples/nCLIMDIV_LUT.csv"
+
+  state_zone_lut = read_csv(file = url(nCLIMDIV_LUT_URL))
+
+  
+  remove(nCLIMDIV_LUT_URL)
+
+  #
+  # Create Pulldown Look-up-Tables 
+  #  
+  
+  state_zone_lut =  state_zone_lut %>% 
+      mutate(State_Code    = substring(text  = Full_Zone_Code,
+                                       first = 1,
+                                       last  = 2),
+             SubState_Code = substring(text  = Full_Zone_Code,
+                                       first = 3,
+                                       last  = 4)) %>%
+      mutate(Zone_Name_and_Code = str_c(SubState_Code,
+                                        Zone_Name,
+                                        sep = " : "),
+             Zones_Per_State    = max(SubState_Code) ) %>%
+      unique()
+  
+
+```
+
+## 3.3 Extracting LOCA data
+
+The LOCA dsata for this script is stored on a THREDDS server at SD Mines.  Each NCEI climate division has its own separate file  They can be accessed fairly easily with R using the [url()](https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/connections) command.
+
+```{r}
+
+# LOCA Data Extraction from SD Mines Thredds Server
+
+  # URL Information
+  
+  root_LOCA_URL = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/climate_divisions/"
+
+  loca_filename = str_c("NGP_LOCA_nCLIMDIV_",
+                        target_climate_zone,
+                        ".RData",
+                        sep = "")
+  
+  LOCA_URL = str_c(root_LOCA_URL,
+                   loca_filename,
+                   sep = "")
+  
+  load(file    = url(LOCA_URL),
+       verbose = TRUE)
+  
+  remove(LOCA_URL)
+
+  Ensembles = unique(loca_daily$Ensemble)
+  Scenarios = unique(loca_daily$Scenario)
+
+```
+
+# 4 Exteme Event Analysis
+
+## 4.1 Period Selection
+
+Here we are going to select a "control" period representing a period before the "point of divergence" in our alternative histories (the RCP 4.5 and RCP 8.5)
+
+```{r}
+
+# Select Periods
+
+  # "Historical" Period
+
+  reference_period_start = 1981
+  reference_period_end   = 2005
+ 
+  # "Future" Period
+   
+  future_period_start    = 2036
+  future_period_end      = 2065
+
+```
+
+We are extractring the period data here.  
+
+(Also we are editing the names of the scenario's to include the period years)
+
+```{r}
+# Period Extraction (using the zone maximum daily event)
+
+  loca_daily = loca_daily %>% 
+    mutate(Center_of_Month = as.Date(str_c(year(Time),
+                                           month(Time),
+                                           "15",
+                                           sep="-"),
+                                     tryFormats = c("%Y-%m-%d")))
+
+  loca_histo = loca_daily %>%
+    filter((year(Time) >= reference_period_start) &
+           (year(Time) <= reference_period_end)   &
+           (Percentile == "P100")                 ) %>%
+    mutate(Scenario = str_c(Scenario,
+                            " (",
+                            reference_period_start,
+                            "-",
+                            reference_period_end,
+                            ")",
+                            sep = ""))   
+
+  loca_futr = loca_daily %>%
+    filter((year(Time) >= future_period_start)    &
+           (year(Time) <= future_period_end)      &
+           (Percentile == "P100")                 )  %>%
+    mutate(Scenario = str_c(Scenario,
+                            " (",
+                            future_period_start,
+                            "-",
+                            future_period_end,
+                            ")",
+                            sep = "")) 
+  
+  loca_periods = rbind(loca_histo,
+                       loca_futr)
+  
+  remove(loca_histo)
+  remove(loca_futr)
+
+  Scenarios = unique(loca_periods$Scenario)
+  
+  loca_location_data = state_zone_lut %>%
+    filter(Full_Zone_Code == target_climate_zone)
+  
+  State_Name    = unique(loca_location_data$State_Name)
+  Division_Name = unique(loca_location_data$Zone_Name)
+
+```
+
+## 4.2 Calculating Yearly Maxima
+
+This is mostly for illustrative purposes because we are using the daily data for our return periods.
+
+Here we are taking the extreme maximum rainfall for each year.
+
+```{r}
+
+# Yearly Maximum 
+
+  loca_period_extremes = loca_periods %>%
+    group_by(Year = year(Time),
+             Ensemble,
+             Scenario) %>%
+    summarize(tasmax_max_ann = max(tasmax),
+              tasmin_min_ann = min(tasmax),
+              pr_max_ann     = max(pr))
+
+
+
+```
+
+The plot below shows a collective shape of all of our yearly maximum rainfal distributions
+
+```{r}
+
+loca_period_histo = loca_period_extremes %>%
+                      filter(str_detect(Scenario, "Historical"))
+
+loca_period_rcp85 = loca_period_extremes %>%
+                      filter(str_detect(Scenario, "8.5"))
+
+loca_period_rcp45 = loca_period_extremes %>%
+                      filter(str_detect(Scenario, "4.5"))
+
+ggplot(data = loca_period_extremes) +
+  aes(x     = pr_max_ann,
+      group = Ensemble,
+      color = Scenario) +
+  
+  theme_bw() + 
+    
+  ggtitle(label    = "LOCA-Dervied Extreme Events",
+          subtitle = str_c(Division_Name,
+                           " Climate Division, ",
+                           State_Name,
+                           sep = "")) + 
+  
+  scale_color_manual(values = c("blue",       "green",  "red")) +
+  
+  ylab(label = "Probability")  + 
+
+  xlab(label = "Total Annual Max Daily Precipitation (mm)")  + 
+  
+  xlim(0, max(loca_period_extremes$pr_max_ann)) +
+  
+  geom_density(data  = loca_period_histo,
+               alpha = 0.1) +
+  geom_density(data  = loca_period_rcp45,
+               alpha = 0.1) +
+
+  geom_density(data  = loca_period_rcp85,
+               alpha = 0.1)
+```
+
+We can also plot just the mean values
+
+```{r}
+
+ggplot(data = loca_period_extremes) +
+  aes(x     = pr_max_ann,
+      color = Scenario) +
+  
+  theme_bw() + 
+    
+  ggtitle(label    = "LOCA-Dervied Extreme Events",
+          subtitle = str_c(Division_Name,
+                           " Climate Division, ",
+                           State_Name,
+                           sep = "")) + 
+  
+  scale_color_manual(values = c("blue", 
+                                "green",
+                                "red")) +
+  
+  ylab(label = "Probability")  + 
+
+  xlab(label = "Total Annual Max Daily Precipitation (mm)")  + 
+  
+  xlim(0, max(loca_period_extremes$pr_max_ann)) +
+  
+  geom_density()
+
+
+
+```
+
+# 5 General Pareto Distribution Analysis.
+
+For daily data to capture the return intervals we need to fit each of our daily precip values to a ("Generalized Pareto")[https://en.wikipedia.org/wiki/Pareto_distribution] distribution.  
+
+There are a number of resources that do this without too much user interference.  The one I use is the NCAR [ExtRemes](https://ral.ucar.edu/staff/ericg/extRemes/) package
+
+For this we are going to also need a threshold rainfal amount for each case.  We use a 95% percentile value for this and it normally does a good job here for automated processes.
+
+We are going to make a new data frame for the extreme event return periods and amounts as well as their 5% and 95%b confidence limits.  
+
+```{r}
+
+# Extreme Event Pulls
+
+#scenario = Scenarios[1]
+for (scenario in Scenarios) 
+{
+  #ensemble = Ensembles[1]
+  for (ensemble in Ensembles)
+  {
+    
+    loca_scen_ens = loca_periods %>%
+                       filter((Ensemble == ensemble),
+                              (Scenario == scenario))
+
+    
+    threshold = quantile(x     = loca_scen_ens$pr,
+                         probs = 0.95)
+    
+    fit_GP_daily = fevd(x          = loca_scen_ens$pr, 
+                        threshold  = threshold,
+                        units      = "mm",
+                        time.units = "365/year",
+                        type       = "GP"
+                     )
+    
+    year_return   = c( 2:100.,
+                      141.,
+                      200.,
+                      316.,
+                      500.)
+
+    
+    return_ci = ci(x             = fit_GP_daily, 
+                   return.period = year_return)
+    
+
+    if ((scenario == Scenarios[1]) & (ensemble == Ensembles[1]))
+    {
+      return_events = tibble(Ensemble           = ensemble,
+                             Scenario           = scenario,
+                             Division           = unique(loca_daily$Division),
+                             Return_Period      = year_return,
+                             Return_Estimate_05 = return_ci[,1],
+                             Return_Estimate    = return_ci[,2],
+                             Return_Estimate_95 = return_ci[,3])
+      
+    } else # first run
+    {
+      delete_me     = tibble(Ensemble           = ensemble,
+                             Scenario           = scenario,
+                             Division           = unique(loca_daily$Division),
+                             Return_Period      = year_return,
+                             Return_Estimate_05 = return_ci[,1],
+                             Return_Estimate    = return_ci[,2],
+                             Return_Estimate_95 = return_ci[,3])
+      return_events = rbind(return_events,
+                            delete_me)
+
+    } # not the first run
+
+  } # ensemble
+  
+} # scenario
+
+remove(loca_scen_ens)
+remove(threshold)
+remove(fit_GP_daily)
+remove(delete_me)
+
+```
+
+#6. Plotting The Results
+
+Plotting the data is going to be tough since there is a LOT of data points and they are going to sit on top of each other.
+
+Here is an example..
+
+```{r}
+
+  ggplot(data = return_events) +
+  
+    aes(x     = Return_Period,
+        y     = Return_Estimate,
+        color = Scenario) +
+  
+    ggtitle(label    = "LOCA-Dervied Extreme Events",
+          subtitle = str_c(Division_Name,
+                           " Climate Division, ",
+                           State_Name,
+                           sep = "")) + 
+  
+    xlab(label = "Return Period (years)") +
+    ylab(label = "Mean Maximum Daily Rainfall (mm)") +
+    scale_color_manual(values = c("blue", 
+                                "green",
+                                "red")) +
+    geom_point(alpha=.1)
+  
+  
+
+```
+
+
+```{r}
+
+  max_year = 100
+
+  return_events_for_plotting = return_events %>% 
+                                   filter(Return_Period <= max_year)
+
+
+  return_events_for_plotting = return_events_for_plotting %>%
+                                   group_by(Scenario,
+                                            Return_Period) %>%
+                                   summarize(Return_Estimate = mean(Return_Estimate))
+  
+  ggplot(data = return_events_for_plotting) +
+  
+    aes(x     = Return_Period,
+        y     = Return_Estimate,
+        color = Scenario) +
+  
+    theme_bw() +
+  
+    ggtitle(label    = "LOCA-Dervied Extreme Events",
+          subtitle = str_c(Division_Name,
+                           " Climate Division, ",
+                           State_Name,
+                           sep = "")) + 
+  
+    xlab(label = "Return Period (years)") +
+    ylab(label = "Ensemble-Mean Maximum Daily Rainfall (mm)") +
+
+    xlim(0, max_year) +
+  
+    scale_color_manual(values = c("blue", 
+                                "green",
+                                "red")) +
+  
+    geom_line()
+
+```
+
+If you look at the above plot, you can trace a given return event horizontally to the y-axis to get the amount.  BUT also if you follow the a return interval trace horizontally just to either of the future climate cases, you can see how, for example a 75-year return event can become a 50-year return event.  
+
+## External Contributed Code: *GeomSplitViolin()*
+
+There are plots where you can see the shape of distributions side-by-side called ["violin plots"](https://en.wikipedia.org/wiki/Violin_plot).  Some people like to a pair of distributons.  This isn't officially part of any current R library but it was desirable enough for a air of saints from Max Plank Institute and Stockholm University to write a piece of code to emulate it.
+
+The custom code in the hidden block below was developed by Jan Gleixner (Max Plank Inst.) & Wouter van der Bijl (Stockholm Univ.) and creates a split violin plot similar to a split beanplot for the ggplot2 plotting framework.
+
+Source: [Stackoverflow](https://stackoverflow.com/questions/35717353/split-violin-plot-with-ggplot2/45614547#45614547)
+
+
+```{r echo=FALSE}
+{
+#######################################################
+#
+# Credit for Split Violin Plot for GGPLOT2 Library
+#   
+# Jan Gleixner & Wouter van der Bijl : https://stackoverflow.com/questions/35717353/split-violin-plot-with-ggplot2/45614547#45614547
+#
+  GeomSplitViolin <- ggproto("GeomSplitViolin", 
+                             GeomViolin, 
+                             draw_group = function(self, 
+                                                   data, 
+                                                   ..., 
+                                                   draw_quantiles = NULL) {
+                               
+      # Original function by Jan Gleixner (@jan-glx)
+      # Adjustments by Wouter van der Bijl (@Axeman)
+                               
+      data <- transform(data, 
+                        xminv = x - violinwidth * (x - xmin), 
+                        xmaxv = x + violinwidth * (xmax - x))
+      
+      grp <- data[1, "group"]
+      
+      newdata <- plyr::arrange(transform(data, x = if (grp %% 2 == 1) 
+                                                     xminv 
+                                                   else 
+                                                     xmaxv), 
+                               if (grp %% 2 == 1) 
+                                 y 
+                               else 
+                                 -y)
+      
+      newdata <- rbind(newdata[1, ], newdata, newdata[nrow(newdata), ], newdata[1, ])
+      
+      newdata[c(1, nrow(newdata) - 1, nrow(newdata)), "x"] <- round(newdata[1, "x"])
+      
+      if (length(draw_quantiles) > 0 & 
+          !scales::zero_range(range(data$y))) {
+        
+        stopifnot(all(draw_quantiles >= 0), 
+                  all(draw_quantiles <= 1))
+        
+        quantiles <- create_quantile_segment_frame(data, 
+                                                   draw_quantiles, 
+                                                   split = TRUE,
+                                                   grp   = grp)
+        aesthetics <- data[rep(1, 
+                               nrow(quantiles)), 
+                           setdiff(names(data), 
+                                   c("x", "y")), 
+                           drop = FALSE]
+        
+        aesthetics$alpha <- rep(1, 
+                                nrow(quantiles))
+        
+        both <- cbind(quantiles, 
+                      aesthetics)
+        
+        quantile_grob <- GeomPath$draw_panel(both, ...)
+        
+        ggplot2:::ggname("geom_split_violin", 
+                         grid::grobTree(GeomPolygon$draw_panel(newdata, 
+                                                               ...), 
+                                        quantile_grob))
+        
+      } else {
+        
+        ggplot2:::ggname("geom_split_violin", 
+                         GeomPolygon$draw_panel(newdata, 
+                                                ...))
+        
+      }
+    }
+  )
+  
+  create_quantile_segment_frame <- function(data, 
+                                            draw_quantiles, 
+                                            split = FALSE, 
+                                            grp = NULL) 
+    {
+    
+    dens <- cumsum(data$density) / sum(data$density)
+    
+    ecdf <- stats::approxfun(dens, 
+                             data$y)
+    
+    ys <- ecdf(draw_quantiles)
+    
+    violin.xminvs <- (stats::approxfun(data$y, 
+                                       data$xminv))(ys)
+    
+    violin.xmaxvs <- (stats::approxfun(data$y, 
+                                       data$xmaxv))(ys)
+    
+    violin.xs <- (stats::approxfun(data$y, 
+                                   data$x))(ys)
+    
+    if (grp %% 2 == 0) {
+      
+      data.frame(x     = ggplot2:::interleave(violin.xs, 
+                                              violin.xmaxvs),
+                 y     = rep(ys, each = 2), 
+                 group = rep(ys, each = 2))
+      
+    } else {
+      data.frame(x     = ggplot2:::interleave(violin.xminvs,
+                                              violin.xs),
+                 y     = rep(ys, each = 2), 
+                 group = rep(ys, each = 2))
+    }
+  }
+  
+  geom_split_violin <- function(mapping        = NULL, 
+                                data           = NULL, 
+                                stat           = "ydensity", 
+                                position       = "identity", 
+                                ..., 
+                                draw_quantiles = NULL, 
+                                trim           = TRUE, 
+                                scale          = "area", 
+                                na.rm          = FALSE, 
+                                show.legend    = NA, 
+                                inherit.aes    = TRUE) {
+    
+    layer(data        = data, 
+          mapping     = mapping, 
+          stat        = stat, 
+          geom        = GeomSplitViolin, 
+          position    = position, 
+          show.legend = show.legend, 
+          inherit.aes = inherit.aes, 
+          params      = list(trim          = trim, 
+                             scale         = scale, 
+                             draw_quantiles = draw_quantiles, 
+                             na.rm          = na.rm, 
+                             ...))
+  }
+#
+#######################################################
+}
+```
+
+## Split Violin Plot
+
+Here are the results of those plots comparing the Historical Periods against the Future Periods
+
+Fiorst 
+
+
+```{r}
+subset = return_events %>% filter(!str_detect(string  =   Scenario,
+                                              pattern = "RCP 4.5") &
+                                    ((Return_Period %% 2) == 0) &
+                                     (Return_Period <= 30))
+
+subset2 = subset %>% group_by(Scenario,
+                              Return_Period) %>%
+                     summarize(Median_Return_Estimate = median(Return_Estimate))
+
+subset$Return_Period = as.factor(subset$Return_Period)
+subset2$Return_Period = as.factor(subset2$Return_Period)
+
+  ggplot(data = subset) + 
+  
+    aes(x     = Return_Period,
+        y     = Return_Estimate) +
+  
+    theme_bw() +
+    
+    theme(legend.position       = c(0.02, 0.98),
+          legend.justification  = c(0.00, 1.00)) + 
+  
+    ggtitle(label    = "LOCA-Dervied Extreme Events",
+          subtitle = str_c(Division_Name,
+                           " Climate Division, ",
+                           State_Name,
+                           sep = "")) + 
+
+    ylab(label = "Daily Rainfall (mm)") +
+  
+    xlab(label = "Return Periods (years)") +
+    labs(caption = "Solid Lines are the Median ") +
+  
+   scale_fill_manual(values = c( "cyan",  "red")) + 
+  
+
+    geom_split_violin(mapping = aes(x    = Return_Period,
+                                    y    = Return_Estimate,
+                                    fill = Scenario),
+                      alpha   = 0.75,
+                      trim    = FALSE,
+                      color   = NA) +
+    
+   scale_colour_manual(values = c( "darkblue",  "darkred")) + 
+
+ 
+    
+    geom_line(data = subset2,
+              mapping = aes(x = Return_Period,
+                            y = Median_Return_Estimate,
+                            group = Scenario,
+                            color = Scenario))
+  
+    remove(subset, subset2)
+
+```
+
+
+
+```{r}
+subset = return_events %>% filter(!str_detect(string  =   Scenario,
+                                              pattern = "RCP 8.5") &
+                                    ((Return_Period %% 2) == 0) &
+                                     (Return_Period <= 30))
+
+subset2 = subset %>% group_by(Scenario,
+                              Return_Period) %>%
+                     summarize(Median_Return_Estimate = median(Return_Estimate))
+
+subset$Return_Period = as.factor(subset$Return_Period)
+subset2$Return_Period = as.factor(subset2$Return_Period)
+
+  ggplot(data = subset) + 
+  
+    aes(x     = Return_Period,
+        y     = Return_Estimate) +
+  
+    theme_bw() +
+    
+    theme(legend.position       = c(0.02, 0.98),
+          legend.justification  = c(0.00, 1.00)) + 
+  
+    ggtitle(label    = "LOCA-Dervied Extreme Events",
+          subtitle = str_c(Division_Name,
+                           " Climate Division, ",
+                           State_Name,
+                           sep = "")) + 
+
+    ylab(label = "Daily Rainfall (mm)") +
+  
+    xlab(label = "Return Periods (years)") +
+    labs(caption = "LOCA Downscaled CMIP5 Analyses") +
+  
+    scale_fill_manual(values = c( "cyan", "orange"),
+                      name  = "Scenario") + 
+
+    geom_split_violin(mapping = aes(x    = Return_Period,
+                                    y    = Return_Estimate,
+                                    fill = Scenario),
+                      alpha   = 0.75,
+                      trim    = FALSE,
+                      color   = NA) +
+    
+    scale_colour_manual(values = c( "darkblue", "darkred")) + 
+
+    
+    geom_line(data = subset2,
+              mapping = aes(x = Return_Period,
+                            y = Median_Return_Estimate,
+                            group = Scenario,
+                            color = Scenario))
+  
+    remove(subset, subset2)
+
+```
+
