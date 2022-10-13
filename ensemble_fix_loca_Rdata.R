@@ -103,7 +103,6 @@ for (huc_zone_lut in Completed_HUCS)
   loca_location_data = HUC08_MRB_LUT %>%
     filter(HUC08_Code_ID == huc_zone_lut)
 
-  levels(loca_daily$Ensemble) = Ensembles2
 
 
   loca_filename = str_c("NGP_LOCA_HUC08_",
