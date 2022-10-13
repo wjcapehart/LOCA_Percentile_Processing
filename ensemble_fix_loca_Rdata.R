@@ -131,8 +131,7 @@ for (huc_zone_lut in Completed_HUCS)
                   loca_filename,
                   sep = "")
 
-  save(loca_daily, file    = LOCA_URL,
-                   verbose = TRUE)
+  save(loca_daily, file    = LOCA_URL)
 
 
 
