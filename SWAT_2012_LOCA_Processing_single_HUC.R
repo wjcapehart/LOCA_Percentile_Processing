@@ -6,7 +6,9 @@
   library(package = "tidyverse")
   library(package = "lubridate")
   library(package = "RCurl")
-
+  library(package = "rgdal")
+  library(package = "elevatr")
+  
 
 
 thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/"
@@ -21,6 +23,14 @@ hucs_to_process = c("10120110")
 HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
 
 
+prj_dd <- "EPSG:4326"
+
+
+
+dem_heights=  get_elev_point(HUC08_MRB_Code_Frame, prj = prj_dd, src = "aws")
+
+HUC08_MRB_Code_Frame$elevation = dem_heights@data$elevation
+
 
 
 
@@ -33,10 +43,11 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
     metadata = HUC08_MRB_LUT %>% filter(HUC08_Code_ID == basin)
     
     spatial = HUC08_MRB_Code_Frame %>% 
-      filter(HUC08_Code_ID == basin) %>% 
+      filter(HUC08_Code_ID == basin) %>%
       group_by(HUC08_Code_ID) %>% 
       summarize(lat = mean(lat),
-                lon = mean(lon))
+                lon = mean(lon),
+                elev = mean(elevation))
 
 
     File_URL = str_c(thredds_root,
@@ -95,13 +106,13 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
             cat(record)
             cat("\n")
           # Line 2 == Latitude
-          record = sprintf("%17.6f\n", 44.40000)     
+          record = sprintf("%17.6f\n", spatial$lat)     
             cat(record)
           # Line 3 == Longitude
-          record = sprintf("%17.5f\n",  -103.47000)
+          record = sprintf("%17.5f\n",  spatial$lon)
             cat(record)
           # Line 4 == Elevation
-          record = sprintf("%17.5f\n", 1005.79999 ) # metadata$Mean_Elevation)
+          record = sprintf("%17.5f\n", spatial$elev ) # metadata$Mean_Elevation)
             cat(record)
 
           for (time in subset$Time)
@@ -128,7 +139,7 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
         # Write the Daily Rainfall File
         #        
 
-        filename_pcp = str_c("./SWAT_LOCA_",
+        filename_pcp = str_c("./SWAT2012_LOCA_",
                              basin,
                              "__",
                              ensemble,
@@ -160,7 +171,7 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
           record = sprintf("%17.5f\n", spatial$lon)
             cat(record)
           # Line 4 == Elevation # Add me Lucas!
-          record = sprintf("%17.5f\n", 1115.3359) # metadata$Mean_Elevation)
+          record = sprintf("%17.5f\n", spatial$elev) # metadata$Mean_Elevation)
             cat(record)
 
 

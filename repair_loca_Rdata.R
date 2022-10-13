@@ -52,7 +52,36 @@
                 "NorESM1-M_r1i1p1",
                 "bcc-csm1-1-m_r1i1p1")
 
+  Ensembles = c("ACCESS1-0",
+                "ACCESS1-3",
+                "CCSM4",
+                "CESM1-BGC",
+                "CESM1-CAM5",
+                "CMCC-CMS",
+                "CMCC-CM",
+                "CNRM-CM5",
+                "CSIRO-Mk3-6-0",
+                "CanESM2",
+                "FGOALS-g2",
+                "GFDL-CM3",
+                "GFDL-ESM2G",
+                "GFDL-ESM2M",
+                "HadGEM2-AO",
+                "HadGEM2-CC",
+                "HadGEM2-ES",
+                "IPSL-CM5A-LR",
+                "IPSL-CM5A-MR",
+                "MIROC-ESM",
+                "MIROC-ESM-CHEM",
+                "MIROC5",
+                "MPI-ESM-LR",
+                "MPI-ESM-MR",
+                "MRI-CGCM3",
+                "NorESM1-M",
+                "bcc-csm1-1-m")
+
   Ensembles_factor = factor(Ensembles)
+  Ensembles2_factor = factor(Ensembles2)
 
 
 

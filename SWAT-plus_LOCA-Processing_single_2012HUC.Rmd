@@ -7,6 +7,8 @@
   library(package = "tidyverse")
   library(package = "lubridate")
   library(package = "RCurl")
+  library(package = "elevatr")
+  library(package = "rgdal")
 
 
 ```
@@ -21,6 +23,7 @@ get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Spe
 load(url(get_metadata), verbose=TRUE)
 
 
+hucs_to_process = c("10120202")
 
 hucs_to_process = c("10120110")
 
@@ -29,6 +32,87 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
 
 
 ```
+
+```{r}
+prj_dd <- "EPSG:4326"
+
+
+
+dem_heights=  get_elev_point(HUC08_MRB_Code_Frame, prj = prj_dd, src = "aws")
+
+HUC08_MRB_Code_Frame$elevation = dem_heights@data$elevation
+
+```
+
+```{r}
+ggplot(data = HUC08_MRB_Code_Frame) +
+  aes(x = lon,
+      y = lat,
+      color = elevation,
+      fill  = elevation) + 
+  geom_point()
+
+
+ggplot(data = HUC08_MRB_Code_Frame) +
+  aes(x = lon,
+      y = lat,
+      color = HUC08_Code_ID,
+      fill  = HUC08_Code_ID) + 
+  geom_point( show.legend = FALSE)
+
+
+ for (basin in c("10120202","10120110"))
+  {   
+       spatial = HUC08_MRB_Code_Frame %>% 
+      filter(HUC08_Code_ID == basin) 
+
+    plot = ggplot(data = spatial) +
+      aes(x = lon,
+          y = lat,
+          color = elevation,
+          fill  = elevation) + 
+      geom_point()
+    
+    print(plot)
+    
+       
+    spatial = HUC08_MRB_Code_Frame %>% 
+      filter(HUC08_Code_ID == basin) %>%
+      group_by(HUC08_Code_ID) %>% 
+      summarize(max_lat = max(lat),
+                min_lat = min(lat),
+                max_lon = max(lon),
+                min_lon = min(lon),
+                lat = mean(lat),
+                lon = mean(lon),
+                elev = mean(elevation))
+    
+    print(spatial)
+    
+    line_1 = str_c("ID",
+                  "NAME",
+                  "LAT",
+                  "LONG",
+                  "ELEVATION",
+                  sep=',')
+    
+    line_2 = str_c(1,
+                  "loca_pcp",
+                  sprintf("%8.5f", spatial$lat),
+                  sprintf("%9.5f", spatial$lon),
+                  sprintf("%9.5f", spatial$elev),
+                  sep=',')
+ }
+
+
+        
+        line_1 = "ID,NAME,LAT,LONG,ELEVATION"
+        line_2 = "1,loca_pcp,44.40000,-103.47000,1005.79999"
+
+
+```
+
+
 
 ```{r}
 
@@ -42,11 +126,21 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
 
     metadata = HUC08_MRB_LUT %>% filter(HUC08_Code_ID == basin)
     
+
+
+    
     spatial = HUC08_MRB_Code_Frame %>% 
-      filter(HUC08_Code_ID == basin) %>% 
+      filter(HUC08_Code_ID == basin) %>%
       group_by(HUC08_Code_ID) %>% 
-      summarize(lat = mean(lat),
-                lon = mean(lon))
+      summarize(max_lat = max(lat),
+                min_lat = min(lat),
+                max_lon = max(lon),
+                min_lon = min(lon),
+                lat = mean(lat),
+                lon = mean(lon),
+                elev = mean(elevation))
+    
+    
 
 
     File_URL = str_c(thredds_root,
@@ -103,7 +197,12 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
                              sep = "")
         
         line_1 = "ID,NAME,LAT,LONG,ELEVATION"
-        line_2 = "1,loca_tmp,44.40000,-103.47000,1005.79999"
+        line_2 = str_c(1,
+                  "loca_tmp",
+                  sprintf("%8.5f", spatial$lat),
+                  sprintf("%9.5f", spatial$lon),
+                  sprintf("%9.5f", spatial$elev),
+                  sep=',')
 
         fileConn<-file(filename_hedt)
           writeLines(c(line_1,line_2), fileConn)
@@ -146,7 +245,12 @@ HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
                              sep = "")
         
         line_1 = "ID,NAME,LAT,LONG,ELEVATION"
-        line_2 = "1,loca_pcp,44.40000,-103.47000,1005.79999"
+        line_2 = str_c(1,
+                  "loca_pcp",
+                  sprintf("%8.5f", spatial$lat),
+                  sprintf("%9.5f", spatial$lon),
+                  sprintf("%9.5f", spatial$elev),
+                  sep=',')
 
         fileConn<-file(filename_hedp)
           writeLines(c(line_1,line_2), fileConn)

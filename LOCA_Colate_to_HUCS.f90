@@ -38,9 +38,9 @@ program LOCA_Colate_to_HUCS
 
   integer (kind=4) :: t_buffer
 
-  integer (kind=4), allocatable          :: start_t(:)
-  integer (kind=4), allocatable          :: end_t(:)
-  integer (kind=4), allocatable          :: span_t(:)
+  integer (kind=4), allocatable :: start_t(:)
+  integer (kind=4), allocatable ::   end_t(:)
+  integer (kind=4), allocatable ::  span_t(:)
 
   integer :: e, s, h, t, tt, ntime, huc_counter, n_reads, last_read
 
@@ -61,10 +61,14 @@ program LOCA_Colate_to_HUCS
   real    (kind=4), allocatable :: map_pr(:,:,:)
   real    (kind=4), allocatable :: map_tasmax(:,:,:)
   real    (kind=4), allocatable :: map_tasmin(:,:,:)
+  real    (kind=4), allocatable :: map_rhmin(:,:,:)
+  real    (kind=4), allocatable :: map_rhmax(:,:,:)
 
-  real (kind=4), allocatable          :: sort_pr(:)
-  real (kind=4), allocatable          :: sort_tasmax(:)
-  real (kind=4), allocatable          :: sort_tasmin(:)
+  real (kind=4), allocatable :: sort_pr(:)
+  real (kind=4), allocatable :: sort_tasmax(:)
+  real (kind=4), allocatable :: sort_tasmin(:)
+  real (kind=4), allocatable :: sort_rhmax(:)
+  real (kind=4), allocatable :: sort_rhmin(:)
 
   real (kind=4), dimension(nlat*nlon) :: linear_array
 
@@ -78,7 +82,7 @@ program LOCA_Colate_to_HUCS
 
   logical :: first_huc
 
-  character (len=21), dimension(nens)   :: ensembles
+  character (len=13), dimension(nens)   :: ensembles
   character (len=06), dimension(nvars)  :: variables
   character (len=10), dimension(nscen)  :: scenarios
 
@@ -89,6 +93,12 @@ program LOCA_Colate_to_HUCS
   real (kind=4) :: pr_add_offset,   tasmax_add_offset,   tasmin_add_offset
   real (kind=4) :: pr_scale_factor, tasmax_scale_factor, tasmin_scale_factor
   real (kind=4) :: pr_FillValue,    tasmax_FillValue,    tasmin_FillValue
+
+  real (kind=4) :: rhmin_add_offset,   rhmax_add_offset
+  real (kind=4) :: rhmin_scale_factor, rhmax_scale_factor
+  real (kind=4) :: rhmin_FillValue,    rhmax_FillValue
+
+
 
   real (kind=4) :: quantile7
 
@@ -153,33 +163,33 @@ program LOCA_Colate_to_HUCS
                  "rcp45     ", &
                  "rcp85     " /)
 
-  ensembles = (/ "ACCESS1-0_r1i1p1     ", &
-                 "ACCESS1-3_r1i1p1     ", &
-                 "CCSM4_r6i1p1         ", &
-                 "CESM1-BGC_r1i1p1     ", &
-                 "CESM1-CAM5_r1i1p1    ", &
-                 "CMCC-CMS_r1i1p1      ", &
-                 "CMCC-CM_r1i1p1       ", &
-                 "CNRM-CM5_r1i1p1      ", &
-                 "CSIRO-Mk3-6-0_r1i1p1 ", &
-                 "CanESM2_r1i1p1       ", &
-                 "FGOALS-g2_r1i1p1     ", &
-                 "GFDL-CM3_r1i1p1      ", &
-                 "GFDL-ESM2G_r1i1p1    ", &
-                 "GFDL-ESM2M_r1i1p1    ", &
-                 "HadGEM2-AO_r1i1p1    ", &
-                 "HadGEM2-CC_r1i1p1    ", &
-                 "HadGEM2-ES_r1i1p1    ", &
-                 "IPSL-CM5A-LR_r1i1p1  ", &
-                 "IPSL-CM5A-MR_r1i1p1  ", &
-                 "MIROC-ESM-CHEM_r1i1p1", &
-                 "MIROC-ESM_r1i1p1     ", &
-                 "MIROC5_r1i1p1        ", &
-                 "MPI-ESM-LR_r1i1p1    ", &
-                 "MPI-ESM-MR_r1i1p1    ", &
-                 "MRI-CGCM3_r1i1p1     ", &
-                 "NorESM1-M_r1i1p1     ", &
-                 "bcc-csm1-1-m_r1i1p1  " /)
+  ensembles = (/ "ACCESS1-0     ", &
+                 "ACCESS1-3     ", &
+                 "CCSM4         ", &
+                 "CESM1-BGC     ", &
+                 "CESM1-CAM5    ", &
+                 "CMCC-CMS      ", &
+                 "CMCC-CM       ", &
+                 "CNRM-CM5      ", &
+                 "CSIRO-Mk3-6-0 ", &
+                 "CanESM2       ", &
+                 "FGOALS-g2     ", &
+                 "GFDL-CM3      ", &
+                 "GFDL-ESM2G    ", &
+                 "GFDL-ESM2M    ", &
+                 "HadGEM2-AO    ", &
+                 "HadGEM2-CC    ", &
+                 "HadGEM2-ES    ", &
+                 "IPSL-CM5A-LR  ", &
+                 "IPSL-CM5A-MR  ", &
+                 "MIROC-ESM-CHEM", &
+                 "MIROC-ESM     ", &
+                 "MIROC5        ", &
+                 "MPI-ESM-LR    ", &
+                 "MPI-ESM-MR    ", &
+                 "MRI-CGCM3     ", &
+                 "NorESM1-M     ", &
+                 "bcc-csm1-1-m  " /)
 
 
 
