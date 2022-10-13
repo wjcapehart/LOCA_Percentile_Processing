@@ -135,8 +135,53 @@ for (huc_zone_lut in Completed_HUCS)
 
 
 
+  filename = str_c(directory,
+                    "NGP_LOCA_HUC08_",
+                        huc_zone_lut,
+                   sep = "")
 
 
+
+
+            loca_monthly = loca_daily %>%
+              mutate(Time  = as.Date(str_c(year(Time),
+                                           month(Time),
+                                           "15",
+                                           sep="-"),
+                                     tryFormats = c("%Y-%m-%d")),
+                     tasavg = (tasmin + tasmax)/2)   %>%
+              group_by(Time,
+                       Division,
+                       Ensemble,
+                       Scenario,
+                       Percentile) %>%
+              summarize(tasmax = mean(tasmax),
+                        tasavg = mean(tasavg),
+                        tasmin = mean(tasmin),
+                        pr     = sum(pr))
+
+            save(loca_monthly, file = str_c(filename,
+                                            "_Monthly",
+                                            ".RData",
+                                            sep=""))
+
+            loca_yearly = loca_daily %>%
+              mutate(Year  = year(Time),
+                     tasavg = (tasmin + tasmax)/2)   %>%
+              group_by(Year,
+                       Division,
+                       Ensemble,
+                       Scenario,
+                       Percentile) %>%
+              summarize(tasmax = mean(tasmax),
+                        tasavg = mean(tasavg),
+                        tasmin = mean(tasmin),
+                        pr     = sum(pr))
+
+            save(loca_yearly, file = str_c(filename,
+                                            "_Yearly",
+                                            ".RData",
+                                            sep=""))
 
 
 
