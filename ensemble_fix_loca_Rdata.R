@@ -160,6 +160,10 @@ for (huc_zone_lut in Completed_HUCS)
                         tasmin = mean(tasmin),
                         pr     = sum(pr))
 
+              print(str_c(filename,  "_Monthly",
+                                              ".RData",
+                                              sep=""))
+
             save(loca_monthly, file = str_c(filename,
                                             "_Monthly",
                                             ".RData",
@@ -177,6 +181,10 @@ for (huc_zone_lut in Completed_HUCS)
                         tasavg = mean(tasavg),
                         tasmin = mean(tasmin),
                         pr     = sum(pr))
+
+            print(str_c(filename,"_Yearly",
+                                            ".RData",
+                                            sep=""))
 
             save(loca_yearly, file = str_c(filename,
                                             "_Yearly",
