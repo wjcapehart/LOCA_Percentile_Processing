@@ -97,6 +97,8 @@ root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
 for (huc_zone_lut in Completed_HUCS)
 {  # huc
 
+  print(str_c("processing ",huc_zone_lut))
+
 
 
 
