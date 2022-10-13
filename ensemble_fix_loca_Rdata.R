@@ -135,7 +135,7 @@ for (huc_zone_lut in Completed_HUCS)
 
 
 
-  filename = str_c(directory,
+  filename = str_c(root_LOCA_URL,
                     "NGP_LOCA_HUC08_",
                         huc_zone_lut,
                    sep = "")
