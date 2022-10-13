@@ -111,13 +111,13 @@ for (huc_zone_lut in Completed_HUCS)
                         sep = "")
 
 
-   print(loca_filename)
 
 
   LOCA_URL = str_c(root_LOCA_URL, "huc_08_basins/",
                    loca_filename,
                    sep = "")
 
+  print(LOCA_URL)
 
   load(file    = LOCA_URL,
        verbose = TRUE)
