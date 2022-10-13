@@ -91,7 +91,7 @@
 
 huc_zone_lut = Completed_HUCS[1]
 
-root_LOCA_URL = "/maelstrom2/LOCA_GRIDDED_ENSEMBLES/LOCA_NGP/"
+root_LOCA_URL = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/"
 
 
 for (huc_zone_lut in Completed_HUCS)
@@ -115,7 +115,7 @@ for (huc_zone_lut in Completed_HUCS)
 
 
 
-  LOCA_URL = str_c(root_LOCA_URL, "huc_08_basins/",
+  LOCA_URL = str_c(root_LOCA_URL, "R_Daily_Files/",
                    loca_filename,
                    sep = "")
 
