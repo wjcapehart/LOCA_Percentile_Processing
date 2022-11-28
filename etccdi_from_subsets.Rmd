@@ -1,0 +1,558 @@
+---
+title: "Creating the ETC"
+output: html_notebook
+---
+
+
+# Introduction
+
+This script processes LOCA temperature and rainfall for the [CCl/CLIVAR/JCOMM Expert Team (ET) on Climate Change Detection and Indices (ETCCDI) Climate Extremes Indicies](http://etccdi.pacificclimate.org/list_27_indices.shtml).
+
+The climate model output comes from the USGS [LOCA](http://loca.ucsd.edu) Downscaled Analyses from the CMIP5 climate model runs from 27 models. (There were a total of 32 models used for these analyses but we are only using the model runs that include maximum/minimum temperature, and precipitation.)
+
+**Table for Available LOCA CMIP5 Point Stations**
+
+| CMIP5 Models        | CMIP5 Models          | CMIP5 Models         |
+|---------------------|-----------------------|----------------------|
+| ACCESS1.0_r1i1p1    | ACCESS1.3_r1i1p1      | CCSM4_r6i1p1         |
+| CESM1.BGC_r1i1p1    | CESM1.CAM5_r1i1p1     | CMCC.CMS_r1i1p1      |
+| CMCC.CM_r1i1p1      | CNRM.CM5_r1i1p1       | CSIRO.Mk3.6.0_r1i1p1 |
+| CanESM2_r1i1p1      | FGOALS.g2_r1i1p1      | GFDL.CM3_r1i1p1      |
+| GFDL.ESM2G_r1i1p1   | GFDL.ESM2M_r1i1p1     | HadGEM2.AO_r1i1p1    |
+| HadGEM2.CC_r1i1p1   | HadGEM2.ES_r1i1p1     | IPSL.CM5A.LR_r1i1p1  |
+| IPSL.CM5A.MR_r1i1p1 | MIROC.ESM.CHEM_r1i1p1 | MIROC.ESM_r1i1p1     |
+| MIROC5_r1i1p1       | MPI.ESM.LR_r1i1p1     | MPI.ESM.MR_r1i1p1    |
+| MRI.CGCM3_r1i1p1    | NorESM1.M_r1i1p1      | bcc.csm1.1.m_r1i1p1  |
+
+The result is an *ensemble* of 27 independant virtual earths for our simulation period from 1950 to 2099.
+
+The simulations further diverge at 2006 where our model runs separate into two scenarios.
+
+-   **RCP 4.5**: A simulation targeting a total amount of 4.5 W m^2^ addition greenhouse forcing
+-   **RCP 8.5**: A simulation targeting a total amount of 8.5 W m^2^ addition greenhouse forcing
+
+Together, we use these two future cases to reprsent upper and lower bounds of likely expected future climates depending on current and projected greenhouse gas emissions. (The "RPC" stands for ["Representative Pathway Concentration"](https://link.springer.com/article/10.1007/s10584-011-0148-z))
+
+# R Libraries for this Activity
+
+We aren't going to use all of these today but I DO want you to get these libraries ready to go. Some of of these libraries will load a set of prerequisite libraries so it will kill more than one bird with one import command.
+
+For starters let's install...
+
+-   [tidyverse](https://www.tidyverse.org): A set of data science libraries loading the "meta-library" "tidyverse" will automatically load the core packages
+    -   [ggplot2](https://ggplot2.tidyverse.org) : Data Visualizations Using the Grammar of Graphics
+    -   [tibble](https://tibble.tidyverse.org) : Simplified Data Frames
+    -   [tidyr](https://tidyr.tidyverse.org) : Tools for shepherding data in data frames
+    -   [readr](https://readr.tidyverse.org) : Tools for importing tabular data
+    -   [dplyr](https://dplyr.tidyverse.org) : A grammar for data manipulation
+    -   [purrr](https://purrr.tidyverse.org) : Functional Programming Toolkit
+    -   [stringr](https://stringr.tidyverse.org) : Simple, Consistent Wrappers for Common String Operations
+    -   [forcats](https://forcats.tidyverse.org) : Tools for Working with Categorical Variables. In R these are called "[factors](https://www.geeksforgeeks.org/r-factors/)."
+-   [lubridate](https://lubridate.tidyverse.org) : time/date support functions
+-   [RCurl](https://www.rdocumentation.org/packages/RCurl/versions/0.9-4) : Web-based Data Retrieval
+-   [PCICt](https://www.rdocumentation.org/packages/PCICt/versions/0.5-4.3) : Implementation of POSIXct Work-Alike for 365 and 360 Day Calendars
+-   [climdex.pcic](https://www.rdocumentation.org/packages/climdex.pcic/) : PCIC Implementation of Climdex Routines
+-   [labelled](https://cran.r-project.org/web/packages/labelled/vignettes/intro_labelled.html)L 
+
+```{r}
+###############################
+#
+# Libraries
+#
+
+  library(package = "stringr")
+  library(package = "forcats")
+  library(package = "readr")
+  library(package = "tidyverse")
+  library(package = "lubridate")
+  library(package = "RCurl")
+  library(package = "labelled")
+
+  library(package = "climdex.pcic")
+  library(package = "PCICt")
+
+#
+##############################
+```
+
+# Location of Data
+
+We will be accessing the HUC-8 Aggregated LOCA datasets for the Missouri River Basin.
+
+[![USGS HUC Region 10](https://water.usgs.gov/wsc/reg/10.jpg)](https://water.usgs.gov/wsc/reg/10.html)
+
+To access it we need need to know the location if the data on our local [THREDDS Service](http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/catalog.html) and also where we keep the description of the watersheds and basins in the dataset. These are in a format readable by R.
+
+We use the [url()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/connections) command to retrieve the data and the load the data with the [load()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load) command.
+
+What may look strange here is those [%\>%](https://dplyr.tidyverse.org/articles/dplyr.html?q=pipe#combining-functions-with) things. In R these are called "pipes" and are used to string commands together.
+
+So for example let's say that we have a dataframe called x which has a column called "Year." If you are looking for data from *1984*, you can ask to [filter()](https://dplyr.tidyverse.org/reference/filter.html) so that you only return the rowws the where the year is equal to 1984.
+
+y = x %\>% [filter(Year == 1984)](https://dplyr.tidyverse.org/reference/filter.html) would be another way to write
+
+and filter our metadata data to our desired watershed with the [filter()](https://dplyr.tidyverse.org/reference/filter.html) command.
+
+```{r}
+###################################
+#
+# File and Basin Locations.
+#
+
+thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/"
+
+#
+# Load metadata for the missiouri river dataset
+#
+
+get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
+
+load(url(get_metadata), verbose=TRUE)
+
+HUC08_MRB_LUT
+
+#
+# Identify Basin that we will use
+#
+
+basin = "10120110"
+
+HUC08_MRB_LUT = HUC08_MRB_LUT %>% 
+  filter(HUC08_Code_ID == basin)
+
+HUC08_MRB_LUT
+
+load("./ETCCDI_LEGEND.RData")
+
+etccdi_legend
+
+#
+###################################
+```
+
+
+```{r}
+
+
+
+```
+
+
+# Date Selection
+
+We typically use 30-year periods to extract various statistics. For the Historical Period for example using LOCA we typically use the last 30 years of the "Historical" period. And then select the middle or last 30-years of the 21st Century.
+
+```{r}
+####################
+#
+#  Date Selection
+#
+
+hist_end     = 2005
+hist_start   = hist_end - (30-1)
+
+mid21_start = 2036
+mid21_end   = mid21_start + 29
+
+end21_end   = 2099
+end21_start = end21_end - 29
+#
+####################
+```
+
+# Pulling the LOCA Data
+
+We now open our daily, monthly and yearly LOCA files for our chosen basin. Because of the file sizes for these data sets, we use slightly different way to download and read them.
+
+That [remove()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/remove) function just cleans out our memory.
+
+The [str_c()](https://stringr.tidyverse.org/reference/str_c.html) function is used to "concatenate" character strings into a single string.
+
+```{r}
+###################################
+#
+# Pull Basin LOCA data
+#
+
+
+#
+# Daily Output
+#
+
+    File_URL = str_c(thredds_root,
+                     "R_Daily_Files/",
+                     "NGP_LOCA_HUC08_",
+                     basin,
+                     ".RData",
+                     sep = "")
+    
+    print(str_c("opening ", File_URL))
+
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection, verbose=TRUE)
+      close(con = my.connection)
+      remove( my.connection)
+      
+    loca_daily$TimePCICt = as.PCICt(as.character(loca_daily$Time), cal="gregorian")
+    
+  loca_daily$pr[loca_daily$pr <  0.025] =  0
+      
+
+#      
+###################################
+```
+
+## Identifying Our Ensembles and Scenarios from a dataframe
+
+It's a good idea for us to identify the unique Ensembles and our Scenarios for later use. We use the unique() operator to extract each distinct instances in the Ensemble, and Scenario columns. (Columns can be identified by **dataframe\$column**)
+
+```{r}
+#########################
+#
+# Extract Unique Values of Scenarios and Ensembles 
+#
+
+Ensembles   = unique(loca_daily$Ensemble)
+Percentiles = unique(loca_daily$Percentile)
+Scenarios   = unique(loca_daily$Scenario)
+
+
+print(  Ensembles)
+print(  Scenarios)
+print(Percentiles)
+
+
+#
+#########################
+```
+
+
+
+
+# Getting Dictionary
+
+
+
+# Calculating teh Dataframes
+
+
+
+
+```{r}
+
+Ens = Ensembles[1]
+Sce = Scenarios[2]
+Til = Percentiles[6]
+Div = basin
+
+newframe = TRUE
+
+
+
+print(str_c("-> ", Div, sep = ""))
+for (Ens in Ensembles) {
+  
+  print(str_c("---> ",Ens))
+
+  for (Sce in Scenarios[2:3]) {
+    
+    print(str_c("------> ",Sce))
+    
+    for (Til in c("P050","MEAN")) {
+      
+      print(str_c("---------> ",Til))
+
+      subset = loca_daily %>%
+        filter( (Ensemble   == Ens)            &
+               ((Scenario   == Sce)          | 
+                (Scenario   == "Historical") ) &
+               (Percentile == Til))
+      
+      # Create CI Dataframe
+      
+      ci = climdexInput.raw(tmax                = subset$tasmax,
+                            tmin                = subset$tasmin,
+                            prec                = subset$pr,
+                            tmax.dates          = subset$TimePCICt, 
+                            tmin.dates          = subset$TimePCICt, 
+                            prec.dates          = subset$TimePCICt, 
+                            base.range          = c(1976, 2005),
+                            n                   = 5, 
+                            northern.hemisphere = TRUE,
+                            tavg                = NULL, 
+                            tavg.dates          = NULL, 
+                            quantiles           = NULL, 
+                            temp.qtiles         = c(0.10, 0.90), 
+                            prec.qtiles         = c(0.95, 0.99), 
+                            max.missing.days    = c(annual = 15, 
+                                                    monthly = 3),
+                            min.base.data.fraction.present = 0.1)
+
+      # Annual ECIs
+      
+      fd_ann      = climdex.fd(     ci = ci)
+      su_ann      = climdex.su(     ci = ci)
+      id_ann      = climdex.id(     ci = ci)
+      tr_ann      = climdex.tr(     ci = ci)
+      gsl_ann     = climdex.gsl(    ci = ci)
+      tnn_ann     = climdex.tnn(    ci = ci, freq = "annual")
+      txn_ann     = climdex.txn(    ci = ci, freq = "annual")
+      txx_ann     = climdex.txx(    ci = ci, freq = "annual")
+      tnx_ann     = climdex.tnx(    ci = ci, freq = "annual")
+      tn10p_ann   = climdex.tn10p(  ci = ci, freq = "annual")
+      tx10p_ann   = climdex.tx10p(  ci = ci, freq = "annual")
+      tn90p_ann   = climdex.tn90p(  ci = ci, freq = "annual")
+      tx90p_ann   = climdex.tx90p(  ci = ci, freq = "annual")
+      wsdi_ann    = climdex.wsdi(   ci = ci, spells.can.span.years = TRUE)
+      csdi_ann    = climdex.csdi(   ci = ci, spells.can.span.years = TRUE)
+      dtr_ann     = climdex.dtr(    ci = ci, freq = "annual")
+      rx1day_ann  = climdex.rx1day( ci = ci, freq = "annual")
+      rx5day_ann  = climdex.rx5day( ci = ci, freq = "annual")
+      sdii_ann    = climdex.sdii(   ci = ci)
+      r10mm_ann   = climdex.r10mm(  ci = ci)
+      r20mm_ann   = climdex.r20mm(  ci = ci)
+      r03mm_ann   = climdex.rnnmm(  ci = ci, threshold = 2.54)
+      cdd_ann     = climdex.cdd(    ci = ci, spells.can.span.years = TRUE)
+      cwd_ann     = climdex.cwd(    ci = ci, spells.can.span.years = TRUE)
+      r95ptot_ann = climdex.r95ptot(ci = ci)
+      r99ptot_ann = climdex.r99ptot(ci = ci)
+      prcptot_ann = climdex.prcptot(ci = ci)
+      
+      # Additonal Monthly ECIs
+      
+      tnn_mon     = climdex.tnn(   ci = ci, freq = "monthly")
+      txn_mon     = climdex.txn(   ci = ci, freq = "monthly")
+      txx_mon     = climdex.txx(   ci = ci, freq = "monthly")
+      tnx_mon     = climdex.tnx(   ci = ci, freq = "monthly")
+      dtr_mon     = climdex.dtr(   ci = ci, freq = "monthly")
+      tn10p_mon   = climdex.tn10p( ci = ci, freq = "monthly")
+      tx10p_mon   = climdex.tx10p( ci = ci, freq = "monthly")
+      tn90p_mon   = climdex.tn90p( ci = ci, freq = "monthly")
+      tx90p_mon   = climdex.tx90p( ci = ci, freq = "monthly")
+      rx1day_mon  = climdex.rx1day(ci = ci, freq = "monthly")
+      rx5day_mon  = climdex.rx5day(ci = ci, freq = "monthly")
+      
+
+      
+      Time_ann  = as.Date(str_c(labels(tnx_ann), "-07-02", sep=""))
+      Time_mon  = as.Date(str_c(labels(tnx_mon),    "-15", sep=""))
+      
+      temp_mon = tibble(division    = basin,
+                        Scenario    = Sce,
+                        Ensemble    = Ens,
+                        Percentiles = Til,
+                        Time        = Time_mon,
+                        Year        = year(Time_mon),
+                        Month       = month(Time_mon,
+                                            abbr  = TRUE,
+                                            label = TRUE),
+                        TXx         = remove_attributes(x =    txx_mon, attributes = "names"),
+                        TNx         = remove_attributes(x =    tnx_mon, attributes = "names"),
+                        TXn         = remove_attributes(x =    txn_mon, attributes = "names"),
+                        TNn         = remove_attributes(x =    tnn_mon, attributes = "names"),   
+                        TN10p       = remove_attributes(x =  tn10p_mon, attributes = "names"),
+                        TX10p       = remove_attributes(x =  tx10p_mon, attributes = "names"),
+                        TN90p       = remove_attributes(x =  tn90p_mon, attributes = "names"),
+                        TX90p       = remove_attributes(x =  tx90p_mon, attributes = "names"),
+                        DTR         = remove_attributes(x =    dtr_mon, attributes = "names"),
+                        Rx1day      = remove_attributes(x = rx1day_mon, attributes = "names"),
+                        Rx5day      = remove_attributes(x = rx5day_mon, attributes = "names"))
+      
+      temp_ann = tibble(division    = Div,
+                        Scenario    = Sce,
+                        Ensemble    = Ens,
+                        Percentiles = Til,
+                        Time        = Time_ann,
+                        Year        = year(Time_ann),
+                        FD          = remove_attributes(x =      fd_ann, attributes = "names"),
+                        SU          = remove_attributes(x =      su_ann, attributes = "names"),
+                        ID          = remove_attributes(x =      id_ann, attributes = "names"),
+                        TR          = remove_attributes(x =      tr_ann, attributes = "names"),
+                        GSL         = remove_attributes(x =     gsl_ann, attributes = "names"),
+                        TXx         = remove_attributes(x =     txx_ann, attributes = "names"),
+                        TNx         = remove_attributes(x =     tnx_ann, attributes = "names"),
+                        TXn         = remove_attributes(x =     txn_ann, attributes = "names"),
+                        TNn         = remove_attributes(x =     tnn_ann, attributes = "names"),                  
+                        TN10p       = remove_attributes(x =   tn10p_ann, attributes = "names"),
+                        TX10p       = remove_attributes(x =   tx10p_ann, attributes = "names"),
+                        TN90p       = remove_attributes(x =   tn90p_ann, attributes = "names"),
+                        TX90p       = remove_attributes(x =   tx90p_ann, attributes = "names"),
+                        WSDI        = remove_attributes(x =    wsdi_ann, attributes = "names"),
+                        CSDI        = remove_attributes(x =    csdi_ann, attributes = "names"),
+                        DTR         = remove_attributes(x =     dtr_ann, attributes = "names"),
+                        Rx1day      = remove_attributes(x =  rx1day_ann, attributes = "names"),
+                        Rx5day      = remove_attributes(x =  rx5day_ann, attributes = "names"),
+                        SDII        = remove_attributes(x =    sdii_ann, attributes = "names"),
+                        R10mm       = remove_attributes(x =   r10mm_ann, attributes = "names"),
+                        R20mm       = remove_attributes(x =   r20mm_ann, attributes = "names"),
+                        R03mm       = remove_attributes(x =   r03mm_ann, attributes = "names"),
+                        CDD         = remove_attributes(x =     cdd_ann, attributes = "names"),
+                        CWD         = remove_attributes(x =     cwd_ann, attributes = "names"),
+                        R95pTOT     = remove_attributes(x = r95ptot_ann, attributes = "names"),
+                        R99pTOT     = remove_attributes(x = r99ptot_ann, attributes = "names"),
+                        PRCPTOT     = remove_attributes(x = prcptot_ann, attributes = "names"))
+      
+      if (Sce == "RCP 8.5") {
+        
+        temp_ann = temp_ann %>%
+          filter(Year > 2005)
+        temp_mon = temp_mon %>%
+          filter(Year > 2005)        
+        
+      } else {  # Remove Historical Period from the RCP 8.5
+        
+        temp_ann = temp_ann %>%
+          mutate(Scenario = if_else(condition = (Year < 2006),
+                                    true      =  "Historical",
+                                    false     =     "RCP 4.5"))
+        
+        temp_mon = temp_mon %>%
+          mutate(Scenario = if_else(condition = (Year < 2006),
+                                    true      =  "Historical",
+                                    false     =     "RCP 4.5"))
+        
+      } # Label Historical and RCP 4.5
+      
+      
+      
+      if (newframe) { 
+        newframe    =  FALSE
+        CEI_MONTHLY = temp_mon
+        CEI_ANNUAL  = temp_ann
+      } else { # Create New CEI_MONTHLY & CEI_ANNUAL Frames
+        CEI_MONTHLY = rbind(CEI_MONTHLY, temp_mon)
+        CEI_ANNUAL  = rbind(CEI_ANNUAL,  temp_ann)
+      } # Append CEI_MONTHLY & CEI_ANNUAL Frames
+      
+    } # Percentiles
+  } # Scenarios
+} # Ensembles
+
+
+CEI_MONTHLY$Scenario = as.factor(CEI_MONTHLY$Scenario)
+CEI_ANNUAL$Scenario  = as.factor(CEI_ANNUAL$Scenario)
+
+File_Out = str_c("./NGP_LOCA_HUC08_",
+                 basin,
+                 "_ETCCDI.RData",
+                 sep = "")
+
+print(str_c("saving to ", File_Out))
+
+save(CEI_MONTHLY,
+     CEI_ANNUAL,
+     file = File_Out)
+
+
+remove(newframe)
+remove(subset)
+remove(ci)
+remove(temp_ann)
+remove(temp_mon)
+remove(Sce)
+remove(Til)
+remove(Ens)
+remove(Time_ann)
+remove(Time_mon)
+
+remove(tnn_mon)
+remove(txn_mon)
+remove(txx_mon)
+remove(tnx_mon)
+remove(dtr_mon)
+remove(tn10p_mon)
+remove(tx10p_mon)
+remove(tn90p_mon)
+remove(tx90p_mon)
+remove(rx1day_mon)
+remove(rx5day_mon)        
+
+
+remove(fd_ann)
+remove(su_ann)
+remove(id_ann)
+remove(tr_ann)
+remove(gsl_ann)
+remove(sdii_ann)
+remove(r10mm_ann)
+remove(r20mm_ann)
+remove(r03mm_ann)
+remove(cdd_ann)
+remove(cwd_ann)
+remove(tnn_ann)
+remove(txn_ann)
+remove(txx_ann)
+remove(tnx_ann)
+remove(dtr_ann)
+remove(wsdi_ann)
+remove(tn10p_ann)
+remove(tx10p_ann)
+remove(tn90p_ann)
+remove(tx90p_ann)
+remove(rx1day_ann)
+remove(rx5day_ann)      
+remove(r95ptot_ann)
+remove(r99ptot_ann)
+remove(prcptot_ann)      
+      
+      
+  
+```
+
+
+
+```{r}
+
+subset_30_year_daily = CEI_ANNUAL %>%
+  
+  filter(((Year >=  hist_start) & (Year  <= hist_end)) |
+         ((Year >= mid21_start) & (Year <= mid21_end)) |
+         ((Year >= end21_start) & (Year <= end21_end)) )  %>%
+  
+  # OK this part is nasty looking below.  There are more "elegant" ways
+  #   to do this but it will make for a new rabit hole to get lost in.
+  # Instead I am just using a train of if-else statements.  
+  
+  mutate(Period = if_else(condition = ((Year >=  hist_start) & 
+                                       (Year  <=   hist_end)),
+                          true      = str_c(hist_start, 
+                                            hist_end, 
+                                            sep="-"),
+                          false     = if_else(condition = ((Year >= mid21_start) & 
+                                                           (Year <=  mid21_end)),
+                                              true      = str_c(mid21_start, 
+                                                                  mid21_end, 
+                                                                  sep = "-"),
+                                              false     = str_c(end21_start, 
+                                                                  end21_end, 
+                                                                  sep = "-"))))
+
+print(subset_30_year_daily)
+
+```
+
+
+
+```{r}
+
+
+ggplot(data = subset_30_year_daily)  + 
+  aes(x = Period,
+      y = SDII,
+      fill = Scenario, 
+      color = Scenario)+
+    theme_bw() + 
+
+    scale_color_manual(values = c("navyblue",    # historical
+                               "chocolate",    # rcp 4.5
+                                 "darkred")) + # rcp 8.5
+  
+  scale_fill_manual(values = c("royalblue",    # historical
+                               "orange",    # rcp 4.5
+                                 "red")) + # rcp 8.5
+  geom_boxplot(scale = "area", notch = TRUE)
+
+```
+
+

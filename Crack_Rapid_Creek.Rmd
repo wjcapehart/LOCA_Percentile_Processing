@@ -1,0 +1,1162 @@
+---
+title: "Extracting and Pulling Statistics for the LOCA data"
+output: html_notebook
+---
+
+# Introduction
+
+This script processes LOCA temperature and rainfall for Extreme Events
+
+The climate model output comes from the USGS [LOCA](http://loca.ucsd.edu) Downscaled Analyses from the CMIP5 climate model runs from 27 models. (There were a total of 32 models used for these analyses but we are only using the model runs that include maximum/minimum temperature, and precipitation.)
+
+**Table for Available LOCA CMIP5 Point Stations**
+
+| CMIP5 Models        | CMIP5 Models          | CMIP5 Models         |
+|---------------------|-----------------------|----------------------|
+| ACCESS1.0_r1i1p1    | ACCESS1.3_r1i1p1      | CCSM4_r6i1p1         |
+| CESM1.BGC_r1i1p1    | CESM1.CAM5_r1i1p1     | CMCC.CMS_r1i1p1      |
+| CMCC.CM_r1i1p1      | CNRM.CM5_r1i1p1       | CSIRO.Mk3.6.0_r1i1p1 |
+| CanESM2_r1i1p1      | FGOALS.g2_r1i1p1      | GFDL.CM3_r1i1p1      |
+| GFDL.ESM2G_r1i1p1   | GFDL.ESM2M_r1i1p1     | HadGEM2.AO_r1i1p1    |
+| HadGEM2.CC_r1i1p1   | HadGEM2.ES_r1i1p1     | IPSL.CM5A.LR_r1i1p1  |
+| IPSL.CM5A.MR_r1i1p1 | MIROC.ESM.CHEM_r1i1p1 | MIROC.ESM_r1i1p1     |
+| MIROC5_r1i1p1       | MPI.ESM.LR_r1i1p1     | MPI.ESM.MR_r1i1p1    |
+| MRI.CGCM3_r1i1p1    | NorESM1.M_r1i1p1      | bcc.csm1.1.m_r1i1p1  |
+
+The result is an *ensemble* of 27 independant virtual earths for our simulation period from 1950 to 2099.
+
+The simulations further diverge at 2006 where our model runs separate into two scenarios.
+
+-   **RCP 4.5**: A simulation targeting a total amount of 4.5 W m^2^ addition greenhouse forcing
+-   **RCP 8.5**: A simulation targeting a total amount of 8.5 W m^2^ addition greenhouse forcing
+
+Together, we use these two future cases to reprsent upper and lower bounds of likely expected future climates depending on current and projected greenhouse gas emissions. (The "RPC" stands for ["Representative Pathway Concentration"](https://link.springer.com/article/10.1007/s10584-011-0148-z))
+
+# R Libraries for this Activity
+
+We aren't going to use all of these today but I DO want you to get these libraries ready to go. Some of of these libraries will load a set of prerequisite libraries so it will kill more than one bird with one import command.
+
+For starters let's install...
+
+-   [tidyverse](https://www.tidyverse.org): A set of data science libraries loading the "meta-library" "tidyverse" will automatically load the core packages
+    -   [ggplot2](https://ggplot2.tidyverse.org) : Data Visualizations Using the Grammar of Graphics
+    -   [tibble](https://tibble.tidyverse.org) : Simplified Data Frames
+    -   [tidyr](https://tidyr.tidyverse.org) : Tools for shepherding data in data frames
+    -   [readr](https://readr.tidyverse.org) : Tools for importing tabular data
+    -   [dplyr](https://dplyr.tidyverse.org) : A grammar for data manipulation
+    -   [purrr](https://purrr.tidyverse.org) : Functional Programming Toolkit
+    -   [stringr](https://stringr.tidyverse.org) : Simple, Consistent Wrappers for Common String Operations
+    -   [forcats](https://forcats.tidyverse.org) : Tools for Working with Categorical Variables. In R these are called "[factors](https://www.geeksforgeeks.org/r-factors/)."
+-   [lubridate](https://lubridate.tidyverse.org) : time/date support functions
+-   [RCurl](https://www.rdocumentation.org/packages/RCurl/versions/0.9-4) : Web-based Data Retrieval
+-   [extRemes](https://www.rdocumentation.org/packages/extRemes) : NCAR functions for performing extreme value analysis.
+
+```{r}
+###############################
+#
+# Libraries
+#
+
+  library(package = "stringr")
+  library(package = "forcats")
+  library(package = "readr")
+  library(package = "tidyverse")
+  library(package = "lubridate")
+  library(package = "RCurl")
+  library(package = "readxl")
+
+#
+##############################
+```
+
+# Location of Data
+
+We will be accessing the HUC-8 Aggregated LOCA datasets for the Missouri River Basin.
+
+[![USGS HUC Region 10](https://water.usgs.gov/wsc/reg/10.jpg)](https://water.usgs.gov/wsc/reg/10.html)
+
+To access it we need need to know the location if the data on our local [THREDDS Service](http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/catalog.html) and also where we keep the description of the watersheds and basins in the dataset. These are in a format readable by R.
+
+We use the [url()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/connections) command to retrieve the data and the load the data with the [load()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/load) command.
+
+What may look strange here is those [%\>%](https://dplyr.tidyverse.org/articles/dplyr.html?q=pipe#combining-functions-with) things. In R these are called "pipes" and are used to string commands together.
+
+So for example let's say that we have a dataframe called x which has a column called "Year." If you are looking for data from *1984*, you can ask to [filter()](https://dplyr.tidyverse.org/reference/filter.html) so that you only return the rowws the where the year is equal to 1984.
+
+y = x %\>% [filter(Year == 1984)](https://dplyr.tidyverse.org/reference/filter.html) would be another way to write
+
+and filter our metadata data to our desired watershed with the [filter()](https://dplyr.tidyverse.org/reference/filter.html) command.
+
+```{r}
+###################################
+#
+# File and Basin Locations.
+#
+
+thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/"
+
+#
+# Load metadata for the missiouri river dataset
+#
+
+get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
+
+load(url(get_metadata), verbose=TRUE)
+
+HUC08_MRB_LUT
+
+#
+# Identify Basin that we will use
+#
+
+basin = "10120110"
+
+HUC08_MRB_LUT = HUC08_MRB_LUT %>% 
+  filter(HUC08_Code_ID == basin)
+
+HUC08_MRB_LUT
+
+#
+###################################
+```
+
+# Date Selection
+
+We typically use 30-year periods to extract various statistics. For the Historical Period for example using LOCA we typically use the last 30 years of the "Historical" period. And then select the middle or last 30-years of the 21st Century.
+
+```{r}
+####################
+#
+#  Date Selection
+#
+
+hist_end     = 2005
+hist_start   = hist_end - (30-1)
+
+mid21_start = 2036
+mid21_end   = mid21_start + 29
+
+end21_end   = 2099
+end21_start = end21_end - 29
+#
+####################
+```
+
+# Pulling the LOCA Data
+
+We now open our daily, monthly and yearly LOCA files for our chosen basin. Because of the file sizes for these data sets, we use slightly different way to download and read them.
+
+That [remove()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/remove) function just cleans out our memory.
+
+The [str_c()](https://stringr.tidyverse.org/reference/str_c.html) function is used to "concatenate" character strings into a single string.
+
+```{r}
+###################################
+#
+# Pull Basin LOCA data
+#
+
+
+#
+# Daily Output
+#
+
+    File_URL = str_c(thredds_root,
+                     "R_Daily_Files/",
+                     "NGP_LOCA_HUC08_",
+                     basin,
+                     ".RData",
+                     sep = "")
+    
+    print(str_c("opening ",File_URL ))
+
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection, verbose=TRUE)
+      close(con = my.connection)
+      remove( my.connection)
+      
+#
+# Monthly Output
+#      
+
+    File_URL = str_c(thredds_root,
+                     "R_Monthly_Files/",
+                     "NGP_LOCA_HUC08_",
+                     basin,
+                     "_Monthly.RData",
+                     sep = "")
+    
+    print(str_c("opening ",File_URL ))
+
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection, verbose=TRUE)
+      close(con = my.connection)
+      remove( my.connection)
+    
+#
+# Yearly Output
+#      
+    
+    File_URL = str_c(thredds_root,
+                     "R_Yearly_Files/",
+                     "NGP_LOCA_HUC08_",
+                     basin,
+                     "_Yearly.RData",
+                     sep = "")
+    
+    print(str_c("opening ",File_URL ))
+
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection, verbose=TRUE)
+      close(con = my.connection)
+      remove( my.connection)
+      
+
+print(loca_daily)
+print(loca_monthly)
+print(loca_yearly)
+                  
+
+#      
+###################################
+```
+
+## Identifying Our Ensembles and Scenarios from a dataframe
+
+It's a good idea for us to identify the unique Ensembles and our Scenarios for later use. We use the unique() operator to extract each distinct instances in the Ensemble, and Scenario columns. (Columns can be identified by **dataframe\$column**)
+
+```{r}
+#########################
+#
+# Extract Unique Values of Scenarios and Ensembles 
+#
+
+Ensembles = unique(loca_yearly$Ensemble)
+
+Scenarios = unique(loca_yearly$Scenario)
+
+print(Ensembles)
+print(Scenarios)
+
+#
+#########################
+```
+
+# Beating your data into a pulp with dplyr
+
+Before moving on let's give some examples of data wrangling.
+
+We are going to make some various data frames.
+
+-   The daily output filtered so we only have the mean values over the watershed for each day or month or year.
+
+-   Filter the daily output so we only have records with precip greater than zero.
+
+-   Filter and Aggregate our data
+
+-   Calculate an Annual Maximum Series (AMS) so we record a month's or year's highest precipitation event.
+
+-   Select only three 30-year sequences of data and make a new column for a label for each period
+
+First let's identify some subsets that may make for some good graphs.
+
+We are going to use some of the fancier filter operations in R to do this.
+
+See if you can follow along with each examples syntax.
+
+## Simple filtering by a single column.
+
+We did this trick earlier when we just got the metadata for our "HUC of interest."
+
+```{r}
+#####################################
+#
+# Subset only the areal mean of our huc
+#
+
+subset_areal_means = loca_daily  %>% 
+  filter(Percentile == "MEAN")  # Only use the spatial mean values for the region
+
+#
+# Subset only the rainy days
+#
+
+subset_rainydays = subset_areal_means  %>% 
+  filter(pr > 0)  # Only use the spatial mean values for the region
+
+print(subset_areal_means)
+print(subset_rainydays)
+
+#
+#####################################
+```
+
+## Aggregating by over a single and set of columns
+
+It's common in extreme value analyes (such as flood assessment) to produce get the yearly rainfall for a given extended time series. You can also do it by month or season.
+
+To do this here, we are going to use three functions.
+
+-   [group_by()](https://dplyr.tidyverse.org/reference/group_by.html): place the dataframe in a series of little cubbyholes by a given variable or set of variables (for example breaking the dataframe into yearly chunks)...
+
+... you can then aggregate statistics on each chunck by using the command...
+
+-   [summarize()](https://dplyr.tidyverse.org/reference/summarise.html): reduce the number of rows by aggregating by a given parameter (which is done by groupby()).
+
+When you are done you can [ungroup()](https://dplyr.tidyverse.org/reference/group_by.html) the "group_by"ed dataframe.
+
+We have some other functions here:
+
+-   [year()](https://lubridate.tidyverse.org/reference/year.html) and [month()](https://lubridate.tidyverse.org/reference/month.html) return the month and time for a given time variable
+
+-   [which.max()]() returns the row number where the maximum value of a column is now. (We're using it here to get the specific dates of the maximum rainfall events)
+
+```{r}
+#####################################
+#
+# Calculate a Monthly Max Series
+#
+
+monthly_max_precip_series = loca_daily  %>% 
+  filter(Percentile == "P100") %>% 
+  group_by(      Year = year(x      = Time),
+                Month = month(x     = Time,
+                              label = TRUE, 
+                              abbr  = TRUE),
+             Ensemble,
+             Division,
+           Percentile,
+             Scenario) %>%
+  summarize(Date_Max = Time[which.max(pr)],
+            max_mon_pr   = max(pr)) %>%
+  ungroup()
+
+#
+# Calculate a Annual Max Series 
+#
+
+annual_max_precip_series = loca_daily  %>% 
+  filter(Percentile == "P100") %>% 
+  group_by(Year = year(Time),
+           Division,
+           Percentile,
+           Ensemble,
+           Scenario) %>%
+  summarize(Date_Max   = Time[which.max(pr)],
+            max_ann_pr = max(pr)) %>%
+  ungroup()
+
+print(monthly_max_precip_series)
+print(annual_max_precip_series)
+
+#
+#####################################
+```
+
+# Dividing up the data into periods with lots of Dplyr-Fu.
+
+Let's also now look at other kinds of plots. For example probability distributions.
+
+To do this fairly between the longer future and shorter historical time periods, lets use new 30-year periods.
+
+This will also entail a lot of fighting with dplyr which we've already used to filter and aggregate/summarize our data.
+
+Some new functions here are
+
+-   [mutate()](https://dplyr.tidyverse.org/reference/mutate.html): adds and modifies column variables.
+-   [ifelse()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/ifelse): R's *awful* if-then-blocks (other languages do it better.)
+
+We are also going to take this set of 30 year periods and aggregate them using the same use of the group_by() and summarize() functions we used above.
+
+All this will do is remove any record that is not happening during our three periods and add a new column to show what period to which the record belongs.
+
+```{r}
+###################################
+#
+# 30-year period breakdowns
+#
+
+#
+# Select only 3 30-yr periods 
+#
+#
+# This is the big scary block... breakign it down it does the following
+#
+# 1) takes the daily loca datafrme
+# 2) adds separate columns for the record's month and year
+# 3) filter by three periods (the | means "or")
+# 4) make another new column to house a string for each 30-yr period. (This is the messy one.)
+#
+
+subset_30_year_daily = loca_daily %>%
+  
+  mutate(Year  = year(Time), 
+         Month = month(x     = Time,
+                       label = TRUE, 
+                       abbr  = TRUE)) %>%
+  
+  filter(((Year >=  hist_start) & (Year  <= hist_end)) |
+         ((Year >= mid21_start) & (Year <= mid21_end)) |
+         ((Year >= end21_start) & (Year <= end21_end)) )  %>%
+  
+  # OK this part is nasty looking below.  There are more "elegant" ways
+  #   to do this but it will make for a new rabit hole to get lost in.
+  # Instead I am just using a train of if-else statements.  
+  
+  mutate(Period = if_else(condition = ((Year >=  hist_start) & 
+                                       (Year  <=   hist_end)),
+                          true      = str_c(hist_start, 
+                                            hist_end, 
+                                            sep="-"),
+                          false     = if_else(condition = ((Year >= mid21_start) & 
+                                                           (Year <=  mid21_end)),
+                                              true      = str_c(mid21_start, 
+                                                                  mid21_end, 
+                                                                  sep = "-"),
+                                              false     = str_c(end21_start, 
+                                                                  end21_end, 
+                                                                  sep = "-"))))
+
+print(subset_30_year_daily)
+
+#
+##################################
+```
+
+With this daily field, we can aggregate them by each Month.
+
+```{r}
+##################################
+#
+# Aggregate By Month
+#
+
+subset_30_year_monthly = subset_30_year_daily %>%
+  group_by(Year,
+           Month,
+           Period,
+           Division,
+           Ensemble,
+           Scenario,
+           Percentile) %>%
+  summarize(mon_max_pr =      max(pr),       # do the max(pr) and DateMax
+            Date_Max   = Time[which.max(pr)],  # before the sum(pr) or Time.
+            Time       = mean(Time),
+            tasmax     = mean(tasmax),
+            tasmin     = mean(tasmin),
+            pr         =      sum(pr)) %>%
+  ungroup()
+
+print(subset_30_year_monthly)
+
+#
+##################################
+```
+
+```{r}
+##################################
+#
+# Create a mean monthly climatology of values for each period
+#
+
+subset_30_year_avg_by_month = subset_30_year_monthly %>%
+  group_by(Month,
+           Period,
+           Division,
+           Ensemble,
+           Scenario,
+           Percentile) %>%
+  summarize(tasmax = mean(tasmax),
+            tasmin = mean(tasmin),
+            pr     = mean(pr)) %>%
+  ungroup()
+
+print(subset_30_year_avg_by_month)
+
+#
+##################################
+```
+
+```{r}
+##################################3
+#
+# Aggregate by Year
+#
+
+subset_30_year_yearly = subset_30_year_daily %>%
+  group_by(Year,
+           Period,
+           Division,
+           Ensemble,
+           Scenario,
+           Percentile) %>%
+  summarize(ann_max_pr =      max(pr),       # do the max(pr) and DateMax
+            Date_Max   = Time[which.max(pr)],  # before the sum(pr) or Time.
+            Time       = mean(Time),
+            tasmax     = mean(tasmax),
+            tasmin     = mean(tasmin),
+            pr         =      sum(pr)) %>%
+  ungroup()
+
+
+print(subset_30_year_yearly)
+
+#
+##################################
+```
+
+# Plotting a Time Series (Yearly Data)
+
+To make plotting "easier" (and actually it is easier once you discover the method to the madness...) a clique of people who do data science with R have signed on a movement called...
+
+## ["The Grammar of Graphics"](https://towardsdatascience.com/a-comprehensive-guide-to-the-grammar-of-graphics-for-effective-visualization-of-multi-dimensional-1f92b4ed4149)
+
+If it sounds like a buzzword that will send your prof's eyes rolling, you would not be wrong.
+
+But what it really means is the partitioning of the graphics-making process into compartments that can swapped out with one another and otherwise produce a more navigable graphics environment than the earlier variants of R graphics.
+
+The downside is that
+
+1)  It requires more typing with each element being its own command or addition to a plot...
+2)  ... which means that it *looks* like it's more work.
+
+But the process is more universal and for me makes more sense.
+
+that said, as it is working with advanced graphics in Python, tutorials will often overload your senses with a stream of command lines that may drive you crazy. It certainly is one of the things that cause me to want to "rage-quit."
+
+So I am going to do this one step at a time with a new feature being added to a contiuing growing image in each code block.
+
+The "R for Data Science" reference book has a [chapter on graphics](https://r4ds.had.co.nz/data-visualisation.html) and presumes that you already know how to do the R-Fu needed to make a simple data frame. (We'll be using ours from the earlier session.)
+
+This relies on the ["ggplot2"](https://ggplot2.tidyverse.org) and you will never remember every single command so don't worry about that part. That's why people have made pretty cheatsheets.
+
+## Making a graph one component at a time.
+
+Let's try to make a simple plot.
+
+Now let's plot all of our ensembles on top of each other for rainfall.
+
+First we need to cite the graphical workstation (that's what we called a drawing space when we had to use special graphics monitors or just blindly send things to a plotter).
+
+This requires the [**ggplot()**](https://ggplot2.tidyverse.org/reference/ggplot.html) command.
+
+This requires the [**ggplot()**](https://ggplot2.tidyverse.org/reference/ggplot.html) command.
+
+```{r}
+########################################################
+#
+# Making a plot one element at a time.
+#
+# 1) Drop a workstation figure space with ggplot
+#
+
+ggplot()
+
+#
+########################################################
+```
+
+OK. We have a big box of grey. It's grey because that's what the original designers though would be a nice look-n-feel for a professional looking plot. If you disagree, so do I and you have a set of "styles" that you can choose or customize one for yourself. We'll do that at the end.
+
+But for now, we have a blank canvas on which to put our stuff.
+
+Next we will want to show the "mapping." The word for this is "aesthetics mapping" or **aes()"[<https://ggplot2.tidyverse.org/reference/aes.html>]** This part's job is to assign what columns will be used for the x-axis, y-axis, colors, ploting markers, etc.
+
+The primary data frame that you want is actually cited (you can actually use more than one data frame in a graph but we need one to get things started).
+
+We're just going to make a basic line plot here so we aren't going to get too fancy here, we're just going to request the data frame and the x- and y-axes.
+
+Now instead of using pipes we use + to literally "add" elements to the plot.
+
+```{r}
+########################################################
+#
+# Making a plot one element at a time.
+#
+# 1) Drop a workstation figure space with ggplot()
+# 2) Add Aesthetic Mappings with aes()
+#
+
+ggplot(data = annual_max_precip_series) + # Plot this dataset
+  
+  aes(x     = Date_Max,
+      y     = max_ann_pr,
+      color = Scenario,
+      group = Ensemble)   # Use these columns for our axes, color, etc
+  
+
+#
+########################################################
+```
+
+OK. Now we have more some axes drawn out. (Again don't worry if you don't like the look-n-feel. I don't like their default style). We can customize the labels on the axes later.
+
+OK we have formally established our artistic battlespace so let's now try decide what kind of plotting we want to do.
+
+The graphical objects that render the data are called in ggplot2 **geoms**. You can take a look at your choices with this link [**here**](https://ggplot2.tidyverse.org/reference/index.html#section-geoms)
+
+Note that you can also modify elements locally in the command. You can also add new graphical elements using other columns in the plot.
+
+```{r}
+########################################################
+#
+# Making a plot one element at a time.
+#
+# 1) Drop a workstation figure space with ggplot() 
+# 2) Add Aesthetic Mappings with aes()
+# 3) Add the data rendering geom_*()
+#
+
+ggplot(data = annual_max_precip_series) + # Plot this dataset
+  
+  aes(x     =   Date_Max,
+      y     = max_ann_pr,
+      color =   Scenario,
+      group =   Ensemble)  +  # Use these columns for our axes, color, etc
+  
+  geom_point(size = 0.5) 
+
+
+#
+########################################################
+```
+
+(oooo! Look at how there are more extreme events in the future scenarios than in "historical" cases!)
+
+From there you can add labels and axes and other features that will keep you from getting (rightfully) docked by a TA.
+
+Unfortunately various labels and such are spread through the ggplot2 manual pages but [here](https://ggplot2.tidyverse.org/reference/labs.html) are some basic ones that I use.
+
+```{r}
+########################################################
+#
+# Making a plot one element at a time.
+#
+# 1) Drop a workstation figure space with ggplot() 
+# 2) Add Aesthetic Mappings with aes()
+# 3) Add the data rendering geom_*()
+# 4) Don't forget to label your graph!
+#
+
+ggplot(data = annual_max_precip_series) + # Plot this dataset
+  
+  aes(x     =   Date_Max,
+      y     = max_ann_pr,
+      color =   Scenario,
+      group =   Ensemble)  +  # Use these columns for our axes, color, etc
+  
+  geom_point(size = 0.5) + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Time") +
+  
+  ylab("Daily Precipitation Amount (mm)")
+  
+#
+########################################################
+```
+
+The colors for our plots looks counter intuitive. We can assign colors once you can see the order of what our line, point. [There are a set of operations that let you customize colors, size, thickness, and transparency ("alpha")](https://ggplot2.tidyverse.org/reference/scale_manual.html)
+
+```{r}
+########################################################
+#
+# Making a plot one element at a time.
+#
+# 1) Drop a workstation figure space with ggplot() 
+# 2) Add Aesthetic Mappings with aes()
+# 5) Change the plotting colors with scale_{color/fill}_manual
+# 3) Add the data rendering geom_*()
+# 4) Don't forget to label your graph!
+#
+
+ggplot(data = annual_max_precip_series) + # Plot this dataset
+  
+  aes(x     =   Date_Max,
+      y     = max_ann_pr,
+      color =   Scenario,
+      group =   Ensemble)  +  # Use these columns for our axes, color, etc
+
+  scale_color_manual(values = c("blue",    # historical
+                               "green",    # rcp 4.5
+                                 "red")) + # rcp 8.5
+  
+  geom_point(size = 0.5) + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Time") +
+  
+  ylab("Daily Precipitation Amount (mm)")
+  
+#
+########################################################
+```
+
+OK I don't know about you but this is MY graph and I hate the grey. So I'm going to chagne the overall look-n-feel or **("theme")[<https://ggplot2.tidyverse.org/reference/ggtheme.html>]**
+
+I am partial to the "theme_bw" which is a no-nonsense Black-n-White line based theme.
+
+I prefer to add my "theme" information up front.
+
+```{r}
+########################################################
+#
+# Making a plot one element at a time.
+#
+# 1) Drop a workstation figure space with ggplot() 
+# 2) Add Aesthetic Mappings with aes()
+# 6) Change Default Theme to plain black-n-white.
+# 5) Change the plotting colors with scale_{color/fill}_manual
+# 3) Add the data rendering geom_*()
+# 4) Don't forget to label your graph!
+#
+
+ggplot(data = annual_max_precip_series) + # Plot this dataset
+  
+  
+  aes(x     =   Date_Max,
+      y     = max_ann_pr,
+      color =   Scenario,
+      group =   Ensemble)  +  # Use these columns for our axes, color, etc
+  theme_bw() + 
+ 
+  scale_color_manual(values = c("blue",    # historical
+                               "green",    # rcp 4.5
+                                 "red")) + # rcp 8.5
+
+  geom_point(size = 0.5) + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+
+  
+  xlab("Time") +
+  
+  ylab("Annual Maximum Daily Precip Series (mm)") 
+  
+#
+########################################################
+```
+
+# Probability Distribution Functions
+
+We have some geom objects that do a nice job expressing how probabilities are represented. You can view these as the smoothed histograms. We also call these "Probability Density Functions" (PDF).
+
+The [geom_density()](https://ggplot2.tidyverse.org/reference/geom_density.html) object does a good job here.
+
+Here are two PDF plots showing the future scenarios against the historical gaps.
+
+First for the Historical vs mid-21st century
+
+```{r}
+#####################################
+#
+# Plot Probability Density Curve for Annual Rainfall (mid 21st period)
+#
+
+Periods = unique(subset_30_year_yearly$Period) 
+print(Periods)
+
+subset = subset_30_year_yearly %>% 
+  filter(Percentile == "P100",
+         Period != Periods[3])  
+
+ggplot(data = subset) + 
+  aes(x        = ann_max_pr,
+      color    = Scenario,
+      linetype = Period) + 
+  
+  theme_bw() + 
+  
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                  "red")) + # rcp 8.5
+
+
+  geom_density() + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Annual Daily Maximum Precip (mm)") +
+  ylab("Probability Density Function (PDF)") 
+  
+
+
+
+
+#
+#####################################
+```
+
+(And here is the PDF for the latter 21st century)
+
+```{r}
+#####################################
+#
+# and end of 21st cent
+#
+
+subset = subset_30_year_yearly %>% 
+  filter(Percentile == "P100",
+         Period != Periods[2])  
+
+
+ggplot(data = subset) + 
+  aes(x        = ann_max_pr,
+      color    = Scenario,
+      linetype = Period) + 
+  
+  theme_bw() + 
+  
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                  "red")) + # rcp 8.5
+
+
+  geom_density() + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Annual Daily Maximum Precip (mm)") +
+  ylab("Probability Density Function (PDF)") 
+  
+
+#
+#####################################
+```
+
+Some people prefer to use a cumulative probability distribution function such as [stat_ecdf()](https://ggplot2.tidyverse.org/reference/stat_ecdf.html) which shows the probability a value is less than "x".
+
+These plots are "monotonic" (they go either up all the time or down all the time). And that makes it a little easier to see if it is more likely to have high-magnitude events and or low-magnitude events.
+
+Here are the same two plots from above but using the CDF.
+
+First for the mid 21st cent.
+
+```{r}
+#####################################
+#
+# Plot Probability Density Curve for Annual Rainfall (mid 21st period)
+#
+
+Periods = unique(subset_30_year_yearly$Period) 
+print(Periods)
+
+subset = subset_30_year_yearly %>% 
+  filter(Percentile == "P100",
+         Period != Periods[3])  
+
+ggplot(data = subset) + 
+  aes(x        = ann_max_pr,
+      color    = Scenario,
+      linetype = Period) + 
+  
+  theme_bw() + 
+  
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                    "red")) + # rcp 8.5
+
+
+  stat_ecdf() + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Annual Daily Maximum Precip (mm)") +
+  ylab("Cumulative Density Function (CDF)") 
+  
+
+
+#
+#####################################
+```
+
+And again for for the late 21st cent.
+
+```{r}
+#####################################
+#
+# And for the end of the 21st cent
+#
+
+subset = subset_30_year_yearly %>% 
+  filter(Percentile == "P100",   # max amount on the watershed
+         Period != Periods[2])  
+
+ggplot(data = subset) + 
+  aes(x        = ann_max_pr,
+      color    = Scenario,
+      linetype = Period) + 
+  
+  theme_bw() + 
+  
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                  "red")) + # rcp 8.5
+
+
+  stat_ecdf() + 
+  
+  labs(title="LOCA Ensembles for Rapid Creek Watershed",
+       subtitle = "Annual Max Daily Rainfall Across All Ensembles") +
+  
+  xlab("Annual Daily Maximum Precip (mm)") +
+  ylab("Cumulative Density Function (CDF)") 
+  
+
+```
+
+There are ways to do panels using "facets" where for example, we can make "panels" using a variable, such as our Periods. For example here we are using [facet_wrap()](https://ggplot2.tidyverse.org/reference/facet_wrap.html)
+
+In the case below though it is hard to compare them since it's easier to see things if they are all on the same plot.
+
+```{r}
+################################
+#
+# Using Panels to make the PDF plot.
+#
+
+subset = subset_30_year_yearly %>% 
+  filter(Percentile == "P100")  # max amount on the watershed
+
+ggplot(data = subset) + 
+  aes(x        = ann_max_pr,
+      color    =   Scenario) + 
+  
+  theme_bw() + 
+  
+  facet_wrap(~Period) +
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                  "red")) + # rcp 8.5
+
+
+  geom_density() + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Annual Daily Maximum Precip (mm)") +
+  ylab("Probability Distribution Function (PDF)") 
+  
+#
+#####################################
+```
+
+```{r}
+################################
+#
+# Using Panels to make the PDF plot.
+#
+
+subset = subset_30_year_yearly %>% 
+  filter(Percentile == "P100")  # max amount on the watershed
+
+ggplot(data = subset) + 
+  aes(x        = ann_max_pr,
+      color    =   Scenario) + 
+  
+  theme_bw() + 
+  
+  facet_wrap(~Period) +
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                  "red")) + # rcp 8.5
+
+
+  stat_ecdf() + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Annual Daily Maximum Precip (mm)") +
+  ylab("Cumulative Distribution Function (CDF)") 
+  
+#
+#####################################
+```
+
+We can also do panels for months. For the Rapid Creek basin, take a close look at the differences between April and the Summer Months!
+
+(Also I don't like the grey labels over the subplots. That can be fixed )
+
+First for the mid-21st Century
+
+```{r}
+#####################################
+#
+# Max Precip Days by Month (mid-21st cent)
+# 
+
+Periods = unique(subset_30_year_monthly$Period)
+print(Periods)
+
+subset = subset_30_year_monthly %>% 
+  filter(Percentile == "P100",   # max amount on the watershed
+         Period != Periods[3])   # remove the last period
+
+ggplot(data = subset) + 
+  aes(x = mon_max_pr,
+      color = Scenario,
+      linetype = Period) + 
+  
+  theme_bw() + 
+  
+  theme(strip.background = element_rect(fill=NA)) + # This makes the background
+                                                    # for the strip over the plot
+                                                    # clear
+  
+  facet_wrap(~Month) +
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                    "red")) + # rcp 8.5
+
+  stat_ecdf() + 
+  
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlim(0,80) + 
+  xlab("Monthly Daily Maximum Precip (mm)") +
+  ylab("Cumulative Distribution Function (CDF)") 
+
+```
+
+(And for the end of the 21st century.)
+
+```{r}
+#####################################
+#
+# Max Precip Days by Month (end-21st cent)
+# 
+
+
+subset = subset_30_year_monthly %>% 
+  filter(Percentile == "P100",  # max amount on the watershed
+         Period != Periods[2])  # remove the middle period
+
+ggplot(data = subset) + 
+  aes(x        = mon_max_pr,
+      color    =  Scenario,
+      linetype =    Period) + 
+  
+  theme_bw() + 
+  
+  theme(strip.background = element_rect(fill=NA)) + # This makes the background
+                                                    # for the strip over the plot
+                                                    # clear
+  
+  facet_wrap(~Month) + 
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                    "red")) + # rcp 8.5
+
+  xlim(0,80) + 
+  
+  stat_ecdf() + 
+
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Annual Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Monthly Daily Maximum Precip (mm)") +
+  ylab("Cumulative Distribution Function (CDF)") 
+
+#
+#####################################
+```
+
+# Closing
+
+This is just an set of examples of how I will use R to beat data into shape and plot them.
+
+There are a lot of other things like calculating the return periods for rainfall events, etc.
+
+```{r}
+subset = subset_30_year_daily %>%
+  filter(Percentile == "P100") %>%
+  filter(Scenario != "RCP 4.5") %>%
+  filter(pr > 0.1)
+
+
+ggplot(data = subset) + 
+  aes(x = pr,
+      color = Scenario,
+      linetype = Period)  +
+  
+  scale_x_log10() +  
+  
+
+  stat_ecdf()
+```
+
+```{r}
+#####################################
+#
+# Max Precip Days by Month (end-21st cent)
+# 
+
+
+subset = subset_30_year_daily %>% 
+  filter(Percentile == "P100",  # max amount on the watershed
+         Period     != Periods[2],  # remove the middle period
+         pr > 0.254)
+ggplot(data = subset) + 
+  aes(x        = pr,
+      color    =  Scenario,
+      linetype =    Period) + 
+  
+  theme_bw() + 
+  
+  theme(strip.background = element_rect(fill=NA)) + # This makes the background
+                                                    # for the strip over the plot
+                                                    # clear
+  
+  facet_wrap(~Month) + 
+
+  scale_color_manual(values = c(   "blue",    # historical
+                                  "green",    # rcp 4.5
+                                    "red")) + # rcp 8.5
+
+  xlim(0,50) + 
+  
+  stat_ecdf() + 
+
+  labs(title    = "LOCA CMIP5 Ensembles",
+       subtitle = "Rapid Creek Watershed (HUC-08 Region 10120110)",
+       caption  = "Max Daily Rainfall over the Basin for Each Ensemble") +
+  
+  xlab("Daily Maximum Precip (mm)") +
+  ylab("Cumulative Distribution Function (CDF)") 
+
+#
+#####################################
+
+```

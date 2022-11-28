@@ -1,0 +1,128 @@
+```{r}
+
+
+  library(package = "stringr")
+  library(package = "forcats")
+  library(package = "readr")
+  library(package = "tidyverse")
+  library(package = "lubridate")
+  library(package = "RCurl")
+  library(package = "elevatr")
+  library(package = "rgdal")
+  library(package = "openxlsx2")
+
+
+```
+
+```{r}
+
+thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/R_Daily_Files/"
+
+
+get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
+
+load(url(get_metadata), verbose=TRUE)
+
+hucs_to_process = unique(x = HUC08_MRB_LUT$HUC08_Code_ID)
+print(hucs_to_process)
+
+hucs_to_process = c("10120202")
+
+hucs_to_process = c("10120110")
+
+HUC08_MRB_LUT = HUC08_MRB_LUT %>% filter(HUC08_Code_ID %in% hucs_to_process)
+
+
+
+```
+
+```{r}
+
+
+  Output_Scenarios = c("RCP 4.5",
+                       "RCP 8.5")
+
+
+  for (basin in hucs_to_process)
+  {
+
+    metadata = HUC08_MRB_LUT %>% filter(HUC08_Code_ID == basin)
+    
+
+
+    
+    
+
+
+    File_URL = str_c(thredds_root,
+                     "NGP_LOCA_HUC08_",
+                     basin,
+                     ".RData",
+                     sep = "")
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection)
+      close(con = my.connection)
+      remove( my.connection)
+
+    ensembles =  unique(loca_daily$Ensemble)
+    print(ensembles)
+    print(length(ensembles))
+       out_dir = str_c("~/Desktop/",
+                     sep="")
+        
+        outxlsx = str_c(out_dir,"LOCA_pr_",basin,"_Daily.xlsx",sep="")
+        system(str_c("mkdir -pv ",out_dir))
+
+      scenario = Output_Scenarios[1]
+      {
+        
+
+                     
+
+        subset = loca_daily %>%
+                       filter(((Scenario  == "Historical") |
+                               (Scenario  == scenario)) &
+                              (Percentile == "MEAN")) %>%
+                       select(Time, Ensemble,pr)
+        
+        RCP45 = spread(data = subset,
+                          key  = Ensemble,
+                          value = pr)
+        
+      }
+      scenario = Output_Scenarios[2]
+      {
+        
+        
+
+        subset = loca_daily %>%
+                       filter(((Scenario  == "Historical") |
+                               (Scenario  == scenario)) &
+                              (Percentile == "MEAN")) %>%
+                       select(Time, Ensemble,pr)
+        
+        RCP85 = spread(data = subset,
+                          key  = Ensemble,
+                          value = pr)
+        
+      }        
+        
+      
+        write_xlsx(x    = list("RCP 4.5"=RCP45,
+                               "RCP 8.5"=RCP85),
+                  file  = outxlsx)
+          
+        
+
+
+  
+
+
+  } # basin
+  remove(scenario)
+  remove(basin)
+
+
+
+```
