@@ -79,7 +79,7 @@ for (Div in Divisions) {
   
   #my.connection = url(description = File_URL)
   load(file = File_URL, verbose=TRUE)
-  close(con = my.connection)
+  #close(con = my.connection)
   #remove( my.connection)
   
   if (newframe) {
