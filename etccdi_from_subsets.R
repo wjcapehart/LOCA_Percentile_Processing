@@ -35,11 +35,11 @@ dest_output_root = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/climatology
 # Load metadata for the missiouri river dataset
 #
 
-get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
+get_metadata = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA/LOCA_NGP/Specific_Regional_Aggregate_Sets/huc_08_basins/HUC08_Missouri_River_Basin.Rdata"
 
 
 
-load(url(get_metadata), verbose=TRUE)
+load(get_metadata, verbose=TRUE)
 
 HUC08_MRB_LUT
 
