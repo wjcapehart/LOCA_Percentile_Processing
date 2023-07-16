@@ -628,7 +628,8 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     s,                   &
 !$OMP&                     n_reads,             &
 !$OMP&                     csv_filename,        &
-!$OMP&                     ensembles,           &
+!$OMP&                     models,              &
+!$OMP&                     members,              &
 !$OMP&                     scenarios,           &
 !$OMP&                     nhuccells,           &
 !$OMP&                     start_t,             &
