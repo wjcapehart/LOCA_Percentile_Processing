@@ -13,7 +13,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 23741
   integer, parameter :: ntime_futr = 31411
 
-  integer, parameter :: nhucs      =     9
+  integer, parameter :: nhucs      =   344
   integer, parameter :: len_hucstr =     4
   integer, parameter :: len_outbuf =   255
 
@@ -223,6 +223,8 @@ program LOCA_Colate_to_ClimDivs
 
       ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_hucs, hucs)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+        print*, hucs
 
   ncstat = NF90_CLOSE(netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
