@@ -77,6 +77,7 @@ program LOCA_Colate_to_ClimDivs
   real (kind=4), allocatable          :: sort_tasmax(:)
   real (kind=4), allocatable          :: sort_tasmin(:)
 
+
   real (kind=4), dimension(nlat*nlon) :: linear_array
 
   real (kind=8), dimension(ntime_hist) :: time_cord_hist
@@ -113,6 +114,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer (kind=4)              :: nmyhucs
   integer (kind=4)              :: num_procs
+  integer (kind=2) :: nhuccellslocal
 
   integer  (kind=4),         allocatable :: myhucs(:) ! nmyhucs
   integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
@@ -619,8 +621,8 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     t_buffer,            &
 !$OMP&                     masked_variable_map, &
 !$OMP&                     t_in_tt,             &
-!$OMP&                     caldate,     
-!$OMP&                     nhuccellslocal        &
+!$OMP&                     caldate,             &
+!$OMP&                     nhuccellslocal       &
 !$OMP&                     output_buffer,       &
 !$OMP&                     sort_tasmax,         &
 !$OMP&                     sort_tasmin,         &
