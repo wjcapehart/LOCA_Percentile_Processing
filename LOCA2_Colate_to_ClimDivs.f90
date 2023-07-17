@@ -657,6 +657,7 @@ program LOCA_Colate_to_ClimDivs
       do h = 1, nmyhucs, 1
 
             t_buffer = 1
+
             allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
 
 
@@ -670,7 +671,7 @@ program LOCA_Colate_to_ClimDivs
                 caldate = caldate_futr(t_in_tt)
               end if
 
-              write(*,'("proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8 )') &
+              write(*,'(" - proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8 )') &
                    omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
 
@@ -690,131 +691,126 @@ program LOCA_Colate_to_ClimDivs
 
               !!! tasmax
 
-                masked_variable_map = map_tasmax(:,:,t)
+              masked_variable_map = map_tasmax(:,:,t)
 
-                where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
+              where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
 
-                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+              linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
 
-                call QSort(linear_array, nlon*nlat)
+              call QSort(linear_array, nlon*nlat)
 
-                sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+              sort_tasmax(:) = linear_array(nlon*nlat-nhuccellslocal+1:nlon*nlat)
 
               !!! tasmin
 
-                masked_variable_map = map_tasmin(:,:,t)
+              masked_variable_map = map_tasmin(:,:,t)
 
-                where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
+              where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
 
-                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+              linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
 
-                call QSort(linear_array, nlon*nlat)
+              call QSort(linear_array, nlon*nlat)
 
-                sort_tasmin(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+              sort_tasmin(:) = linear_array(nlon*nlat-nhuccellslocal+1:nlon*nlat)
 
               !!! pr
 
-                masked_variable_map = map_pr(:,:,t)
+              masked_variable_map = map_pr(:,:,t)
 
-                where (mask_map .eq. 0) masked_variable_map = pr_FillValue
+              where (mask_map .eq. 0) masked_variable_map = pr_FillValue
 
-                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+              linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
 
-                call QSort(linear_array, nlon*nlat)
+              call QSort(linear_array, nlon*nlat)
 
-                sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+              sort_pr(:) = linear_array(nlon*nlat-nhuccellslocal+1:nlon*nlat)
 
 
               !!! output
 
-                
+              
 
-                write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P000",  &
-                            minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
+              write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                          trim(caldate), &
+                          myhucs(h), &
+                          trim(   models(e)), &
+                          trim(  members(e)), &
+                          trim(scenarios(s)), &
+                          "P000",  &
+                          minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
 
-                write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P025",  &
-                            quantile7(sort_tasmax, 0.25, nhuccells(h)), &
-                            quantile7(sort_tasmin, 0.25, nhuccells(h)), &
-                            quantile7(sort_pr,     0.25, nhuccells(h))
+              write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                          trim(caldate), &
+                          myhucs(h), &
+                          trim(   models(e)), &
+                          trim(  members(e)), &
+                          trim(scenarios(s)), &
+                          "P025",  &
+                          quantile7(sort_tasmax, 0.25, nhuccellslocal), &
+                          quantile7(sort_tasmin, 0.25, nhuccellslocal), &
+                          quantile7(sort_pr,     0.25, nhuccellslocal)
 
-                write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P050",  &
-                            quantile7(sort_tasmax, 0.50, nhuccells(h)), &
-                            quantile7(sort_tasmin, 0.50, nhuccells(h)), &
-                            quantile7(sort_pr,     0.50, nhuccells(h))
+              write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                          trim(caldate), &
+                          myhucs(h), &
+                          trim(   models(e)), &
+                          trim(  members(e)), &
+                          trim(scenarios(s)), &
+                          "P050",  &
+                          quantile7(sort_tasmax, 0.50, nhuccellslocal), &
+                          quantile7(sort_tasmin, 0.50, nhuccellslocal), &
+                          quantile7(sort_pr,     0.50, nhuccellslocal)
 
-                write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P075",  &
-                            quantile7(sort_tasmax, 0.75, nhuccells(h)), &
-                            quantile7(sort_tasmin, 0.75, nhuccells(h)), &
-                            quantile7(sort_pr,     0.75, nhuccells(h))
+              write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                          trim(caldate), &
+                          myhucs(h), &
+                          trim(   models(e)), &
+                          trim(  members(e)), &
+                          trim(scenarios(s)), &
+                          "P075",  &
+                          quantile7(sort_tasmax, 0.75, nhuccellslocal), &
+                          quantile7(sort_tasmin, 0.75, nhuccellslocal), &
+                          quantile7(sort_pr,     0.75, nhuccellslocal)
 
-                write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P100",  &
-                            maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
+              write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                          trim(caldate), &
+                          myhucs(h), &
+                          trim(   models(e)), &
+                          trim(  members(e)), &
+                          trim(scenarios(s)), &
+                          "P100",  &
+                          maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
-                write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "MEAN",  &
-                            (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
+              write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                          trim(caldate), &
+                          myhucs(h), &
+                          trim(   models(e)), &
+                          trim(  members(e)), &
+                          trim(scenarios(s)), &
+                          "MEAN",  &
+                          (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccellslocal
 
-                !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
+              !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
 
-                deallocate (sort_tasmax)
-                deallocate (sort_tasmin)
-                deallocate (sort_pr)
+              deallocate (sort_tasmax)
+              deallocate (sort_tasmin)
+              deallocate (sort_pr)
 
-                t_buffer = t_buffer + 6
+              t_buffer = t_buffer + 6
 
-              end do  !!  Internal Time Loop (t)
+            end do  !!  Internal Time Loop (t)
 
-              write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
-                   omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
+            write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
+                 omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
 
-              !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
-              write(unit_huc(h),"(A)") output_buffer(:)
-              !close(unit_huc(h))
+            write(unit_huc(h),"(A)") output_buffer(:)
 
-              deallocate (output_buffer)
+            deallocate (output_buffer)
 
-
-              print*, "done with IMP loop"
-
-
+            print*, "done with IMP loop"
 
           end do  !! HUCS loop (h)
 
