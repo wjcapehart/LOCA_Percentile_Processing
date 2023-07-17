@@ -459,10 +459,10 @@ program LOCA_Colate_to_ClimDivs
             ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "_FillValue",  pr_FillValue)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            print*, "==         PR:"
-            print*, "==          scale:",pr_scale_factor
-            print*, "==         offset:",pr_add_offset
-            print*, "==      FillValue:",pr_FillValue
+
+            print*, "==         PR: scale:",pr_scale_factor
+            print*, "==            offset:",pr_add_offset
+            print*, "==         FillValue:",pr_FillValue
             print*, "== "
 
             ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmax_variable_name), netcdf_id_tasmax)
@@ -477,10 +477,9 @@ program LOCA_Colate_to_ClimDivs
             ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-             print*, "==     TASMAX:"
-             print*, "==          scale:",tasmax_scale_factor
-             print*, "==         offset:",tasmax_add_offset
-             print*, "==      FillValue:",tasmax_FillValue
+             print*, "==     TASMAX: scale:",tasmax_scale_factor
+             print*, "==            offset:",tasmax_add_offset
+             print*, "==         FillValue:",tasmax_FillValue
              print*, "== "
 
             ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmin_variable_name), netcdf_id_tasmin)
@@ -495,10 +494,9 @@ program LOCA_Colate_to_ClimDivs
             ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            print*, "==     TASMIN:"
-            print*, "==          scale:", tasmin_scale_factor
-            print*, "==         offset:", tasmin_add_offset
-            print*, "==      FillValue:", tasmin_FillValue
+            print*, "==     TASMIN: scale:", tasmin_scale_factor
+            print*, "==            offset:", tasmin_add_offset
+            print*, "==         FillValue:", tasmin_FillValue
             print*, "== "
 
        ncstat = NF90_CLOSE(netcdf_id_file_loca2)
@@ -680,6 +678,8 @@ program LOCA_Colate_to_ClimDivs
 
               nhuccells(h) = sum(mask_map)
 
+              print*,"allocations ", omp_get_thread_num()
+
               !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
               allocate ( sort_tasmax(nhuccells(h)) )
               allocate ( sort_tasmin(nhuccells(h)) )
@@ -799,6 +799,7 @@ program LOCA_Colate_to_ClimDivs
 
               end do  !!  Internal Time Loop (t)
 
+              print* "writing to unit ", unit_huc(h)
               !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
               !close(unit_huc(h))
