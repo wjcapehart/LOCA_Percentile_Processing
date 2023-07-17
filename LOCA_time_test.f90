@@ -147,34 +147,6 @@ program LOCA_time_test
 
 
 
-  ensembles = (/ "ACCESS1-0_r1i1p1     ", &
-                 "ACCESS1-3_r1i1p1     ", &
-                 "CCSM4_r6i1p1         ", &
-                 "CESM1-BGC_r1i1p1     ", &
-                 "CESM1-CAM5_r1i1p1    ", &
-                 "CMCC-CMS_r1i1p1      ", &
-                 "CMCC-CM_r1i1p1       ", &
-                 "CNRM-CM5_r1i1p1      ", &
-                 "CSIRO-Mk3-6-0_r1i1p1 ", &
-                 "CanESM2_r1i1p1       ", &
-                 "FGOALS-g2_r1i1p1     ", &
-                 "GFDL-CM3_r1i1p1      ", &
-                 "GFDL-ESM2G_r1i1p1    ", &
-                 "GFDL-ESM2M_r1i1p1    ", &
-                 "HadGEM2-AO_r1i1p1    ", &
-                 "HadGEM2-CC_r1i1p1    ", &
-                 "HadGEM2-ES_r1i1p1    ", &
-                 "IPSL-CM5A-LR_r1i1p1  ", &
-                 "IPSL-CM5A-MR_r1i1p1  ", &
-                 "MIROC-ESM-CHEM_r1i1p1", &
-                 "MIROC-ESM_r1i1p1     ", &
-                 "MIROC5_r1i1p1        ", &
-                 "MPI-ESM-LR_r1i1p1    ", &
-                 "MPI-ESM-MR_r1i1p1    ", &
-                 "MRI-CGCM3_r1i1p1     ", &
-                 "NorESM1-M_r1i1p1     ", &
-                 "bcc-csm1-1-m_r1i1p1  " /)
-
 
 
 !!!!!!!!!!!!!!!!  Get input_map

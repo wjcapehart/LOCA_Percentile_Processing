@@ -16,9 +16,12 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 23741
   integer, parameter :: ntime_futr = 31411
 
-  integer, parameter :: nhucs      =   344
-  integer, parameter :: len_hucstr =     4
-  integer, parameter :: len_outbuf =   255
+  integer, parameter :: nhucs        =   344
+  integer, parameter :: len_hucstr   =     4
+  integer, parameter :: len_outbuf   =   255
+  integer, parameter :: len_ensinv   =     4 ! #XNP
+
+  character (len=*), PARAMETER  :: ensinv_file  = "./LOCA2_Model_Member_Available_Ptile.csv"
 
   character (len=*), PARAMETER  :: map_variable_name = "LOCA2_CLIMDIV"
   character (len=*), PARAMETER  :: map_values_name   = "climdiv"
@@ -78,8 +81,15 @@ program LOCA_Colate_to_ClimDivs
 
   logical :: first_huc
 
-  character (len=16), dimension(nens)   :: models
-  character (len=10), dimension(nens)   :: members
+
+
+  
+
+  character (len=16), dimension(nens)       :: models
+  character (len=10), dimension(nens)       :: members
+  character (len= 4), dimension(nens,nscen) :: scen_inv
+  logical, dimension(nens,nscen)            :: got_scenario
+  logical, dimension(nens,nscen,nvars)      :: got_variable
 
   character (len=06), dimension(nvars)  :: variables
   character (len=10), dimension(nscen)  :: scenarios
@@ -102,6 +112,8 @@ program LOCA_Colate_to_ClimDivs
   integer  (kind=4),         allocatable :: unit_huc(:) !nmyhucs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
   character(len=255),        allocatable :: csv_filename(:)   
+
+
 
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -148,59 +160,35 @@ program LOCA_Colate_to_ClimDivs
                  "ssp370    ", &
                  "ssp585    " /)
 
-  models = (/ "GFDL-ESM4      ", &
-              "BCC-CSM2-MR    ", &
-              "GFDL-CM4       ", &
-              "CNRM-CM6-1     ", &
-              "TaiESM1        ", &
-              "CNRM-ESM2-1    ", &
-              "CNRM-CM6-1-HR  ", &
-              "INM-CM4-8      ", &
-              "MIROC6         ", &
-              "MRI-ESM2-0     ", &
-              "INM-CM5-0      ", &
-              "HadGEM3-GC31-MM", &
-              "NorESM2-LM     ", &
-              "FGOALS-g3      ", &
-              "ACCESS-ESM1-5  ", &
-              "HadGEM3-GC31-LL", &
-              "EC-Earth3      ", &
-              "NorESM2-MM     ", &
-              "CanESM5        ", &
-              "ACCESS-CM2     ", &
-              "CESM2-LENS     ", &
-              "IPSL-CM6A-LR   ", &
-              "EC-Earth3-Veg  ", &
-              "KACE-1-0-G     ", &
-              "MPI-ESM1-2-HR  ", &
-              "AWI-CM-1-1-MR  " /)
+  !!!!!!!!!!  Inventory of Scenarios and Variables
 
-  members = (/ "r1i1p1f1 ", &
-               "r1i1p1f1 ", &
-               "r1i1p1f1 ", &
-               "r1i1p1f2 ", &
-               "r1i1p1f1 ", &
-               "r1i1p1f2 ", &
-               "r1i1p1f2 ", &
-               "r1i1p1f1 ", &
-               "r1i1p1f1 ", &
-               "r5i1p1f1 ", &
-               "r4i1p1f1 ", &
-               "r2i1p1f3 ", &
-               "r2i1p1f1 ", &
-               "r3i1p1f1 ", &
-               "r1i1p1f1 ", &
-               "r3i1p1f3 ", &
-               "r2i1p1f1 ", &
-               "r2i1p1f1 ", &
-               "r1i1p1f1 ", &
-               "r1i1p1f1 ", &
-               "r4i1p1f1 ", &
-               "r3i1p1f1 ", &
-               "r4i1p1f1 ", &
-               "r2i1p1f1 ", &
-               "r10i1p1f1", &
-               "r1i1p1f1 " /)
+  open(1, FILE=ensinv_file, STATUS="OLD",FORM="FORMATTED")
+
+    read(1,*) models(1)
+    do e = 1, nens, 1
+      read(1,*) models(e), members(e), scen_inv(e,1), scen_inv(e,2), scen_inv(e,3), scen_inv(e,4)
+      write(*,'(I2.2,x,A)')  e, trim(models(e)) //":"// trim(members(e))
+
+      do s = 1, nscen, 1
+
+        got_scenario(e,s)    = .NOT.(scen_inv(e,s) .eq. "---")
+        got_variable(e,s,1)  = (SCAN(scen_inv(e,s),"X") .ne. 0)
+        got_variable(e,s,2)  = (SCAN(scen_inv(e,s),"N") .ne. 0)
+        got_variable(e,s,3)  = (SCAN(scen_inv(e,s),"P") .ne. 0)
+
+
+        print*, "   --", scenarios(s),  got_scenario(e,s), ":", &
+                      got_variable(e,s,:)
+
+
+
+      end do
+      
+    end do
+
+  close(1)
+
+
 
 
 !!!!!!!!!!!!!!!!  Get input_map
@@ -364,7 +352,6 @@ program LOCA_Colate_to_ClimDivs
     print*, "== ", trim(scenarios(s))
     print*, "== "
 
-
     if (trim(scenarios(s)) .eq. "historical") then
       ntime = ntime_hist
     else
@@ -424,418 +411,439 @@ program LOCA_Colate_to_ClimDivs
 
     do e = 1, nens
 
-      print*, "== processing ensemble ", trim(models(e))//"."// trim(members(e)), &
-                          ", scenario ", trim(scenarios(s))
-      print*, "==  "
+
+
+      if (.NOT.got_scenario(e,s)) then
+
+        print*, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        print*, "!! "
+        print*, "!! ", trim(models(e))//"."// trim(members(e))//":"// trim(scenarios(s))// " Isn't Here!"
+        print*, "!! "
+      
+      else
+
+
+        print*, "== processing ensemble ", trim(models(e))//"."// trim(members(e)), &
+                            ", scenario ", trim(scenarios(s))
+        print*, "==  "
 
 
 
-      pr_variable_name     = "pr"     
-      tasmax_variable_name = "tasmax" 
-      tasmin_variable_name = "tasmin" 
+        pr_variable_name     = "pr"     
+        tasmax_variable_name = "tasmax" 
+        tasmin_variable_name = "tasmin" 
 
-      filename_loca2 = trim(file_front_root) // &  
-                       trim(scenarios(s)) // &
-                       "/LOCA2-CONUS___" //  &
-                       trim(models(e)) // "." //  trim(members(e)) // &
-                       "___" // trim(scenarios(s)) //".nc"
- 
-      print*, "opening ",filename_loca2
+        filename_loca2 = trim(file_front_root) // &  
+                         trim(scenarios(s)) // &
+                         "/LOCA2-CONUS___" //  &
+                         trim(models(e)) // "." //  trim(members(e)) // &
+                         "___" // trim(scenarios(s)) //".nc"
+   
+        print*, "opening ",filename_loca2
 
-
-      ncstat = NF90_OPEN(filename_loca2, NF90_NOWRITE, netcdf_id_file_loca2)
-        if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(pr_variable_name), netcdf_id_pr)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "scale_factor",  pr_scale_factor)
-            if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "add_offset",  pr_add_offset)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "_FillValue",  pr_FillValue)
-            if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          print*, "==         PR:"
-          print*, "==          scale:",pr_scale_factor
-          print*, "==         offset:",pr_add_offset
-          print*, "==      FillValue:",pr_FillValue
-          print*, "== "
-
-          ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmax_variable_name), netcdf_id_tasmax)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmax, "scale_factor",  tasmax_scale_factor)
-            if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-           print*, "==     TASMAX:"
-           print*, "==          scale:",tasmax_scale_factor
-           print*, "==         offset:",tasmax_add_offset
-           print*, "==      FillValue:",tasmax_FillValue
-           print*, "== "
-
-          ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmin_variable_name), netcdf_id_tasmin)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmin, "scale_factor",  tasmin_scale_factor)
-            if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmin, "add_offset",  tasmin_add_offset)
-             if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
-            if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-          print*, "==     TASMIN:"
-          print*, "==          scale:",tasmin_scale_factor
-          print*, "==         offset:",tasmin_add_offset
-          print*, "==      FillValue:",tasmin_FillValue
-          print*, "== "
-
-     ncstat = NF90_CLOSE(netcdf_id_file_loca2)
-       if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-
-
-
-
-
-
-
-      do tt = 1, n_reads
-
-        if (trim(scenarios(s)) .eq. "historical") then
-          caldate_pull = caldate_hist(start_t(tt))
-          caldate_end = caldate_hist(end_t(tt))
-
-        else
-          caldate_pull = caldate_futr(start_t(tt))
-          caldate_end = caldate_futr(end_t(tt))
-
-        end if
-
-        if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
-          print*, "=="
-          print*, "Allocating OMP Arrays for large bulk reads in tt loop ", &
-                   " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", &
-                   tt, n_reads
-          print*, "=="
-
-          allocate (                  input_map(nlon, nlat, span_t(tt)) )
-          allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
-          allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
-          allocate (                  map_pr(nlon, nlat, span_t(tt)) )
-          allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
-
-        end if
-
-
-
-        write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
-                    trim(models(e))//"."//trim(members(e)), &
-                    trim(scenarios(s)), &
-                    num_procs
-
-        netcdf_dims_3d_start   = (/    1,    1, start_t(tt) /)
-        netcdf_dims_3d_count   = (/ nlon, nlat,  span_t(tt) /)
-
-
-
-        !!!!!!!!!!!!!!!!!!!!!!!!!
-        !
-        ! Crack File
-        !
 
         ncstat = NF90_OPEN(filename_loca2, NF90_NOWRITE, netcdf_id_file_loca2)
           if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            !
-            ! Read Precip Block
-            !
-
             ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(pr_variable_name), netcdf_id_pr)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            ncstat = NF90_GET_VAR(netcdf_id_file_loca2,   netcdf_id_pr,  input_map,  &
-                                  start = netcdf_dims_3d_start, &
-                                  count = netcdf_dims_3d_count  )
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "scale_factor",  pr_scale_factor)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "add_offset",  pr_add_offset)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            map_pr = input_map * pr_scale_factor + pr_add_offset
-            where (input_map .eq. pr_FillValue) map_pr = pr_FillValue
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_pr, "_FillValue",  pr_FillValue)
+              if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            !
-            ! Read Tasmax Block
-            !
-
+            print*, "==         PR:"
+            print*, "==          scale:",pr_scale_factor
+            print*, "==         offset:",pr_add_offset
+            print*, "==      FillValue:",pr_FillValue
+            print*, "== "
 
             ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmax_variable_name), netcdf_id_tasmax)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-
-            ncstat = NF90_GET_VAR(netcdf_id_file_loca2,   netcdf_id_tasmax,  input_map,  &
-                                  start = netcdf_dims_3d_start, &
-                                  count = netcdf_dims_3d_count  )
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmax, "scale_factor",  tasmax_scale_factor)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            map_tasmax = input_map * tasmax_scale_factor + tasmax_add_offset
-            where (input_map .eq. tasmax_FillValue) map_tasmax = tasmax_FillValue
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmax, "add_offset",  tasmax_add_offset)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            !
-            ! Read Tasmin Block
-            !
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_tasmax, "_FillValue",  tasmax_FillValue)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+             print*, "==     TASMAX:"
+             print*, "==          scale:",tasmax_scale_factor
+             print*, "==         offset:",tasmax_add_offset
+             print*, "==      FillValue:",tasmax_FillValue
+             print*, "== "
 
             ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmin_variable_name), netcdf_id_tasmin)
                if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-
-            ncstat = NF90_GET_VAR(netcdf_id_file_loca2,   netcdf_id_tasmin,  input_map,  &
-                                  start = netcdf_dims_3d_start, &
-                                  count = netcdf_dims_3d_count  )
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmin, "scale_factor",  tasmin_scale_factor)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-            map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
-            where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2, netcdf_id_tasmin, "add_offset",  tasmin_add_offset)
+               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        ncstat = NF90_CLOSE(netcdf_id_file_loca2)
+            ncstat = NF90_GET_ATT(netcdf_id_file_loca2,   netcdf_id_tasmin, "_FillValue",  tasmin_FillValue)
+              if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+            print*, "==     TASMIN:"
+            print*, "==          scale:",tasmin_scale_factor
+            print*, "==         offset:",tasmin_add_offset
+            print*, "==      FillValue:",tasmin_FillValue
+            print*, "== "
+
+       ncstat = NF90_CLOSE(netcdf_id_file_loca2)
+         if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+
+
+        do tt = 1, n_reads
+
+          if (trim(scenarios(s)) .eq. "historical") then
+            caldate_pull = caldate_hist(start_t(tt))
+            caldate_end = caldate_hist(end_t(tt))
+
+          else
+            caldate_pull = caldate_futr(start_t(tt))
+            caldate_end = caldate_futr(end_t(tt))
+
+          end if
+
+          if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
+            print*, "=="
+            print*, "Allocating OMP Arrays for large bulk reads in tt loop ", &
+                     " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", &
+                     tt, n_reads
+            print*, "=="
+
+            allocate (                  input_map(nlon, nlat, span_t(tt)) )
+            allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
+            allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
+            allocate (                  map_pr(nlon, nlat, span_t(tt)) )
+            allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
+
+          end if
+
+
+
+          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
+                      trim(models(e))//"."//trim(members(e)), &
+                      trim(scenarios(s)), &
+                      num_procs
+
+          netcdf_dims_3d_start   = (/    1,    1, start_t(tt) /)
+          netcdf_dims_3d_count   = (/ nlon, nlat,  span_t(tt) /)
+
+
+
+          !!!!!!!!!!!!!!!!!!!!!!!!!
+          !
+          ! Crack File
+          !
+
+          ncstat = NF90_OPEN(filename_loca2, NF90_NOWRITE, netcdf_id_file_loca2)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        !
-        !!!!!!!!!!!!!!!!!!!!!!!!!
+              IF (got_variable(e,s,3)) THEN
+
+                !
+                ! Read Precip Block
+                !
+
+                ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(pr_variable_name), netcdf_id_pr)
+                   if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+                ncstat = NF90_GET_VAR(netcdf_id_file_loca2,   netcdf_id_pr,  input_map,  &
+                                      start = netcdf_dims_3d_start, &
+                                      count = netcdf_dims_3d_count  )
+                  if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-!$OMP PARALLEL DO PRIVATE (h,                   &
-!$OMP&                     t,                   &
-!$OMP&                     linear_array,        &
-!$OMP&                     mask_map,            &
-!$OMP&                     t_buffer,            &
-!$OMP&                     masked_variable_map, &
-!$OMP&                     caldate,             &
-!$OMP&                     output_buffer,       &
-!$OMP&                     sort_tasmax,         &
-!$OMP&                     sort_tasmin,         &
-!$OMP&                     sort_pr              ), &
-!$OMP&             SHARED (e,                   &
-!$OMP&                     tt,                  &
-!$OMP&                     s,                   &
-!$OMP&                     n_reads,             &
-!$OMP&                     csv_filename,        &
-!$OMP&                     models,              &
-!$OMP&                     members,             &
-!$OMP&                     scenarios,           &
-!$OMP&                     nhuccells,           &
-!$OMP&                     start_t,             &
-!$OMP&                     span_t,              &
-!$OMP&                     t_in_tt,             &
-!$OMP&                     huc_map,             &
-!$OMP&                     caldate_hist,        &
-!$OMP&                     caldate_futr,        &
-!$OMP&                     map_pr,              &
-!$OMP&                     map_tasmax,          &
-!$OMP&                     map_tasmin,          &
-!$OMP&                     pr_FillValue,        &
-!$OMP&                     tasmax_FillValue,    &
-!$OMP&                     tasmin_FillValue,    &
-!$OMP&                     unit_huc,            &
-!$OMP&                     num_procs,           &
-!$OMP&                     nmyhucs,             &
-!$OMP&                     myhucs               ), &
-!$OMP&            DEFAULT (NONE)                 , &
-!$OMP&           SCHEDULE (STATIC)
+                map_pr = input_map * pr_scale_factor + pr_add_offset
+                where (input_map .eq. pr_FillValue) map_pr = pr_FillValue
 
-    do h = 1, nmyhucs, 1
+              END IF
 
-          t_buffer = 1
+              !
+              ! Read Tasmax Block
+              !
 
-          do t = 1,  span_t(tt), 1
+              IF (got_variable(e,s,1)) THEN
 
-            t_in_tt = start_t(tt) + t - 1
-
-            if (trim(scenarios(s)) .eq. "historical") then
-              caldate = caldate_hist(t_in_tt)
-            else
-              caldate = caldate_futr(t_in_tt)
-            end if
+                ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmax_variable_name), netcdf_id_tasmax)
+                   if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-    !  print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+                ncstat = NF90_GET_VAR(netcdf_id_file_loca2,   netcdf_id_tasmax,  input_map,  &
+                                      start = netcdf_dims_3d_start, &
+                                      count = netcdf_dims_3d_count  )
+                  if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-              mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
-                                    (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
-                                    (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
-                                    (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
+                map_tasmax = input_map * tasmax_scale_factor + tasmax_add_offset
+                where (input_map .eq. tasmax_FillValue) map_tasmax = tasmax_FillValue
 
-              nhuccells(h) = sum(mask_map)
+              END IF
 
-              !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
-              allocate ( sort_tasmax(nhuccells(h)) )
-              allocate ( sort_tasmin(nhuccells(h)) )
-              allocate (     sort_pr(nhuccells(h)) )
+              !
+              ! Read Tasmin Block
+              !
 
+              IF (got_variable(e,s,2)) THEN
 
-              !!! tasmax
-
-                masked_variable_map = map_tasmax(:,:,t)
-
-                where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
-
-                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+                ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmin_variable_name), netcdf_id_tasmin)
+                   if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
 
-                call QSort(linear_array, nlon*nlat)
+                ncstat = NF90_GET_VAR(netcdf_id_file_loca2,   netcdf_id_tasmin,  input_map,  &
+                                      start = netcdf_dims_3d_start, &
+                                      count = netcdf_dims_3d_count  )
+                  if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-                sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+                map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
+                where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
 
-              !!! tasmin
+              END IF
 
-                masked_variable_map = map_tasmin(:,:,t)
+          ncstat = NF90_CLOSE(netcdf_id_file_loca2)
+              if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-                where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
-
-                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
-
-
-                call QSort(linear_array, nlon*nlat)
-
-                sort_tasmin(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
-
-              !!! pr
-
-                masked_variable_map = map_pr(:,:,t)
-
-                where (mask_map .eq. 0) masked_variable_map = pr_FillValue
-
-                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+          !
+          !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-                call QSort(linear_array, nlon*nlat)
+  !$OMP PARALLEL DO PRIVATE (h,                   &
+  !$OMP&                     t,                   &
+  !$OMP&                     linear_array,        &
+  !$OMP&                     mask_map,            &
+  !$OMP&                     t_buffer,            &
+  !$OMP&                     masked_variable_map, &
+  !$OMP&                     caldate,             &
+  !$OMP&                     output_buffer,       &
+  !$OMP&                     sort_tasmax,         &
+  !$OMP&                     sort_tasmin,         &
+  !$OMP&                     sort_pr              ), &
+  !$OMP&             SHARED (e,                   &
+  !$OMP&                     tt,                  &
+  !$OMP&                     s,                   &
+  !$OMP&                     n_reads,             &
+  !$OMP&                     csv_filename,        &
+  !$OMP&                     models,              &
+  !$OMP&                     members,             &
+  !$OMP&                     scenarios,           &
+  !$OMP&                     nhuccells,           &
+  !$OMP&                     start_t,             &
+  !$OMP&                     span_t,              &
+  !$OMP&                     t_in_tt,             &
+  !$OMP&                     huc_map,             &
+  !$OMP&                     caldate_hist,        &
+  !$OMP&                     caldate_futr,        &
+  !$OMP&                     map_pr,              &
+  !$OMP&                     map_tasmax,          &
+  !$OMP&                     map_tasmin,          &
+  !$OMP&                     pr_FillValue,        &
+  !$OMP&                     tasmax_FillValue,    &
+  !$OMP&                     tasmin_FillValue,    &
+  !$OMP&                     unit_huc,            &
+  !$OMP&                     num_procs,           &
+  !$OMP&                     nmyhucs,             &
+  !$OMP&                     myhucs               ), &
+  !$OMP&            DEFAULT (NONE)                 , &
+  !$OMP&           SCHEDULE (STATIC)
 
-                sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+      do h = 1, nmyhucs, 1
 
+            t_buffer = 1
 
-              !!! output
+            do t = 1,  span_t(tt), 1
 
+              t_in_tt = start_t(tt) + t - 1
 
-                write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P000",  &
-                            minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
-
-                write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P025",  &
-                            quantile7(sort_tasmax, 0.25, nhuccells(h)), &
-                            quantile7(sort_tasmin, 0.25, nhuccells(h)), &
-                            quantile7(sort_pr,     0.25, nhuccells(h))
-
-                write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P050",  &
-                            quantile7(sort_tasmax, 0.50, nhuccells(h)), &
-                            quantile7(sort_tasmin, 0.50, nhuccells(h)), &
-                            quantile7(sort_pr,     0.50, nhuccells(h))
-
-                write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P075",  &
-                            quantile7(sort_tasmax, 0.75, nhuccells(h)), &
-                            quantile7(sort_tasmin, 0.75, nhuccells(h)), &
-                            quantile7(sort_pr,     0.75, nhuccells(h))
-
-                write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "P100",  &
-                            maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
-
-                write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                            trim(caldate), &
-                            myhucs(h), &
-                            trim(models(e)), &
-                            trim(members(e)), &
-                            trim(scenarios(s)), &
-                            "MEAN",  &
-                            (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
+              if (trim(scenarios(s)) .eq. "historical") then
+                caldate = caldate_hist(t_in_tt)
+              else
+                caldate = caldate_futr(t_in_tt)
+              end if
 
 
-              !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
+      !  print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
 
-              deallocate (sort_tasmax)
-              deallocate (sort_tasmin)
-              deallocate (sort_pr)
+                mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
+                                      (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
+                                      (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
+                                      (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
 
-              t_buffer = t_buffer + 6
+                nhuccells(h) = sum(mask_map)
 
-            end do  !!  Internal Time Loop (t)
+                !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
+                allocate ( sort_tasmax(nhuccells(h)) )
+                allocate ( sort_tasmin(nhuccells(h)) )
+                allocate (     sort_pr(nhuccells(h)) )
 
+                !!! tasmax
 
-            open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
-            write(unit_huc(h),"(A)") output_buffer(:)
-            close(unit_huc(h))
+                  masked_variable_map = map_tasmax(:,:,t)
 
+                  where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
 
-
-        end do  !! HUCS loop (h)
-
-!$OMP END PARALLEL DO
-
-
-      if ((tt .eq. n_reads-1)) then
-        print*, "=="
-        print*, "== De-allocating OMP Arrays for large bulk Reads inside tt loop ",  &
-              " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",   &
-              tt,n_reads-1, n_reads
-        print*, "=="
-
-        deallocate (     input_map )
-        deallocate (    map_tasmax )
-        deallocate (    map_tasmin )
-        deallocate (        map_pr )
-        deallocate ( output_buffer )
-
-      end if
+                  linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
 
-  end do  !!  NetCDF Time Loop (tt)
+                  call QSort(linear_array, nlon*nlat)
 
-  print*, "=="
-  print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble ",  &
-        "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
-  print*, "=="
+                  sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
 
-    deallocate (     input_map )
-    deallocate (    map_tasmax )
-    deallocate (    map_tasmin )
-    deallocate (        map_pr )
-    deallocate ( output_buffer )
+                !!! tasmin
+
+                  masked_variable_map = map_tasmin(:,:,t)
+
+                  where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
+
+                  linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+
+
+                  call QSort(linear_array, nlon*nlat)
+
+                  sort_tasmin(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+
+                !!! pr
+
+                  masked_variable_map = map_pr(:,:,t)
+
+                  where (mask_map .eq. 0) masked_variable_map = pr_FillValue
+
+                  linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+
+
+                  call QSort(linear_array, nlon*nlat)
+
+                  sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+
+
+                !!! output
+
+                  
+
+                  write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                              trim(caldate), &
+                              myhucs(h), &
+                              trim(models(e)), &
+                              trim(members(e)), &
+                              trim(scenarios(s)), &
+                              "P000",  &
+                              minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
+
+                  write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                              trim(caldate), &
+                              myhucs(h), &
+                              trim(models(e)), &
+                              trim(members(e)), &
+                              trim(scenarios(s)), &
+                              "P025",  &
+                              quantile7(sort_tasmax, 0.25, nhuccells(h)), &
+                              quantile7(sort_tasmin, 0.25, nhuccells(h)), &
+                              quantile7(sort_pr,     0.25, nhuccells(h))
+
+                  write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                              trim(caldate), &
+                              myhucs(h), &
+                              trim(models(e)), &
+                              trim(members(e)), &
+                              trim(scenarios(s)), &
+                              "P050",  &
+                              quantile7(sort_tasmax, 0.50, nhuccells(h)), &
+                              quantile7(sort_tasmin, 0.50, nhuccells(h)), &
+                              quantile7(sort_pr,     0.50, nhuccells(h))
+
+                  write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                              trim(caldate), &
+                              myhucs(h), &
+                              trim(models(e)), &
+                              trim(members(e)), &
+                              trim(scenarios(s)), &
+                              "P075",  &
+                              quantile7(sort_tasmax, 0.75, nhuccells(h)), &
+                              quantile7(sort_tasmin, 0.75, nhuccells(h)), &
+                              quantile7(sort_pr,     0.75, nhuccells(h))
+
+                  write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                              trim(caldate), &
+                              myhucs(h), &
+                              trim(models(e)), &
+                              trim(members(e)), &
+                              trim(scenarios(s)), &
+                              "P100",  &
+                              maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
+
+                  write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                              trim(caldate), &
+                              myhucs(h), &
+                              trim(models(e)), &
+                              trim(members(e)), &
+                              trim(scenarios(s)), &
+                              "MEAN",  &
+                              (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
+
+
+                !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
+
+                deallocate (sort_tasmax)
+                deallocate (sort_tasmin)
+                deallocate (sort_pr)
+
+                t_buffer = t_buffer + 6
+
+              end do  !!  Internal Time Loop (t)
+
+
+              open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
+              write(unit_huc(h),"(A)") output_buffer(:)
+              close(unit_huc(h))
+
+
+
+          end do  !! HUCS loop (h)
+
+  !$OMP END PARALLEL DO
+
+
+        if ((tt .eq. n_reads-1)) then
+          print*, "=="
+          print*, "== De-allocating OMP Arrays for large bulk Reads inside tt loop ",  &
+                " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",   &
+                tt,n_reads-1, n_reads
+          print*, "=="
+
+          deallocate (     input_map )
+          deallocate (    map_tasmax )
+          deallocate (    map_tasmin )
+          deallocate (        map_pr )
+          deallocate ( output_buffer )
+
+        end if
+
+
+    end do  !!  NetCDF Time Loop (tt)
+
+    print*, "=="
+    print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble ",  &
+          "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
+    print*, "=="
+
+      deallocate (     input_map )
+      deallocate (    map_tasmax )
+      deallocate (    map_tasmin )
+      deallocate (        map_pr )
+      deallocate ( output_buffer )
+
+
+  end if !! Got Scenario?
 
 
   end do  !! Ensemble Loop (e)
