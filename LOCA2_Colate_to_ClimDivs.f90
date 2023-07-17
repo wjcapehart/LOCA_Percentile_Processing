@@ -56,7 +56,6 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=090) :: filename_times
   character (len=255) :: filename_loca2
-  character (len=255) :: basin_file_name
 
   integer (kind=4) :: t_in_tt
 
@@ -246,9 +245,11 @@ program LOCA_Colate_to_ClimDivs
 
   print*, "Allocating myhucs, nhuccells, unit_huc"
 
-  allocate(    myhucs( nmyhucs ) )
-  allocate( nhuccells( nmyhucs ) )
-  allocate(  unit_huc( nmyhucs ) )
+  allocate(                         myhucs( nmyhucs ) )
+  allocate(                      nhuccells( nmyhucs ) )
+  allocate(                       unit_huc( nmyhucs ) )
+  allocate( character(255) :: csv_filename( nmyhucs ) )
+
 
     !Pass 2
 
@@ -275,15 +276,29 @@ program LOCA_Colate_to_ClimDivs
 
       nhuccells(t) = sum(mask_map)
 
-      write(basin_file_name,'(A, I4.4)') trim(file_output_root), myhucs(t)
+      write(csv_filename(t),'(A, I4.4,".csv")') trim(file_output_root), myhucs(t)
+
+
       write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') t, &
                                                                        unit_huc(t), &
                                                                        myhucs(t), &
                                                                        nhuccells(t), &
-                                                                       trim(basin_file_name)
+                                                                       trim(csv_filename(t))
+       
 
+  
+
+  
     end if
 
+  end do
+  print*, " "
+  print*, "--- OPENING CSV FILES"
+  print*, " " 
+  do h = 1, nmyhucs, 1
+    print*, "   opening ",trim(csv_filename(h))
+    open(unit_huc(h), FILE=trim(csv_filename(h)), form="FORMATTED")
+    write(unit_huc(h),*) "Time,Division,Model,Member,Scenario,Percentile,tasmax,tasmin,pr"
   end do
 
   !!!!!!!!!!!!!!!!!!
@@ -366,26 +381,10 @@ program LOCA_Colate_to_ClimDivs
     print*, "==                   Number of Pulls ", n_reads
     print*, "==  Length of Final Time Record Pull ", last_read
     print*, "== "
-    print*, "== Allocating csv_filename"
-    allocate(character(255) :: csv_filename(nmyhucs))
-    print*, "== "
 
 
-    do h = 1, nmyhucs
-
-      write(csv_filename(h),'(A, I4.4,"_",A,".csv")') trim(file_output_root), myhucs(h), trim(scenarios(s))
-      write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') h, &
-                                                                       unit_huc(h), &
-                                                                       myhucs(h), &
-                                                                       nhuccells(h), &
-                                                                       trim(csv_filename(h))
 
 
-      open(unit_huc(h), FILE=trim(csv_filename(h)), form="FORMATTED")
-      write(unit_huc(h),*) "Time,Division,Model,Member,Scenario,Percentile,tasmax,tasmin,pr"
-      close(unit_huc(h))
-
-    end do
     print*, "== "
     print*, "== Allocating span_t, start_t, end_t"
     print*, "== "
@@ -802,9 +801,9 @@ program LOCA_Colate_to_ClimDivs
               end do  !!  Internal Time Loop (t)
 
 
-              open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
+              !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
-              close(unit_huc(h))
+              !close(unit_huc(h))
 
 
 
@@ -848,6 +847,9 @@ program LOCA_Colate_to_ClimDivs
 
   end do  !! Ensemble Loop (e)
 
+
+ 
+
   print*, "== "
   print*, "== De-Allocating arrays at the end of scenario (span_t,start_t,end_t)"
   print*, "== "
@@ -855,7 +857,6 @@ program LOCA_Colate_to_ClimDivs
   deallocate(span_t)
   deallocate(start_t)
   deallocate(end_t)
-  deallocate(csv_filename)
 
 
   print*, "== "
@@ -866,16 +867,24 @@ program LOCA_Colate_to_ClimDivs
 
 end do   !! Scenario Loop (s)
 
+print*, "Close CSV Files "
+
+do h = 1, nmyhucs, 1
+  close(unit_huc(h))
+end do
+
 
 
 
 !!!!!!!!!!!!!!!!!!
 
-print*, "De-Allocating arrays at the end of program (my hucs,nhuccells,unit_huc,csv_filename)"
+print*, "De-Allocating arrays at the end of program (my hucs,nhuccells,unit_huc, csv_filename)"
 
 deallocate(    myhucs )
 deallocate( nhuccells )
 deallocate(  unit_huc )
+deallocate(csv_filename)
+
 
 print*, "We're Out of Here Like Vladimir"
 
