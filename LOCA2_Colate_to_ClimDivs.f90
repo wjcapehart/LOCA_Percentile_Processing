@@ -799,6 +799,7 @@ program LOCA_Colate_to_ClimDivs
                 deallocate (sort_tasmax)
                 deallocate (sort_tasmin)
                 deallocate (sort_pr)
+                deallocate (output_buffer)
 
                 t_buffer = t_buffer + 6
 
