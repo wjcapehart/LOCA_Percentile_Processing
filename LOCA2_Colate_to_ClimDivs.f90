@@ -33,7 +33,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3904
+  integer (kind=4) :: myhuc_low    = 3901
   integer (kind=4) :: myhuc_high
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
@@ -207,7 +207,7 @@ program LOCA_Colate_to_ClimDivs
 
   first_huc = .TRUE.
 
-  myhuc_high = myhuc_low
+  myhuc_high = 3903 ! myhuc_low
 
   print*, "opening ",filename_map
 
