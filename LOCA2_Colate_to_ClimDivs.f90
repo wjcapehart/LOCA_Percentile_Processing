@@ -796,7 +796,6 @@ program LOCA_Colate_to_ClimDivs
                 deallocate (sort_tasmax)
                 deallocate (sort_tasmin)
                 deallocate (sort_pr)
-                deallocate (output_buffer)
 
                 t_buffer = t_buffer + 6
 
@@ -804,10 +803,15 @@ program LOCA_Colate_to_ClimDivs
 
               write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
                    omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
-                   
+
               !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
               !close(unit_huc(h))
+
+              deallocate (output_buffer)
+
+
+              print*, "done with IMP loop"
 
 
 
