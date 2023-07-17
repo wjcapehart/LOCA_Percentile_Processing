@@ -134,8 +134,10 @@ program LOCA_Colate_to_ClimDivs_CAN
 
   first_huc = .TRUE.
 
-  !  num_procs = omp_get_max_threads()
-     num_procs = 1
+    num_procs = omp_get_max_threads()
+  !  num_procs = 1
+
+   print*, "OMP Threads at start = ", num_procs
 
   variables = (/ "pr    ", &
                  "tasmax", &
