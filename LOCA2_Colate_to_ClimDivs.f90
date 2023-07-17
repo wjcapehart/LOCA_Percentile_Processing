@@ -36,7 +36,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3901
+  integer (kind=4) :: myhuc_low    = 3904
   integer (kind=4) :: myhuc_high
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
@@ -164,7 +164,9 @@ program LOCA_Colate_to_ClimDivs
   open(1, FILE=ensinv_file, STATUS="OLD",FORM="FORMATTED")
 
     read(1,*) models(1)
+
     do e = 1, nens, 1
+
       read(1,*) models(e), members(e), scen_inv(e,1), scen_inv(e,2), scen_inv(e,3), scen_inv(e,4)
       write(*,'(I2.2,x,A)')  e, trim(models(e)) //":"// trim(members(e))
 
@@ -179,8 +181,6 @@ program LOCA_Colate_to_ClimDivs
         print*, "   --", scenarios(s),  got_scenario(e,s), ":", &
                       got_variable(e,s,:)
 
-
-
       end do
       
     end do
@@ -194,7 +194,7 @@ program LOCA_Colate_to_ClimDivs
 
   first_huc = .TRUE.
 
-  myhuc_high = 3903 ! myhuc_low
+  myhuc_high =  myhuc_low
 
   print*, "opening ",filename_map
 
@@ -278,17 +278,12 @@ program LOCA_Colate_to_ClimDivs
 
       write(csv_filename(t),'(A, I4.4,".csv")') trim(file_output_root), myhucs(t)
 
-
       write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') t, &
                                                                        unit_huc(t), &
                                                                        myhucs(t), &
                                                                        nhuccells(t), &
                                                                        trim(csv_filename(t))
-       
-
-  
-
-  
+ 
     end if
 
   end do
