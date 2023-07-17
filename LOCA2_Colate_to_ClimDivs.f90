@@ -648,7 +648,6 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     tasmax_FillValue,    &
 !$OMP&                     tasmin_FillValue,    &
 !$OMP&                     unit_huc,            &
-!$OMP&                     tasmin_FillValue,    &
 !$OMP&                     num_procs,           &
 !$OMP&                     nmyhucs,             &
 !$OMP&                     myhucs),             &
