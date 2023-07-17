@@ -1,5 +1,8 @@
 program LOCA_Colate_to_ClimDivs
 
+!ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff ./LOCA2_Colate_to_ClimDivs.f90 
+
+
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   use omp_lib
 
@@ -610,44 +613,44 @@ program LOCA_Colate_to_ClimDivs
         !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-$OMP PARALLEL DO PRIVATE (h,                   &
-$OMP&                     t,                   &
-$OMP&                     linear_array,        &
-$OMP&                     mask_map,            &
-$OMP&                     t_buffer,            &
-$OMP&                     masked_variable_map, &
-$OMP&                     caldate,             &
-$OMP&                     output_buffer,       &
-$OMP&                     sort_tasmax,         &
-$OMP&                     sort_tasmin,         &
-$OMP&                     sort_pr              ), &
-$OMP&             SHARED (e,                   &
-$OMP&                     tt,                  &
-$OMP&                     s,                   &
-$OMP&                     n_reads,             &
-$OMP&                     csv_filename,        &
-$OMP&                     models,              &
-$OMP&                     members,             &
-$OMP&                     scenarios,           &
-$OMP&                     nhuccells,           &
-$OMP&                     start_t,             &
-$OMP&                     span_t,              &
-$OMP&                     t_in_tt,             &
-$OMP&                     huc_map,             &
-$OMP&                     caldate_hist,        &
-$OMP&                     caldate_futr,        &
-$OMP&                     map_pr,              &
-$OMP&                     map_tasmax,          &
-$OMP&                     map_tasmin,          &
-$OMP&                     pr_FillValue,        &
-$OMP&                     tasmax_FillValue,    &
-$OMP&                     tasmin_FillValue,    &
-$OMP&                     unit_huc,            &
-$OMP&                     num_procs,           &
-$OMP&                     nmyhucs,             &
-$OMP&                     myhucs               ), &
-$OMP&            DEFAULT (NONE)                 , &
-$OMP&           SCHEDULE (STATIC)
+!$OMP PARALLEL DO PRIVATE (h,                   &
+!$OMP&                     t,                   &
+!$OMP&                     linear_array,        &
+!$OMP&                     mask_map,            &
+!$OMP&                     t_buffer,            &
+!$OMP&                     masked_variable_map, &
+!$OMP&                     caldate,             &
+!$OMP&                     output_buffer,       &
+!$OMP&                     sort_tasmax,         &
+!$OMP&                     sort_tasmin,         &
+!$OMP&                     sort_pr              ), &
+!$OMP&             SHARED (e,                   &
+!$OMP&                     tt,                  &
+!$OMP&                     s,                   &
+!$OMP&                     n_reads,             &
+!$OMP&                     csv_filename,        &
+!$OMP&                     models,              &
+!$OMP&                     members,             &
+!$OMP&                     scenarios,           &
+!$OMP&                     nhuccells,           &
+!$OMP&                     start_t,             &
+!$OMP&                     span_t,              &
+!$OMP&                     t_in_tt,             &
+!$OMP&                     huc_map,             &
+!$OMP&                     caldate_hist,        &
+!$OMP&                     caldate_futr,        &
+!$OMP&                     map_pr,              &
+!$OMP&                     map_tasmax,          &
+!$OMP&                     map_tasmin,          &
+!$OMP&                     pr_FillValue,        &
+!$OMP&                     tasmax_FillValue,    &
+!$OMP&                     tasmin_FillValue,    &
+!$OMP&                     unit_huc,            &
+!$OMP&                     num_procs,           &
+!$OMP&                     nmyhucs,             &
+!$OMP&                     myhucs               ), &
+!$OMP&            DEFAULT (NONE)                 , &
+!$OMP&           SCHEDULE (STATIC)
 
     do h = 1, nmyhucs, 1
 
@@ -802,7 +805,7 @@ $OMP&           SCHEDULE (STATIC)
 
         end do  !! HUCS loop (h)
 
-$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 
 
       if ((tt .eq. n_reads-1)) then
