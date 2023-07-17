@@ -4,7 +4,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
-  ! use omp_lib
+  use omp_lib
 
   implicit none
 
@@ -26,6 +26,8 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: map_variable_name = "LOCA2_CLIMDIV"
   character (len=*), PARAMETER  :: map_values_name   = "climdiv"
   character (len=*), PARAMETER  :: filename_map      = "./LOCA2_MASKS.nc"
+
+
   character (len=*), PARAMETER  :: file_front_root   = &
             "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Original_CONUS/"
   character (len=*), PARAMETER  :: file_output_root  = &
@@ -33,11 +35,18 @@ program LOCA_Colate_to_ClimDivs
             "Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/" // &
             "work/LOCA2_nCLIMDIV_"
 
+
+
+  !character (len=*), PARAMETER  :: file_front_root   = &
+  !          "http://kyrill.ias.sdsmt.edu:8080/thredds/dodsC/LOCA2/Original_CONUS/"
+  !character (len=*), PARAMETER  :: file_output_root  = &
+  !          "./work/LOCA2_nCLIMDIV_"
+
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3904
-  integer (kind=4) :: myhuc_high
+  integer (kind=4) :: myhuc_low    = 3901
+  integer (kind=4) :: myhuc_high   = 3903
 
   integer, parameter :: npull = 365    ! 2, 3, 7, 487
 
@@ -78,7 +87,6 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
-  logical :: first_huc
 
 
 
@@ -144,10 +152,10 @@ program LOCA_Colate_to_ClimDivs
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  first_huc = .TRUE.
 
-     !num_procs = omp_get_max_threads()
-     num_procs = 1
+
+     num_procs = omp_get_max_threads()
+     !num_procs = 1
 
 
   variables = (/ "pr    ", &
@@ -192,9 +200,7 @@ program LOCA_Colate_to_ClimDivs
 
 !!!!!!!!!!!!!!!!  Get input_map
 
-  first_huc = .TRUE.
-
-  myhuc_high =  myhuc_low
+  
 
   print*, "opening ",filename_map
 
@@ -251,7 +257,7 @@ program LOCA_Colate_to_ClimDivs
   allocate( character(255) :: csv_filename( nmyhucs ) )
 
 
-    !Pass 2
+  !Pass 2
 
   t = 0
   print*, " "
@@ -488,9 +494,9 @@ program LOCA_Colate_to_ClimDivs
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
             print*, "==     TASMIN:"
-            print*, "==          scale:",tasmin_scale_factor
-            print*, "==         offset:",tasmin_add_offset
-            print*, "==      FillValue:",tasmin_FillValue
+            print*, "==          scale:", tasmin_scale_factor
+            print*, "==         offset:", tasmin_add_offset
+            print*, "==      FillValue:", tasmin_FillValue
             print*, "== "
 
        ncstat = NF90_CLOSE(netcdf_id_file_loca2)
@@ -502,11 +508,11 @@ program LOCA_Colate_to_ClimDivs
 
           if (trim(scenarios(s)) .eq. "historical") then
             caldate_pull = caldate_hist(start_t(tt))
-            caldate_end = caldate_hist(end_t(tt))
+            caldate_end  = caldate_hist(  end_t(tt))
 
           else
             caldate_pull = caldate_futr(start_t(tt))
-            caldate_end = caldate_futr(end_t(tt))
+            caldate_end  = caldate_futr(  end_t(tt))
 
           end if
 
@@ -545,7 +551,6 @@ program LOCA_Colate_to_ClimDivs
           ncstat = NF90_OPEN(filename_loca2, NF90_NOWRITE, netcdf_id_file_loca2)
             if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-              IF (got_variable(e,s,3)) THEN
 
                 !
                 ! Read Precip Block
@@ -563,13 +568,11 @@ program LOCA_Colate_to_ClimDivs
                 map_pr = input_map * pr_scale_factor + pr_add_offset
                 where (input_map .eq. pr_FillValue) map_pr = pr_FillValue
 
-              END IF
 
               !
               ! Read Tasmax Block
               !
 
-              IF (got_variable(e,s,1)) THEN
 
                 ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmax_variable_name), netcdf_id_tasmax)
                    if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -583,13 +586,12 @@ program LOCA_Colate_to_ClimDivs
                 map_tasmax = input_map * tasmax_scale_factor + tasmax_add_offset
                 where (input_map .eq. tasmax_FillValue) map_tasmax = tasmax_FillValue
 
-              END IF
 
               !
               ! Read Tasmin Block
               !
 
-              IF (got_variable(e,s,2)) THEN
+
 
                 ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmin_variable_name), netcdf_id_tasmin)
                    if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -603,7 +605,7 @@ program LOCA_Colate_to_ClimDivs
                 map_tasmin = input_map * tasmin_scale_factor + tasmin_add_offset
                 where (input_map .eq. tasmin_FillValue) map_tasmin = tasmin_FillValue
 
-              END IF
+
 
           ncstat = NF90_CLOSE(netcdf_id_file_loca2)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -622,7 +624,7 @@ program LOCA_Colate_to_ClimDivs
   !$OMP&                     output_buffer,       &
   !$OMP&                     sort_tasmax,         &
   !$OMP&                     sort_tasmin,         &
-  !$OMP&                     sort_pr              ), &
+  !$OMP&                     sort_pr),            &
   !$OMP&             SHARED (e,                   &
   !$OMP&                     tt,                  &
   !$OMP&                     s,                   &
@@ -647,8 +649,8 @@ program LOCA_Colate_to_ClimDivs
   !$OMP&                     unit_huc,            &
   !$OMP&                     num_procs,           &
   !$OMP&                     nmyhucs,             &
-  !$OMP&                     myhucs               ), &
-  !$OMP&            DEFAULT (NONE)                 , &
+  !$OMP&                     myhucs),             &
+  !$OMP&            DEFAULT (NONE),               &
   !$OMP&           SCHEDULE (STATIC)
 
       do h = 1, nmyhucs, 1
@@ -666,124 +668,124 @@ program LOCA_Colate_to_ClimDivs
               end if
 
 
-      !  print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+              print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate), &
+                      " HUC:",myhucs(h)
 
-                mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
-                                      (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
-                                      (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
-                                      (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
+              mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
+                                    (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
+                                    (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
+                                    (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
 
-                nhuccells(h) = sum(mask_map)
+              nhuccells(h) = sum(mask_map)
 
-                !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
-                allocate ( sort_tasmax(nhuccells(h)) )
-                allocate ( sort_tasmin(nhuccells(h)) )
-                allocate (     sort_pr(nhuccells(h)) )
+              !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
+              allocate ( sort_tasmax(nhuccells(h)) )
+              allocate ( sort_tasmin(nhuccells(h)) )
+              allocate (     sort_pr(nhuccells(h)) )
 
-                !!! tasmax
+              !!! tasmax
 
-                  masked_variable_map = map_tasmax(:,:,t)
+                masked_variable_map = map_tasmax(:,:,t)
 
-                  where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
+                where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
 
-                  linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
-
-
-                  call QSort(linear_array, nlon*nlat)
-
-                  sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
-
-                !!! tasmin
-
-                  masked_variable_map = map_tasmin(:,:,t)
-
-                  where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
-
-                  linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
+                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
 
-                  call QSort(linear_array, nlon*nlat)
+                call QSort(linear_array, nlon*nlat)
 
-                  sort_tasmin(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+                sort_tasmax(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
 
-                !!! pr
+              !!! tasmin
 
-                  masked_variable_map = map_pr(:,:,t)
+                masked_variable_map = map_tasmin(:,:,t)
 
-                  where (mask_map .eq. 0) masked_variable_map = pr_FillValue
+                where (mask_map .eq. 0) masked_variable_map = tasmin_FillValue
 
-                  linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
-
-
-                  call QSort(linear_array, nlon*nlat)
-
-                  sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
 
-                !!! output
+                call QSort(linear_array, nlon*nlat)
 
-                  
+                sort_tasmin(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
 
-                  write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                              trim(caldate), &
-                              myhucs(h), &
-                              trim(models(e)), &
-                              trim(members(e)), &
-                              trim(scenarios(s)), &
-                              "P000",  &
-                              minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
+              !!! pr
 
-                  write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                              trim(caldate), &
-                              myhucs(h), &
-                              trim(models(e)), &
-                              trim(members(e)), &
-                              trim(scenarios(s)), &
-                              "P025",  &
-                              quantile7(sort_tasmax, 0.25, nhuccells(h)), &
-                              quantile7(sort_tasmin, 0.25, nhuccells(h)), &
-                              quantile7(sort_pr,     0.25, nhuccells(h))
+                masked_variable_map = map_pr(:,:,t)
 
-                  write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                              trim(caldate), &
-                              myhucs(h), &
-                              trim(models(e)), &
-                              trim(members(e)), &
-                              trim(scenarios(s)), &
-                              "P050",  &
-                              quantile7(sort_tasmax, 0.50, nhuccells(h)), &
-                              quantile7(sort_tasmin, 0.50, nhuccells(h)), &
-                              quantile7(sort_pr,     0.50, nhuccells(h))
+                where (mask_map .eq. 0) masked_variable_map = pr_FillValue
 
-                  write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                              trim(caldate), &
-                              myhucs(h), &
-                              trim(models(e)), &
-                              trim(members(e)), &
-                              trim(scenarios(s)), &
-                              "P075",  &
-                              quantile7(sort_tasmax, 0.75, nhuccells(h)), &
-                              quantile7(sort_tasmin, 0.75, nhuccells(h)), &
-                              quantile7(sort_pr,     0.75, nhuccells(h))
+                linear_array = reshape(masked_variable_map, (/ nlon*nlat /))
 
-                  write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                              trim(caldate), &
-                              myhucs(h), &
-                              trim(models(e)), &
-                              trim(members(e)), &
-                              trim(scenarios(s)), &
-                              "P100",  &
-                              maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
-                  write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
-                              trim(caldate), &
-                              myhucs(h), &
-                              trim(models(e)), &
-                              trim(members(e)), &
-                              trim(scenarios(s)), &
-                              "MEAN",  &
-                              (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
+                call QSort(linear_array, nlon*nlat)
 
+                sort_pr(:) = linear_array(nlon*nlat-nhuccells(h)+1:nlon*nlat)
+
+
+              !!! output
+
+                
+
+                write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                            trim(caldate), &
+                            myhucs(h), &
+                            trim(models(e)), &
+                            trim(members(e)), &
+                            trim(scenarios(s)), &
+                            "P000",  &
+                            minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
+
+                write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                            trim(caldate), &
+                            myhucs(h), &
+                            trim(models(e)), &
+                            trim(members(e)), &
+                            trim(scenarios(s)), &
+                            "P025",  &
+                            quantile7(sort_tasmax, 0.25, nhuccells(h)), &
+                            quantile7(sort_tasmin, 0.25, nhuccells(h)), &
+                            quantile7(sort_pr,     0.25, nhuccells(h))
+
+                write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                            trim(caldate), &
+                            myhucs(h), &
+                            trim(models(e)), &
+                            trim(members(e)), &
+                            trim(scenarios(s)), &
+                            "P050",  &
+                            quantile7(sort_tasmax, 0.50, nhuccells(h)), &
+                            quantile7(sort_tasmin, 0.50, nhuccells(h)), &
+                            quantile7(sort_pr,     0.50, nhuccells(h))
+
+                write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                            trim(caldate), &
+                            myhucs(h), &
+                            trim(models(e)), &
+                            trim(members(e)), &
+                            trim(scenarios(s)), &
+                            "P075",  &
+                            quantile7(sort_tasmax, 0.75, nhuccells(h)), &
+                            quantile7(sort_tasmin, 0.75, nhuccells(h)), &
+                            quantile7(sort_pr,     0.75, nhuccells(h))
+
+                write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                            trim(caldate), &
+                            myhucs(h), &
+                            trim(models(e)), &
+                            trim(members(e)), &
+                            trim(scenarios(s)), &
+                            "P100",  &
+                            maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
+
+                write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+                            trim(caldate), &
+                            myhucs(h), &
+                            trim(models(e)), &
+                            trim(members(e)), &
+                            trim(scenarios(s)), &
+                            "MEAN",  &
+                            (/ sum(sort_tasmax), sum(sort_tasmin), sum(sort_pr) /) / nhuccells(h)
 
                 !!!!  De-Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
 
@@ -794,7 +796,6 @@ program LOCA_Colate_to_ClimDivs
                 t_buffer = t_buffer + 6
 
               end do  !!  Internal Time Loop (t)
-
 
               !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
@@ -858,8 +859,6 @@ program LOCA_Colate_to_ClimDivs
   print*, "== "
   print*, "==============================="
 
-
-
 end do   !! Scenario Loop (s)
 
 print*, "Close CSV Files "
@@ -868,18 +867,14 @@ do h = 1, nmyhucs, 1
   close(unit_huc(h))
 end do
 
-
-
-
 !!!!!!!!!!!!!!!!!!
 
 print*, "De-Allocating arrays at the end of program (my hucs,nhuccells,unit_huc, csv_filename)"
 
-deallocate(    myhucs )
-deallocate( nhuccells )
-deallocate(  unit_huc )
+deallocate(     myhucs )
+deallocate(  nhuccells )
+deallocate(   unit_huc )
 deallocate(csv_filename)
-
 
 print*, "We're Out of Here Like Vladimir"
 

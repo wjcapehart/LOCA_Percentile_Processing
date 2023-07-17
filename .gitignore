@@ -44,3 +44,9 @@ test_for_time_lut.txt
 .Rproj.user
 *.PCP
 *.TMP
+
+./work
+LOCA2_nCLIMDIV_????.csv
+LOCA2_HUC_????.csv
+./work/.DS_Store
+.DS_Store
