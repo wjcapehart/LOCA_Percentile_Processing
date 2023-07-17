@@ -5,7 +5,7 @@ program LOCA_Colate_to_ClimDivs
 
   implicit none
 
-  integer, parameter :: nens       =    27
+  integer, parameter :: nens       =    26
   integer, parameter :: nscen      =     4
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   944
@@ -202,11 +202,11 @@ program LOCA_Colate_to_ClimDivs
 
 !!!!!!!!!!!!!!!!  Get input_map
 
-      first_huc = .TRUE.
+  first_huc = .TRUE.
 
-     myhuc_high = myhuc_low
+  myhuc_high = myhuc_low
 
-     print*, "opening ",filename_map
+  print*, "opening ",filename_map
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
