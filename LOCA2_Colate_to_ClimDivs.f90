@@ -135,8 +135,8 @@ program LOCA_Colate_to_ClimDivs
 
   first_huc = .TRUE.
 
-     num_procs = omp_get_max_threads()
-     !num_procs = 1
+     !num_procs = omp_get_max_threads()
+     num_procs = 1
 
 
   variables = (/ "pr    ", &
@@ -667,7 +667,7 @@ program LOCA_Colate_to_ClimDivs
             end if
 
 
-      print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
+    !  print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate)," HUC:",myhucs(h)
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
