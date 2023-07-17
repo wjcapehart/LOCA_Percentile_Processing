@@ -657,6 +657,8 @@ program LOCA_Colate_to_ClimDivs
       do h = 1, nmyhucs, 1
 
             t_buffer = 1
+            allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
+
 
             do t = 1,  span_t(tt), 1
 
@@ -684,7 +686,6 @@ program LOCA_Colate_to_ClimDivs
               allocate ( sort_tasmax(nhuccellslocal) )
               allocate ( sort_tasmin(nhuccellslocal) )
               allocate (     sort_pr(nhuccellslocal) )
-              allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
 
 
               !!! tasmax
