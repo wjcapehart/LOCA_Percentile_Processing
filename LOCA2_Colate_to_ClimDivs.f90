@@ -170,7 +170,6 @@ program LOCA_Colate_to_ClimDivs
               "EC-Earth3-Veg  ", &
               "KACE-1-0-G     ", &
               "MPI-ESM1-2-HR  ", &
-              "MPI-ESM1-2-LR  ", &
               "AWI-CM-1-1-MR  " /)
 
   members = (/ "r1i1p1f1 ", &
@@ -197,7 +196,6 @@ program LOCA_Colate_to_ClimDivs
                "r3i1p1f1 ", &
                "r4i1p1f1 ", &
                "r2i1p1f1 ", &
-               "r10i1p1f1", &
                "r10i1p1f1", &
                "r1i1p1f1 " /)
 
