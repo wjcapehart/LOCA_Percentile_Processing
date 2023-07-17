@@ -674,12 +674,12 @@ program LOCA_Colate_to_ClimDivs
               write(*,'(" - proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8 )') &
                    omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
-
+              print*, "mapping ut the mask"
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(    :,:,t) .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
-
+              print*, "calculate the mask size"
               nhuccellslocal = sum(mask_map)
 
 
