@@ -519,7 +519,7 @@ program LOCA_Colate_to_ClimDivs
           if ((tt .eq. 1) .or. (tt .eq. n_reads)) then
             print*, "=="
             print*, "Allocating OMP Arrays for large bulk reads in tt loop ", &
-                     " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ", &
+                     " (input_map,map_tasmax,map_tasmin,map_pr) ", &
                      tt, n_reads
             print*, "=="
 
@@ -527,8 +527,6 @@ program LOCA_Colate_to_ClimDivs
             allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
             allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
             allocate (                  map_pr(nlon, nlat, span_t(tt)) )
-            allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
-
           end if
 
 
@@ -614,44 +612,48 @@ program LOCA_Colate_to_ClimDivs
           !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-  !$OMP PARALLEL DO PRIVATE (h,                   &
-  !$OMP&                     t,                   &
-  !$OMP&                     linear_array,        &
-  !$OMP&                     mask_map,            &
-  !$OMP&                     t_buffer,            &
-  !$OMP&                     masked_variable_map, &
-  !$OMP&                     caldate,             &
-  !$OMP&                     output_buffer,       &
-  !$OMP&                     sort_tasmax,         &
-  !$OMP&                     sort_tasmin,         &
-  !$OMP&                     sort_pr),            &
-  !$OMP&             SHARED (e,                   &
-  !$OMP&                     tt,                  &
-  !$OMP&                     s,                   &
-  !$OMP&                     n_reads,             &
-  !$OMP&                     csv_filename,        &
-  !$OMP&                     models,              &
-  !$OMP&                     members,             &
-  !$OMP&                     scenarios,           &
-  !$OMP&                     nhuccells,           &
-  !$OMP&                     start_t,             &
-  !$OMP&                     span_t,              &
-  !$OMP&                     t_in_tt,             &
-  !$OMP&                     huc_map,             &
-  !$OMP&                     caldate_hist,        &
-  !$OMP&                     caldate_futr,        &
-  !$OMP&                     map_pr,              &
-  !$OMP&                     map_tasmax,          &
-  !$OMP&                     map_tasmin,          &
-  !$OMP&                     pr_FillValue,        &
-  !$OMP&                     tasmax_FillValue,    &
-  !$OMP&                     tasmin_FillValue,    &
-  !$OMP&                     unit_huc,            &
-  !$OMP&                     num_procs,           &
-  !$OMP&                     nmyhucs,             &
-  !$OMP&                     myhucs),             &
-  !$OMP&            DEFAULT (NONE),               &
-  !$OMP&           SCHEDULE (STATIC)
+!$OMP PARALLEL DO PRIVATE (h,                   &
+!$OMP&                     t,                   &
+!$OMP&                     linear_array,        &
+!$OMP&                     mask_map,            &
+!$OMP&                     t_buffer,            &
+!$OMP&                     masked_variable_map, &
+!$OMP&                     t_in_tt,             &
+!$OMP&                     caldate,     
+!$OMP&                     nhuccellslocal        &
+!$OMP&                     output_buffer,       &
+!$OMP&                     sort_tasmax,         &
+!$OMP&                     sort_tasmin,         &
+!$OMP&                     sort_pr),            &
+!$OMP&             SHARED (e,                   &
+!$OMP&                     tt,                  &
+!$OMP&                     s,                   &
+!$OMP&                     n_reads,             &
+!$OMP&                     csv_filename,        &
+!$OMP&                     models,              &
+!$OMP&                     members,             &
+!$OMP&                     scenarios,           &
+!$OMP&                     nhuccells,           &
+!$OMP&                     start_t,             &
+!$OMP&                     span_t,              &
+!$OMP&                     huc_map,             &
+!$OMP&                     caldate_hist,        &
+!$OMP&                     caldate_futr,        &
+!$OMP&                     map_pr,              &
+!$OMP&                     map_tasmax,          &
+!$OMP&                     map_tasmin,          &
+!$OMP&                     pr_FillValue,        &
+!$OMP&                     tasmax_FillValue,    &
+!$OMP&                     tasmin_FillValue,    &
+!$OMP&                     unit_huc,            &
+!$OMP&                     nlon,                &
+!$OMP&                     nlat,                &
+!$OMP&                     tasmin_FillValue,    &
+!$OMP&                     num_procs,           &
+!$OMP&                     nmyhucs,             &
+!$OMP&                     myhucs),             &
+!$OMP&            DEFAULT (NONE),               &
+!$OMP&           SCHEDULE (STATIC)
 
       do h = 1, nmyhucs, 1
 
@@ -672,18 +674,20 @@ program LOCA_Colate_to_ClimDivs
                       " HUC:",myhucs(h)
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
-                                    (map_pr(:,:,t)     .ne.     pr_FillValue) .and. &
+                                    (map_pr(    :,:,t) .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
 
-              nhuccells(h) = sum(mask_map)
+              nhuccellslocal = sum(mask_map)
 
               print*,"allocations ", omp_get_thread_num()
 
-              !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop
-              allocate ( sort_tasmax(nhuccells(h)) )
-              allocate ( sort_tasmin(nhuccells(h)) )
-              allocate (     sort_pr(nhuccells(h)) )
+              !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop output_buffer
+              allocate ( sort_tasmax(nhuccellslocal) )
+              allocate ( sort_tasmin(nhuccellslocal) )
+              allocate (     sort_pr(nhuccellslocal) )
+              allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
+
 
               !!! tasmax
 
@@ -799,7 +803,7 @@ program LOCA_Colate_to_ClimDivs
 
               end do  !!  Internal Time Loop (t)
 
-              print*, "writing to unit ",omp_get_thread_num(), unit_huc(h)
+              print* "writing to unit ",omp_get_thread_num(), unit_huc(h)
               !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
               !close(unit_huc(h))
