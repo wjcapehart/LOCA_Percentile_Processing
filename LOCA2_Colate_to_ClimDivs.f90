@@ -671,7 +671,8 @@ program LOCA_Colate_to_ClimDivs
                 caldate = caldate_futr(t_in_tt)
               end if
 
-       
+              write(*,'(" - proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8, " Cells:", I8 )') &
+              omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
               print*, "mapping ut the mask"
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
@@ -680,8 +681,7 @@ program LOCA_Colate_to_ClimDivs
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
               print*, "calculate the mask size"
               nhuccellslocal = sum(mask_map)
-              write(*,'(" - proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8, " Cells:", I8 )') &
-              omp_get_thread_num(), num_procs, trim(caldate), myhucs(h), nhuccellslocal
+
 
               !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop output_buffer
               allocate ( sort_tasmax(nhuccellslocal) )
