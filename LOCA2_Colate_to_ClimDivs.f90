@@ -668,9 +668,8 @@ program LOCA_Colate_to_ClimDivs
                 caldate = caldate_futr(t_in_tt)
               end if
 
-
-              print*, "proc:(",omp_get_thread_num(),":",num_procs,") caldat: ",trim(caldate), &
-                      " HUC:",myhucs(h)
+              write(*,'("proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8.8 )') &
+                   omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
