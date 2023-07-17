@@ -311,14 +311,14 @@ program LOCA_Colate_to_ClimDivs_CAN
 
 
 
-          if (nmyhucs .lt. num_procs) then
-            call omp_set_num_threads(nmyhucs)
-            num_procs = nmyhucs
-            print*, "adjusting total number of cores to ",num_procs
-          else
-            print*, "using default number of cores: ",num_procs
-          end if
-          print*, "myhucs: ", myhucs
+  if (nmyhucs .lt. num_procs) then
+    call omp_set_num_threads(nmyhucs)
+    num_procs = nmyhucs
+    print*, "adjusting total number of cores to ",num_procs
+  else
+    print*, "using default number of cores: ",num_procs
+  end if
+  print*, "myhucs: ", myhucs
 
 
   !!!!!!!!!!!!!!!!!!

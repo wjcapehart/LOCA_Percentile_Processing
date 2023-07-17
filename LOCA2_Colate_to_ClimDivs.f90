@@ -156,7 +156,7 @@ program LOCA_Colate_to_ClimDivs
 
      num_procs = omp_get_max_threads()
 
-     print*, num_procs
+     print*, "Initial Number of OMP Threads " num_procs
      !num_procs = 1
 
 
@@ -220,7 +220,7 @@ program LOCA_Colate_to_ClimDivs
       ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_hucs, hucs)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
-        print*, hucs
+
 
   ncstat = NF90_CLOSE(netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -350,7 +350,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   if (nmyhucs .lt. num_procs) then
-    ! call omp_set_num_threads(nmyhucs)
+    call omp_set_num_threads(nmyhucs)
     num_procs = nmyhucs
     print*, "adjusting total number of cores to ",num_procs
   else
