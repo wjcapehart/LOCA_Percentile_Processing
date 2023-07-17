@@ -648,8 +648,6 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     tasmax_FillValue,    &
 !$OMP&                     tasmin_FillValue,    &
 !$OMP&                     unit_huc,            &
-!$OMP&                     nlon,                &
-!$OMP&                     nlat,                &
 !$OMP&                     tasmin_FillValue,    &
 !$OMP&                     num_procs,           &
 !$OMP&                     nmyhucs,             &
@@ -805,7 +803,7 @@ program LOCA_Colate_to_ClimDivs
 
               end do  !!  Internal Time Loop (t)
 
-              print* "writing to unit ",omp_get_thread_num(), unit_huc(h)
+              print*, "writing to unit ",omp_get_thread_num(), unit_huc(h)
               !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
               !close(unit_huc(h))
