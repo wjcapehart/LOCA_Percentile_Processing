@@ -668,7 +668,7 @@ program LOCA_Colate_to_ClimDivs
                 caldate = caldate_futr(t_in_tt)
               end if
 
-              write(*,'("proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8.8 )') &
+              write(*,'("proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8 )') &
                    omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
 
@@ -679,7 +679,6 @@ program LOCA_Colate_to_ClimDivs
 
               nhuccellslocal = sum(mask_map)
 
-              print*,"allocations ", omp_get_thread_num()
 
               !!!!  Allocating sort_tasmax,sort_tasmin,sort_pr in t loop output_buffer
               allocate ( sort_tasmax(nhuccellslocal) )
@@ -803,7 +802,9 @@ program LOCA_Colate_to_ClimDivs
 
               end do  !!  Internal Time Loop (t)
 
-              print*, "writing to unit ",omp_get_thread_num(), unit_huc(h)
+              write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
+                   omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
+                   
               !open( unit_huc(h), FILE=trim(csv_filename(h)), status="old", position="append", form="formatted", action="write")
               write(unit_huc(h),"(A)") output_buffer(:)
               !close(unit_huc(h))
