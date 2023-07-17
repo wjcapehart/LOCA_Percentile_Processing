@@ -156,7 +156,7 @@ program LOCA_Colate_to_ClimDivs
 
      num_procs = omp_get_max_threads()
 
-     print*, "Initial Number of OMP Threads " num_procs
+     print*, "Initial Number of OMP Threads ", num_procs
      !num_procs = 1
 
 
