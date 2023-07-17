@@ -136,7 +136,7 @@ program LOCA_Colate_to_ClimDivs
   first_huc = .TRUE.
 
      num_procs = omp_get_max_threads()
-     num_procs = 1
+     !num_procs = 1
 
 
   variables = (/ "pr    ", &
