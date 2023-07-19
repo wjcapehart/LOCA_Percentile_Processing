@@ -5,6 +5,7 @@ library(tidyverse)
 library(lubridate)
 
 directory = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/work/"
+out_directory = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
 
 prefix    = "LOCA2_nCLIMDIV_"
 
@@ -96,39 +97,52 @@ for (filename in csv_files)
         print(loca2_daily$Division[1])
         if (is.numeric(loca2_daily$Division[1]))
         {
-          loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
+          loca2_daily$Division = as.character(sprintf("%04d",loca2_daily$Division))
         }
-        loca_daily = loca_daily %>%
-          mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
+        
+        loca2_daily$Division   = factor(x    = loca2_daily$Division,
+                                        levels = FIPS_CD)     
+        
+        loca2_daily$Time       = as.Date( sub("\uFEFF", "", loca2_daily$Time))
+        
+        
+        loca2_daily = loca2_daily %>%
+          mutate(Scenario = case_when(Scenario == "historical"  ~ "Historical",
                                       Scenario == "ssp245"      ~ "SSP2-4.5",
                                       Scenario == "ssp370"      ~ "SSP3-7.0",
                                       Scenario == "ssp585"      ~ "SSP5-8.5"))
 
-        loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
 
-        loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
+        loca2_daily$Scenario   = factor(x      = loca2_daily$Scenario,
                                        levels = c("Historical",
-                                                  "RCP 4.5",
-                                                  "RCP 8.5"))
+                                                  "SSP2-4.5",
+                                                  "SSP3-7.0",
+                                                  "SSP5-8.5"))
 
-        loca_daily$Division   = factor(x    = loca_daily$Division,
-                                       levels = Divisions_factor)
 
-        loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
-                                       levels = Ensembles)
 
-        loca_daily$Percentile = factor(x      = loca_daily$Percentile,
+        loca2_daily$Model   = factor(x      = loca2_daily$Model,
+                                       levels = models)
+        
+        loca2_daily$Member   = factor(x      = loca2_daily$Member,
+                                    levels = members)
+        
+        loca2_daily$Percentile = factor(x      = loca2_daily$Percentile,
                                        levels = c("P000",
                                                   "P025",
                                                   "P050",
                                                   "P075",
                                                   "P100",
                                                   "MEAN"))
-
-        last_record = loca_daily[nrow(loca_daily), ]
+        
+        loca2_daily$tasmax = as.single(loca2_daily$tasmax)
+        loca2_daily$tasmin = as.single(loca2_daily$tasmin)
+        loca2_daily$pr     = as.single(loca2_daily$pr)
+        
+        last2_record = loca2_daily[nrow(loca2_daily), ]
         print(last_record)
 
-        save(loca_daily,
+        save(loca2_daily,
              file = str_c(filename,
                           ".RData",
                           sep=""))
