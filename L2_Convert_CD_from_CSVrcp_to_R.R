@@ -1,0 +1,151 @@
+library(stringr)
+library(forcats)
+library(readr)
+library(tidyverse)
+library(lubridate)
+
+directory = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/work/"
+
+prefix    = "LOCA2_nCLIMDIV_"
+
+
+csv_files = intersect(list.files(path    = directory,
+                                 pattern = prefix),
+                      list.files(path    = directory,
+                                 pattern = "csv"))
+
+csv_files  = str_remove(csv_files, ".csv")
+
+csv_files = str_c(directory,csv_files,sep="")
+
+print(csv_files)
+
+
+models = c("ACCESS-CM2", 
+              "ACCESS-ESM1-5", 
+              "AWI-CM-1-1-MR", 
+              "BCC-CSM2-MR", 
+              "CanESM5", 
+              "CESM2-LENS", 
+              "CNRM-CM6-1", 
+              "CNRM-CM6-1-HR", 
+              "CNRM-ESM2-1", 
+              "EC-Earth3", 
+              "EC-Earth3-Veg", 
+              "FGOALS-g3", 
+              "GFDL-CM4", 
+              "GFDL-ESM4", 
+              "HadGEM3-GC31-LL", 
+              "HadGEM3-GC31-MM", 
+              "INM-CM4-8", 
+              "INM-CM5-0", 
+              "IPSL-CM6A-LR", 
+              "KACE-1-0-G", 
+              "MIROC6", 
+              "MPI-ESM1-2-HR", 
+              "MPI-ESM1-2-LR", 
+              "MRI-ESM2-0", 
+              "NorESM2-LM", 
+              "NorESM2-MM", 
+              "TaiESM1")
+
+members = c("r1i1p1f1", 
+            "r1i1p1f2", 
+            "r1i1p1f3", 
+            "r2i1p1f1", 
+            "r2i1p1f3", 
+            "r3i1p1f1", 
+            "r3i1p1f3", 
+            "r4i1p1f1", 
+            "r5i1p1f1", 
+            "r6i1p1f1", 
+            "r7i1p1f1", 
+            "r8i1p1f1", 
+            "r9i1p1f1", 
+            "r10i1p1f1")
+
+
+load("./NCEI_ClimDivs.RData")
+
+
+
+FIPS_CD = NCEI_ClimDivs$FIPS_CD
+
+
+
+models_factor = factor(models)
+members_factor = factor(members)
+
+
+
+for (filename in csv_files)
+{
+  command = str_c("gunzip -v ",
+                  filename,
+                  ".csv.gz",
+                  sep = "")
+
+  system(command)
+
+        loca2_daily = read_csv(str_c(filename,
+                                    ".csv",
+                                    sep=""))
+
+
+
+        print(loca2_daily$Division[1])
+        if (is.numeric(loca2_daily$Division[1]))
+        {
+          loca_daily$Division = as.character(sprintf("%0d",loca_daily$Division))
+        }
+        loca_daily = loca_daily %>%
+          mutate(Scenario = case_when(Scenario == "historical" ~ "Historical",
+                                      Scenario == "ssp245"      ~ "SSP2-4.5",
+                                      Scenario == "ssp370"      ~ "SSP3-7.0",
+                                      Scenario == "ssp585"      ~ "SSP5-8.5"))
+
+        loca_daily$Time       = as.Date( sub("\uFEFF", "", loca_daily$Time))
+
+        loca_daily$Scenario   = factor(x      = loca_daily$Scenario,
+                                       levels = c("Historical",
+                                                  "RCP 4.5",
+                                                  "RCP 8.5"))
+
+        loca_daily$Division   = factor(x    = loca_daily$Division,
+                                       levels = Divisions_factor)
+
+        loca_daily$Ensemble   = factor(x      = loca_daily$Ensemble,
+                                       levels = Ensembles)
+
+        loca_daily$Percentile = factor(x      = loca_daily$Percentile,
+                                       levels = c("P000",
+                                                  "P025",
+                                                  "P050",
+                                                  "P075",
+                                                  "P100",
+                                                  "MEAN"))
+
+        last_record = loca_daily[nrow(loca_daily), ]
+        print(last_record)
+
+        save(loca_daily,
+             file = str_c(filename,
+                          ".RData",
+                          sep=""))
+
+
+
+
+
+  command = str_c("gzip -9fv ",
+                  filename,
+                   ".csv",
+                  sep = "")
+
+  system(command)
+
+
+  print("")
+}
+
+print("We're Outahere like Vladimir")
