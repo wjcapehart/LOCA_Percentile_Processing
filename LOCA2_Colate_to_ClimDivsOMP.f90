@@ -627,11 +627,11 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     masked_variable_map, &
 !$OMP&                     t_in_tt,             &
 !$OMP&                     caldate,             &
-!$OMP&                     nhuccellslocal,       &
+!$OMP&                     nhuccellslocal,      &
 !$OMP&                     output_buffer,       &
-!$OMP&                     local_map_tasmax,       &
-!$OMP&                     local_map_tasmin,       &
-!$OMP&                     local_map_pr,       &
+!$OMP&                     local_map_tasmax,    &
+!$OMP&                     local_map_tasmin,    &
+!$OMP&                     local_map_pr,        &
 !$OMP&                     sort_tasmax,         &
 !$OMP&                     sort_tasmin,         &
 !$OMP&                     sort_pr),            &
@@ -682,9 +682,13 @@ program LOCA_Colate_to_ClimDivs
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
 
-
+              print*, "mapping local_map_pr"
               local_map_pr     = map_pr(       :,:,t)
+
+              print*, "mapping local_map_tasmax"
               local_map_tasmax = map_tasmax(    :,:,t)
+
+              print*, "mapping local_map_tasmin"
               local_map_tasmin = map_tasmin(    :,:,t)
 
               print*, "mapping ut the mask"
