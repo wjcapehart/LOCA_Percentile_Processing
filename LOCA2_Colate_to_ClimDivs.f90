@@ -657,8 +657,8 @@ program LOCA_Colate_to_ClimDivs
       do h = 1, nmyhucs, 1
 
             t_buffer = 1
-
             allocate (character(len_outbuf) :: output_buffer(span_t(tt)*6))
+
 
             do t = 1,  span_t(tt), 1
 
@@ -805,9 +805,12 @@ program LOCA_Colate_to_ClimDivs
             !write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
              !    omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
 
+            
+
             write(unit_huc(h),"(A)") output_buffer(:)
 
-            deallocate (output_buffer)
+            deallocate ( output_buffer )
+
 
             !print*, "done with IMP loop"
 
@@ -827,9 +830,9 @@ program LOCA_Colate_to_ClimDivs
           deallocate (    map_tasmax )
           deallocate (    map_tasmin )
           deallocate (        map_pr )
-          deallocate ( output_buffer )
 
         end if
+
 
 
     end do  !!  NetCDF Time Loop (tt)
@@ -839,11 +842,7 @@ program LOCA_Colate_to_ClimDivs
           "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
     print*, "=="
 
-      deallocate (     input_map )
-      deallocate (    map_tasmax )
-      deallocate (    map_tasmin )
-      deallocate (        map_pr )
-      deallocate ( output_buffer )
+
 
 
   end if !! Got Scenario?
