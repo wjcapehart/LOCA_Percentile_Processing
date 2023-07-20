@@ -819,10 +819,10 @@ program LOCA_Colate_to_ClimDivs
   !$OMP END PARALLEL DO
 
 
-        if ((tt .eq. n_reads-1)) then
+        if ((tt .ge. n_reads-1)) then
           print*, "=="
           print*, "== De-allocating OMP Arrays for large bulk Reads inside tt loop ",  &
-                " (input_map,map_tasmax,map_tasmin,map_pr,output_buffer) ",   &
+                " (input_map,map_tasmax,map_tasmin,map_pr) ",   &
                 tt,n_reads-1, n_reads
           print*, "=="
 
@@ -831,16 +831,14 @@ program LOCA_Colate_to_ClimDivs
           deallocate (    map_tasmin )
           deallocate (        map_pr )
 
+          print*, "== Arrays are deallocated "
+
         end if
 
 
 
     end do  !!  NetCDF Time Loop (tt)
 
-    print*, "=="
-    print*, "== De-Allocating OMP Arrays for large bulk Reads Last Pull for end of ensemble ",  &
-          "(input_map,map_tasmax,map_tasminmap_pr,output_buffer)"
-    print*, "=="
 
 
 
