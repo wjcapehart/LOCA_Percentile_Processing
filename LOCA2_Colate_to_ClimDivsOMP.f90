@@ -619,8 +619,7 @@ program LOCA_Colate_to_ClimDivs
           !!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-!$OMP PARALLEL DO PRIVATE (h,                   &
-!$OMP&                     t,                   &
+!$OMP PARALLEL DO PRIVATE (t,                   &
 !$OMP&                     linear_array,        &
 !$OMP&                     mask_map,            &
 !$OMP&                     t_buffer,            &
