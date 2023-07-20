@@ -1,6 +1,6 @@
 program LOCA_Colate_to_ClimDivs
 
-!ifort -o ./omp.exe -ffpe-trap=zero,invalid,overflow,underflow -I$NETCDFINC -L$NETCDFLIB -lnetcdff -qopenmp ./LOCA2_Colate_to_ClimDivsOMP.f90 
+!ifort -o ./omp.exe -ftrapuv -I$NETCDFINC -L$NETCDFLIB -lnetcdff -qopenmp ./LOCA2_Colate_to_ClimDivsOMP.f90 
 
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
@@ -682,13 +682,13 @@ program LOCA_Colate_to_ClimDivs
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
 
-              print*, "mapping local_map_pr"
+              print*, "mapping local_map_pr",t
               local_map_pr     = map_pr(       :,:,t)
 
-              print*, "mapping local_map_tasmax"
+              print*, "mapping local_map_tasmax",t
               local_map_tasmax = map_tasmax(    :,:,t)
 
-              print*, "mapping local_map_tasmin"
+              print*, "mapping local_map_tasmin",t
               local_map_tasmin = map_tasmin(    :,:,t)
 
               print*, "mapping ut the mask"
