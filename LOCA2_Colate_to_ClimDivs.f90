@@ -1,6 +1,6 @@
 program LOCA_Colate_to_ClimDivs
 
-!ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff -openmp ./LOCA2_Colate_to_ClimDivs.f90 
+!ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff -qopenmp ./LOCA2_Colate_to_ClimDivs.f90 
 
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod

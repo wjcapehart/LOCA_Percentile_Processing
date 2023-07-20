@@ -1,6 +1,6 @@
 program LOCA_Colate_to_ClimDivs
 
-!ifort -o LOCA2_Colate_to_ClimDivs.exe -ffpe-trap=zero,invalid,overflow,underflow -I$NETCDFINC -L$NETCDFLIB -lnetcdff -openmp ./LOCA2_Colate_to_ClimDivs.f90 
+!ifort -o ./omp.exe -ffpe-trap=zero,invalid,overflow,underflow -I$NETCDFINC -L$NETCDFLIB -lnetcdff -openmp ./LOCA2_Colate_to_ClimDivsOMP.f90 
 
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
@@ -61,6 +61,11 @@ program LOCA_Colate_to_ClimDivs
   integer (kind=4), dimension(nlon,nlat) :: mask_map
   real    (kind=4), dimension(nlon,nlat) :: masked_variable_map
   integer (kind=4), dimension(nlon,nlat) :: huc_map
+
+  real(kind=4),  dimension(nlon,nlat) :: local_map_pr
+  real(kind=4),  dimension(nlon,nlat) :: local_map_tasmax
+  real(kind=4),  dimension(nlon,nlat) :: local_map_tasmin
+
   integer (kind=4), dimension(nhucs)     :: hucs
 
   character (len=090) :: filename_times
@@ -672,6 +677,12 @@ program LOCA_Colate_to_ClimDivs
 
               write(*,'(" - proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8, " Cells:", I8 )') &
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
+
+
+
+              map_pr_local     = map_pr(       :,:,t)
+              map_tasmax_local = map_tasmax(    :,:,t)
+              map_tasmin_local = map_tasmin(    :,:,t)
 
               print*, "mapping ut the mask"
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
