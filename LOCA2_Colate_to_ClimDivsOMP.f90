@@ -1,6 +1,6 @@
 program LOCA_Colate_to_ClimDivs
 
-!ifort -o ./omp.exe -ffpe-trap=zero,invalid,overflow,underflow -I$NETCDFINC -L$NETCDFLIB -lnetcdff -openmp ./LOCA2_Colate_to_ClimDivsOMP.f90 
+!ifort -o ./omp.exe -ffpe-trap=zero,invalid,overflow,underflow -I$NETCDFINC -L$NETCDFLIB -lnetcdff -qopenmp ./LOCA2_Colate_to_ClimDivsOMP.f90 
 
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
@@ -629,6 +629,9 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     caldate,             &
 !$OMP&                     nhuccellslocal,       &
 !$OMP&                     output_buffer,       &
+!$OMP&                     local_map_tasmax,       &
+!$OMP&                     local_map_tasmin,       &
+!$OMP&                     local_map_pr,       &
 !$OMP&                     sort_tasmax,         &
 !$OMP&                     sort_tasmin,         &
 !$OMP&                     sort_pr),            &
@@ -680,15 +683,15 @@ program LOCA_Colate_to_ClimDivs
 
 
 
-              map_pr_local     = map_pr(       :,:,t)
-              map_tasmax_local = map_tasmax(    :,:,t)
-              map_tasmin_local = map_tasmin(    :,:,t)
+              local_map_pr     = map_pr(       :,:,t)
+              local_map_tasmax = map_tasmax(    :,:,t)
+              local_map_tasmin = map_tasmin(    :,:,t)
 
               print*, "mapping ut the mask"
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
-                                    (map_pr(    :,:,t) .ne.     pr_FillValue) .and. &
-                                    (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
-                                    (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
+                                    (local_map_pr     .ne.     pr_FillValue) .and. &
+                                    (local_map_tasmax .ne. tasmax_FillValue) .and. &
+                                    (local_map_tasmin .ne. tasmin_FillValue)       )
               print*, "calculate the mask size"
               nhuccellslocal = sum(mask_map)
 
