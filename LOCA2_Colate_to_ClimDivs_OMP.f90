@@ -639,8 +639,11 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     masked_variable_map, &
 !$OMP&                     t_in_tt,             &
 !$OMP&                     caldate,             &
-!$OMP&                     nhuccellslocal,       &
+!$OMP&                     nhuccellslocal,      &
 !$OMP&                     output_buffer,       &
+!$OMP&                     map_pr_local,        &
+!$OMP&                     map_tasmax_local,    &
+!$OMP&                     map_tasmin_local,    &
 !$OMP&                     sort_tasmax,         &
 !$OMP&                     sort_tasmin,         &
 !$OMP&                     sort_pr),            &
