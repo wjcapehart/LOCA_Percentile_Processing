@@ -1,5 +1,5 @@
 program LOCA_Colate_to_ClimDivs
-  
+
   !ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff  ./LOCA2_Colate_to_ClimDivs.f90 
   
   !ifort    -o ./a.out -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -qopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90 
@@ -7,8 +7,9 @@ program LOCA_Colate_to_ClimDivs
 
   !ulimit -s unlimited
 
+
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
-  !use omp_lib
+  use omp_lib
 
   implicit none
 
@@ -24,6 +25,10 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: len_hucstr   =     4
   integer, parameter :: len_outbuf   =   255
   integer, parameter :: len_ensinv   =     4 ! #XNP
+
+  integer, parameter :: start_scen = 1
+  integer, parameter :: end_scen   = nscen
+  integer, parameter :: npull      = 2 !, 3, 7, 487
 
   character (len=*), PARAMETER  :: ensinv_file  = "./LOCA2_Model_Member_Available_Ptile.csv"
 
@@ -46,13 +51,11 @@ program LOCA_Colate_to_ClimDivs
   !character (len=*), PARAMETER  :: file_output_root  = &
   !          "./work/LOCA2_nCLIMDIV_"
 
-  integer, parameter :: start_scen = 1
-  integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3905
-  integer (kind=4) :: myhuc_high   = 3909
 
-  integer, parameter :: npull = 365! 2 !, 3, 7, 487
+  integer (kind=4) :: myhuc_low    = 3106
+  integer (kind=4) :: myhuc_high   = 3106
+
 
   integer (kind=4) :: t_buffer
 
@@ -161,9 +164,9 @@ program LOCA_Colate_to_ClimDivs
 
   num_procs = 1
 
-     !num_procs = omp_get_max_threads()
+    num_procs = omp_get_max_threads()
 
-     !print*, "Initial Number of OMP Threads ", num_procs
+    print*, "Initial Number of OMP Threads ", num_procs
 
 
   variables = (/ "pr    ", &
@@ -356,7 +359,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   if (nmyhucs .lt. num_procs) then
-    !call omp_set_num_threads(nmyhucs)
+    call omp_set_num_threads(nmyhucs)
     num_procs = nmyhucs
     print*, "adjusting total number of cores to ",num_procs
   else
@@ -560,6 +563,8 @@ program LOCA_Colate_to_ClimDivs
                 ! Read Precip Block
                 !
 
+              print*, "omp: reading pr"
+
                 ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(pr_variable_name), netcdf_id_pr)
                    if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
@@ -577,6 +582,7 @@ program LOCA_Colate_to_ClimDivs
               ! Read Tasmax Block
               !
 
+                print*, "omp: reading tasmax"
 
                 ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmax_variable_name), netcdf_id_tasmax)
                    if(ncstat /= nf90_noerr) call handle_err(ncstat)
@@ -595,6 +601,7 @@ program LOCA_Colate_to_ClimDivs
               ! Read Tasmin Block
               !
 
+                print*, "omp: reading tasmin"
 
 
                 ncstat = NF90_INQ_VARID(netcdf_id_file_loca2, trim(tasmin_variable_name), netcdf_id_tasmin)
@@ -613,6 +620,8 @@ program LOCA_Colate_to_ClimDivs
 
           ncstat = NF90_CLOSE(netcdf_id_file_loca2)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+          print*, "closed file"
 
           !
           !!!!!!!!!!!!!!!!!!!!!!!!!
@@ -674,15 +683,19 @@ program LOCA_Colate_to_ClimDivs
                 caldate = caldate_futr(t_in_tt)
               end if
 
-              !write(*,'(" - proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8, " Cells:", I8 )') &
-              !omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
+              write(*,'(" - omp proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8, " Cells:", I8 )') &
+              omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
-              !print*, "mapping ut the mask"
+             
+              print*, "omp mapping ut the mask"
+
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(    :,:,t) .ne.     pr_FillValue) .and. &
                                     (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
                                     (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
-              !print*, "calculate the mask size"
+
+              print*, "omp calculate the mask size"
+
               nhuccellslocal = sum(mask_map)
 
 
@@ -806,8 +819,8 @@ program LOCA_Colate_to_ClimDivs
 
             end do  !!  Internal Time Loop (t)
 
-            !write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
-             !    omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
+            write(*,'("writing to thread:", I2.2," h:",I2.2," u:",I2.2,X,A)') &
+                omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
 
             
 
@@ -816,7 +829,7 @@ program LOCA_Colate_to_ClimDivs
             deallocate ( output_buffer )
 
 
-            !print*, "done with IMP loop"
+            print*, "omp done with IMP loop"
 
           end do  !! HUCS loop (h)
 
