@@ -80,6 +80,10 @@ program LOCA_Colate_to_ClimDivs
   real    (kind=4), allocatable :: map_tasmax(:,:,:)
   real    (kind=4), allocatable :: map_tasmin(:,:,:)
 
+  real (kind=4), dimension(nlon,nlat) :: map_tasmin_local
+  real (kind=4), dimension(nlon,nlat) :: map_tasmax_local
+  real (kind=4), dimension(nlon,nlat) :: map_pr_local
+
   real (kind=4), allocatable          :: sort_pr(:)
   real (kind=4), allocatable          :: sort_tasmax(:)
   real (kind=4), allocatable          :: sort_tasmin(:)
@@ -687,7 +691,20 @@ program LOCA_Colate_to_ClimDivs
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
              
-              print*, "omp mapping ut the mask"
+             print*, "omp subsetting the precip map"
+
+             map_pr_local = map_pr(    :,:,t)
+
+             print*, "omp subsetting the tasmax map"
+
+             map_tasmax_local = map_tasmax(:,:,t)
+
+             print*, "omp subsetting the tasmin map"
+
+             map_tasmin_local = map_tasmin(:,:,t)
+
+
+              print*, "omp mapping out the mask"
 
               mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
                                     (map_pr(    :,:,t) .ne.     pr_FillValue) .and. &
