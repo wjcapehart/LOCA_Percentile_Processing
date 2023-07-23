@@ -54,7 +54,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   integer (kind=4) :: myhuc_low    = 3106
-  integer (kind=4) :: myhuc_high   = 3106
+  integer (kind=4) :: myhuc_high   = 3107
 
 
   integer (kind=4) :: t_buffer
