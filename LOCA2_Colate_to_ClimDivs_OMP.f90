@@ -536,10 +536,10 @@ program LOCA_Colate_to_ClimDivs
                      tt, n_reads
             print*, "=="
 
-            allocate (                  input_map(nlon, nlat, span_t(tt)) )
+            allocate (                  input_map( nlon, nlat, span_t(tt)) )
             allocate (                  map_tasmax(nlon, nlat, span_t(tt)) )
             allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
-            allocate (                  map_pr(nlon, nlat, span_t(tt)) )
+            allocate (                  map_pr(    nlon, nlat, span_t(tt)) )
           end if
 
 
@@ -694,7 +694,11 @@ program LOCA_Colate_to_ClimDivs
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
 
              
-             print*, "omp subsetting the precip map"
+             print*, "omp subsetting the precip map, t = ", t
+
+             print*, "   omp shape map_pr_local", shape(map_pr_local)
+             print*, "   omp shape       map_pr", shape(map_pr_local)
+             print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t))
 
              map_pr_local = map_pr(    :,:,t)
 
