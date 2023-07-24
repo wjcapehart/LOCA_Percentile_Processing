@@ -710,7 +710,7 @@ program LOCA_Colate_to_ClimDivs
                              ii,jj,t, &
                              huc_map(   ii,jj), &
                              map_pr(    ii,jj,t), &
-                             map_tasmax(ii,jj,t) &
+                             map_tasmax(ii,jj,t) 
 
 
 
