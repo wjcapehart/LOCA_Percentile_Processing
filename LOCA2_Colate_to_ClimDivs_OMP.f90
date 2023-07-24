@@ -652,7 +652,6 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&             SHARED (e,                   &
 !$OMP&                     tt,                  &
 !$OMP&                     s,                   &
-!$OMP&                     s,                   &
 !$OMP&                     csv_filename,        &
 !$OMP&                     models,              &
 !$OMP&                     members,             &
