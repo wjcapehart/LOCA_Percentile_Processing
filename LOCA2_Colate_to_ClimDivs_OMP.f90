@@ -695,9 +695,9 @@ program LOCA_Colate_to_ClimDivs
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
             
 
-             print*, "   omp shape map_pr_local", shape(map_pr_local)
-             print*, "   omp shape       map_pr", shape(map_pr_local)
-             print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t))
+             print*, "   omp shape map_pr_local", shape(map_pr_local), size(map_pr_local)
+             print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t)), size(map_pr(    :,:,t)))
+             print*, "   omp shape       map_pr", shape(map_pr), size(map_pr)
 
             do jj = 1, nlat
               do ii = 1, nlon
