@@ -54,7 +54,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   integer (kind=4) :: myhuc_low    = 3106
-  integer (kind=4) :: myhuc_high   = 3107
+  integer (kind=4) :: myhuc_high   = 3106
 
 
   integer (kind=4) :: t_buffer
@@ -704,7 +704,7 @@ program LOCA_Colate_to_ClimDivs
             do jj = 1, nlat
               do ii = 1, nlon
 
-                write(6,'("   h:",I3,"(",I4,") i:",I3.3,":",I3.3," j:",I3.3,":",I3.3," t:",I4," HUC:",I8.8," PR:",F8.1,"Tx:",F8.1)') &
+                write(6,'("   h:",I3,"(",I4,") i:",I3.3,":",I3.3," j:",I3.3,":",I3.3," t:",I4," HUC:",I8.8," PR:",F8.1," Tx:",F8.1)') &
                              h, myhucs(h), &
                              ii,nlon, &
                              jj,nlat, &
