@@ -704,11 +704,13 @@ program LOCA_Colate_to_ClimDivs
             do jj = 1, nlat
               do ii = 1, nlon
 
-                print*, "   h,i,j,t,map_pr,map_tmax,huc_map:",myhucs(h), &
+                write(6,"('A,x,I4,I4,I4,I8,x,F10.1,F10.1x,F10.1)")
+                    "   h,i,j,t,map_pr,map_tmax,huc_map:", &
+                             myhucs(h), &
                              ii,jj,t, &
+                             huc_map(   ii,jj), &
                              map_pr(    ii,jj,t), &
-                             map_tasmax(ii,jj,t), &
-                             huc_map(ii,jj)
+                             map_tasmax(ii,jj,t) &
 
 
 
