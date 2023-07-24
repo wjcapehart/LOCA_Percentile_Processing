@@ -699,7 +699,7 @@ program LOCA_Colate_to_ClimDivs
              print*, "   omp shape map_pr_local", shape(map_pr_local)
              print*, "   omp shape       map_pr", shape(map_pr_local)
              print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t))
-
+             print*, "   omp shape   map_pr_sub", map_pr(:,:,t)
              map_pr_local = map_pr(    :,:,t)
 
              print*, "omp subsetting the tasmax map"
