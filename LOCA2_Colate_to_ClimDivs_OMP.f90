@@ -696,7 +696,7 @@ program LOCA_Colate_to_ClimDivs
             
 
              print*, "   omp shape map_pr_local", shape(map_pr_local), size(map_pr_local)
-             print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t)), size(map_pr(    :,:,t)))
+             print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t)), size(map_pr(    :,:,t))
              print*, "   omp shape       map_pr", shape(map_pr), size(map_pr)
 
             do jj = 1, nlat
