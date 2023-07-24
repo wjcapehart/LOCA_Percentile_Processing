@@ -63,7 +63,7 @@ program LOCA_Colate_to_ClimDivs
   integer (kind=4), allocatable          :: end_t(:)
   integer (kind=4), allocatable          :: span_t(:)
 
-  integer :: e, s, h, t, tt, ntime, huc_counter, n_reads, last_read
+  integer :: e, s, h, t, tt, ntime, huc_counter, n_reads, last_read, ii, jj
 
   integer (kind=4), dimension(nlon,nlat) :: mask_map
   real    (kind=4), dimension(nlon,nlat) :: masked_variable_map
@@ -107,6 +107,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=16), dimension(nens)       :: models
   character (len=10), dimension(nens)       :: members
   character (len= 4), dimension(nens,nscen) :: scen_inv
+
   logical, dimension(nens,nscen)            :: got_scenario
   logical, dimension(nens,nscen,nvars)      :: got_variable
 
@@ -642,6 +643,7 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     nhuccellslocal,      &
 !$OMP&                     output_buffer,       &
 !$OMP&                     map_pr_local,        &
+!$OMP&                     ii,jj,               &
 !$OMP&                     map_tasmax_local,    &
 !$OMP&                     map_tasmin_local,    &
 !$OMP&                     sort_tasmax,         &
@@ -650,7 +652,7 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&             SHARED (e,                   &
 !$OMP&                     tt,                  &
 !$OMP&                     s,                   &
-!$OMP&                     n_reads,             &
+!$OMP&                     s,                   &
 !$OMP&                     csv_filename,        &
 !$OMP&                     models,              &
 !$OMP&                     members,             &
@@ -699,7 +701,25 @@ program LOCA_Colate_to_ClimDivs
              print*, "   omp shape map_pr_local", shape(map_pr_local)
              print*, "   omp shape       map_pr", shape(map_pr_local)
              print*, "   omp shape   map_pr_sub", shape(map_pr(    :,:,t))
+
+            do jj = 1, nlat
+              do ii = 1, nlon
+
+                print*, "   i,j,t,map_pr,map_tmax,huc_map:",ii,jj,t, &
+                             map_pr(    ii,jj,t), &
+                             map_tasmax(ii,jj,t), &
+                             huc_map(ii,jj)
+
+
+
+              end do
+            end do
+
+
              print*, "   omp shape   map_pr_sub", map_pr(:,:,t)
+
+
+
              map_pr_local = map_pr(    :,:,t)
 
              print*, "omp subsetting the tasmax map"
