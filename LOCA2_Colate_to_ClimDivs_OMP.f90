@@ -704,8 +704,7 @@ program LOCA_Colate_to_ClimDivs
             do jj = 1, nlat
               do ii = 1, nlon
 
-                write(6,'(A,x,I5,I5,I5,I5,I8,x,F10.1,x,F10.1,x,F10.1)')
-                    "   h,i,j,t,map_pr,map_tmax,huc_map:", &
+                write(6,'("   h,i,j,t,map_pr,map_tmax,huc_map:",x,I5,I5,I5,I5,I8,x,F10.1,x,F10.1,x,F10.1)') &
                              h,
                              myhucs(h), &
                              ii,jj,t, &
