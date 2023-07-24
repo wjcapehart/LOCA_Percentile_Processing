@@ -54,7 +54,7 @@ program LOCA_Colate_to_ClimDivs
 
 
   integer (kind=4) :: myhuc_low    = 3106
-  integer (kind=4) :: myhuc_high   = 3106
+  integer (kind=4) :: myhuc_high   = 3107
 
 
   integer (kind=4) :: t_buffer
@@ -642,8 +642,8 @@ program LOCA_Colate_to_ClimDivs
 !$OMP&                     caldate,             &
 !$OMP&                     nhuccellslocal,      &
 !$OMP&                     output_buffer,       &
-!$OMP&                     map_pr_local,        &
 !$OMP&                     ii,jj,               &
+!$OMP&                     map_pr_local,        &
 !$OMP&                     map_tasmax_local,    &
 !$OMP&                     map_tasmin_local,    &
 !$OMP&                     sort_tasmax,         &
@@ -693,9 +693,7 @@ program LOCA_Colate_to_ClimDivs
 
               write(*,'(" - omp proc:(",I2.2,":",I2.2,") caldat: ",A," HUC:", I8, " Cells:", I8 )') &
               omp_get_thread_num(), num_procs, trim(caldate), myhucs(h)
-
-             
-             print*, "omp subsetting the precip map, t = ", t
+            
 
              print*, "   omp shape map_pr_local", shape(map_pr_local)
              print*, "   omp shape       map_pr", shape(map_pr_local)
@@ -704,7 +702,7 @@ program LOCA_Colate_to_ClimDivs
             do jj = 1, nlat
               do ii = 1, nlon
 
-                write(6,'("   h:",I3,"(",I4,") i:",I3.3,":",I3.3," j:",I3.3,":",I3.3," t:",I4," HUC:",I8.8," PR:",F8.1," Tx:",F8.1)') &
+                write(6,'("   h:",I3,"(",I4,") i:",I3.3,":",I3.3," j:",I3.3,":",I3.3," t:",I4," HUC:",I4.4," PR:",F8.1," Tx:",F8.1)') &
                              h, myhucs(h), &
                              ii,nlon, &
                              jj,nlat, &
@@ -713,15 +711,10 @@ program LOCA_Colate_to_ClimDivs
                              map_pr(    ii,jj,t), &
                              map_tasmax(ii,jj,t) 
 
-
-
               end do
             end do
 
-
-             print*, "   omp shape   map_pr_sub", map_pr(:,:,t)
-
-
+             print*, "omp subsetting the precip map, t = ", t
 
              map_pr_local = map_pr(    :,:,t)
 
@@ -736,10 +729,10 @@ program LOCA_Colate_to_ClimDivs
 
               print*, "omp mapping out the mask"
 
-              mask_map = merge(1,0, (huc_map           .eq.        myhucs(h)) .and. &
-                                    (map_pr(    :,:,t) .ne.     pr_FillValue) .and. &
-                                    (map_tasmax(:,:,t) .ne. tasmax_FillValue) .and. &
-                                    (map_tasmin(:,:,t) .ne. tasmin_FillValue)       )
+              mask_map = merge(1,0, (huc_map          .eq.        myhucs(h)) .and. &
+                                    (map_pr_local     .ne.     pr_FillValue) .and. &
+                                    (map_tasmax_local .ne. tasmax_FillValue) .and. &
+                                    (map_tasmin_local .ne. tasmin_FillValue)       )
 
               print*, "omp calculate the mask size"
 
