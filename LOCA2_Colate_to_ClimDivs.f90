@@ -31,15 +31,13 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: map_values_name   = "climdiv"
   character (len=*), PARAMETER  :: filename_map      = "./LOCA2_MASKS.nc"
 
-
   character (len=*), PARAMETER  :: file_front_root   = &
-            "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Original_CONUS/"
+            "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Original_CONUS/"
+            
   character (len=*), PARAMETER  :: file_output_root  = &
-            "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/"    // &
+            "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/"    // &
             "Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/" // &
             "work/LOCA2_nCLIMDIV_"
-
-
 
   !character (len=*), PARAMETER  :: file_front_root   = &
   !          "http://kyrill.ias.sdsmt.edu:8080/thredds/dodsC/LOCA2/Original_CONUS/"
