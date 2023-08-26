@@ -13,7 +13,7 @@ program LOCA_Colate_to_ClimDivs
 
   implicit none
 
-  integer, parameter :: nens       =    26
+  integer, parameter :: nens       =    67
   integer, parameter :: nscen      =     4
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   944
