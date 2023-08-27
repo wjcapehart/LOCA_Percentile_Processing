@@ -99,10 +99,8 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
-
-
-
-  
+  real (kind=4) :: new_cpu_time
+  real (kind=4) :: old_cpu_time 
 
   character (len=16), dimension(nens)       :: models
   character (len=10), dimension(nens)       :: members
@@ -166,6 +164,7 @@ program LOCA_Colate_to_ClimDivs
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  call cpu_time(old_cpu_time)
 
   num_procs = 1
 
@@ -542,13 +541,16 @@ program LOCA_Colate_to_ClimDivs
             allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
             allocate (                  map_pr(    nlon, nlat, span_t(tt)) )
           end if
-
-
-
-          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
+          
+          call cpu_time(new_cpu_time)
+     
+          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2," t=",F8.3,"s")')  trim(caldate_pull),trim(caldate_end), &
                       trim(models(e))//"."//trim(members(e)), &
                       trim(scenarios(s)), &
-                      num_procs
+                      num_procs,
+                      (new_cpu_time-old_cpu_time)
+        
+          old_cpu_time = new_cpu_time
 
           netcdf_dims_3d_start   = (/    1,    1, start_t(tt) /)
           netcdf_dims_3d_count   = (/ nlon, nlat,  span_t(tt) /)

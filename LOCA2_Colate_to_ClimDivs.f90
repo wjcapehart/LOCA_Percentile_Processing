@@ -1,9 +1,9 @@
 program LOCA_Colate_to_ClimDivs
   
-  !ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff  ./LOCA2_Colate_to_ClimDivs.f90 
+  !ifort -o LOCA2_Colate_to_ClimDivs.exe  -O3 -I$NETCDFINC -L$NETCDFLIB -lnetcdff  ./LOCA2_Colate_to_ClimDivs.f90 
   
-  !ifort    -o ./a.out -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -qopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90 
-  !gfortran -o ./a.out -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -fopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90
+  !ifort    -o ./a.out -O3 -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -qopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90 
+  !gfortran -o ./a.out  -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -fopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90
 
   !ulimit -s unlimited
 
@@ -79,7 +79,6 @@ program LOCA_Colate_to_ClimDivs
   real (kind=4), allocatable          :: sort_tasmax(:)
   real (kind=4), allocatable          :: sort_tasmin(:)
 
-
   real (kind=4), dimension(nlat*nlon) :: linear_array
 
   real (kind=8), dimension(ntime_hist) :: time_cord_hist
@@ -90,10 +89,8 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
-
-
-
-  
+  real (kind=4) :: new_cpu_time
+  real (kind=4) :: old_cpu_time
 
   character (len=16), dimension(nens)       :: models
   character (len=10), dimension(nens)       :: members
@@ -124,9 +121,6 @@ program LOCA_Colate_to_ClimDivs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
   character(len=255),        allocatable :: csv_filename(:)   
 
-
-
-
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   ! NetCDF Identifiers
@@ -156,6 +150,7 @@ program LOCA_Colate_to_ClimDivs
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  call cpu_time(old_cpu_time)
 
   num_procs = 1
 
@@ -200,9 +195,6 @@ program LOCA_Colate_to_ClimDivs
     end do
 
   close(1)
-
-
-
 
 !!!!!!!!!!!!!!!!  Get input_map
 
@@ -533,12 +525,15 @@ program LOCA_Colate_to_ClimDivs
             allocate (                  map_pr(nlon, nlat, span_t(tt)) )
           end if
 
-
-
-          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
+          call cpu_time(new_cpu_time)
+     
+          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2," t=",F8.3,"s")')  trim(caldate_pull),trim(caldate_end), &
                       trim(models(e))//"."//trim(members(e)), &
                       trim(scenarios(s)), &
-                      num_procs
+                      num_procs,
+                      (new_cpu_time-old_cpu_time)
+        
+          old_cpu_time = new_cpu_time
 
           netcdf_dims_3d_start   = (/    1,    1, start_t(tt) /)
           netcdf_dims_3d_count   = (/ nlon, nlat,  span_t(tt) /)
