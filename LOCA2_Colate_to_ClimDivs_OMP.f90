@@ -547,7 +547,7 @@ program LOCA_Colate_to_ClimDivs
           write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2," Δt=",F8.3,"s")')  trim(caldate_pull),trim(caldate_end), &
                       trim(models(e))//"."//trim(members(e)), &
                       trim(scenarios(s)), &
-                      num_procs,
+                      num_procs, &
                       (new_cpu_time-old_cpu_time)
         
           old_cpu_time = new_cpu_time
