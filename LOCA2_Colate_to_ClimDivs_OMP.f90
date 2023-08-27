@@ -541,10 +541,10 @@ program LOCA_Colate_to_ClimDivs
             allocate (                  map_tasmin(nlon, nlat, span_t(tt)) )
             allocate (                  map_pr(    nlon, nlat, span_t(tt)) )
           end if
-          
+
           call cpu_time(new_cpu_time)
      
-          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2," t=",F8.3,"s")')  trim(caldate_pull),trim(caldate_end), &
+          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2," Δt=",F8.3,"s")')  trim(caldate_pull),trim(caldate_end), &
                       trim(models(e))//"."//trim(members(e)), &
                       trim(scenarios(s)), &
                       num_procs,
