@@ -516,6 +516,8 @@ program LOCA_Colate_to_ClimDivs
        ncstat = NF90_CLOSE(netcdf_id_file_loca2)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+        print*, " Starting OMP Space ", n_reads
+
 !$OMP PARALLEL DO PRIVATE (h,                   &
 !$OMP&                     t,                   &
 !$OMP&                     linear_array,        &
