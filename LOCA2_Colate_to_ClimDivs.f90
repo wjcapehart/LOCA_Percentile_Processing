@@ -607,6 +607,9 @@ program LOCA_Colate_to_ClimDivs
           ncstat = NF90_CLOSE(netcdf_id_file_loca2)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+              deallocate (     input_map )
+
+
           !
           !!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -803,8 +806,9 @@ program LOCA_Colate_to_ClimDivs
              !    omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
 
             
-
+            !$OMP CRITICAL
             write(unit_huc(h),"(A)") output_buffer(:)
+            !$OMP END CRITICAL
 
             deallocate ( output_buffer )
 
@@ -823,7 +827,6 @@ program LOCA_Colate_to_ClimDivs
                 tt,n_reads-1, n_reads
           print*, "=="
 
-          deallocate (     input_map )
           deallocate (    map_tasmax )
           deallocate (    map_tasmin )
           deallocate (        map_pr )
