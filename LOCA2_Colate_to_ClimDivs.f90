@@ -1,18 +1,14 @@
 program LOCA_Colate_to_ClimDivs
-  
-  !ifort -o LOCA2_Colate_to_ClimDivs.exe  -O3 -I$NETCDFINC -L$NETCDFLIB -lnetcdff  ./LOCA2_Colate_to_ClimDivs.f90 
-  
-  !ifort    -o ./a.out -O3 -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -qopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90 
-  !gfortran -o ./a.out  -I$NETCDFINC -L$NETCDFLIB -lnetcdff  -fopenmp ./LOCA2_Colate_to_ClimDivs_OMP.f90
 
-  !ulimit -s unlimited
+!ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff -qopenmp ./LOCA2_Colate_to_ClimDivs.f90 
+
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
   !use omp_lib
 
   implicit none
 
-  integer, parameter :: nens       =    67
+  integer, parameter :: nens       =    26
   integer, parameter :: nscen      =     4
   integer, parameter :: nvars      =     3
   integer, parameter :: nlon       =   944
@@ -31,13 +27,15 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: map_values_name   = "climdiv"
   character (len=*), PARAMETER  :: filename_map      = "./LOCA2_MASKS.nc"
 
+
   character (len=*), PARAMETER  :: file_front_root   = &
-            "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Original_CONUS/"
-            
+            "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Original_CONUS/"
   character (len=*), PARAMETER  :: file_output_root  = &
-            "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/"    // &
+            "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/"    // &
             "Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/" // &
-            "R_Daily_Files/work/LOCA2_nCLIMDIV_"
+            "work/LOCA2_nCLIMDIV_"
+
+
 
   !character (len=*), PARAMETER  :: file_front_root   = &
   !          "http://kyrill.ias.sdsmt.edu:8080/thredds/dodsC/LOCA2/Original_CONUS/"
@@ -48,9 +46,9 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: end_scen   = nscen
 
   integer (kind=4) :: myhuc_low    = 3905
-  integer (kind=4) :: myhuc_high   = 3905
+  integer (kind=4) :: myhuc_high   = 3909
 
-  integer, parameter :: npull = 2! 2 !, 3, 7, 487
+  integer, parameter :: npull = 365! 2 !, 3, 7, 487
 
   integer (kind=4) :: t_buffer
 
@@ -79,6 +77,7 @@ program LOCA_Colate_to_ClimDivs
   real (kind=4), allocatable          :: sort_tasmax(:)
   real (kind=4), allocatable          :: sort_tasmin(:)
 
+
   real (kind=4), dimension(nlat*nlon) :: linear_array
 
   real (kind=8), dimension(ntime_hist) :: time_cord_hist
@@ -89,8 +88,10 @@ program LOCA_Colate_to_ClimDivs
 
   character (len=19)  :: caldate, caldate_pull, caldate_end
 
-  real (kind=4) :: new_cpu_time
-  real (kind=4) :: old_cpu_time
+
+
+
+  
 
   character (len=16), dimension(nens)       :: models
   character (len=10), dimension(nens)       :: members
@@ -121,6 +122,9 @@ program LOCA_Colate_to_ClimDivs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
   character(len=255),        allocatable :: csv_filename(:)   
 
+
+
+
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   ! NetCDF Identifiers
@@ -150,7 +154,6 @@ program LOCA_Colate_to_ClimDivs
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  call cpu_time(old_cpu_time)
 
   num_procs = 1
 
@@ -195,6 +198,9 @@ program LOCA_Colate_to_ClimDivs
     end do
 
   close(1)
+
+
+
 
 !!!!!!!!!!!!!!!!  Get input_map
 
@@ -525,15 +531,12 @@ program LOCA_Colate_to_ClimDivs
             allocate (                  map_pr(nlon, nlat, span_t(tt)) )
           end if
 
-          call cpu_time(new_cpu_time)
-     
-          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2," Δt=",F8.3,"s")')  trim(caldate_pull),trim(caldate_end), &
+
+
+          write(*,'(A,"  ",A,"   ",A,"_",A," NP:",I2)')  trim(caldate_pull),trim(caldate_end), &
                       trim(models(e))//"."//trim(members(e)), &
                       trim(scenarios(s)), &
-                      num_procs, &
-                      (new_cpu_time-old_cpu_time)
-        
-          old_cpu_time = new_cpu_time
+                      num_procs
 
           netcdf_dims_3d_start   = (/    1,    1, start_t(tt) /)
           netcdf_dims_3d_count   = (/ nlon, nlat,  span_t(tt) /)
@@ -606,9 +609,6 @@ program LOCA_Colate_to_ClimDivs
 
           ncstat = NF90_CLOSE(netcdf_id_file_loca2)
               if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
-              deallocate (     input_map )
-
 
           !
           !!!!!!!!!!!!!!!!!!!!!!!!!
@@ -806,9 +806,8 @@ program LOCA_Colate_to_ClimDivs
              !    omp_get_thread_num(),h, unit_huc(h), csv_filename(h)
 
             
-            !$OMP CRITICAL
+
             write(unit_huc(h),"(A)") output_buffer(:)
-            !$OMP END CRITICAL
 
             deallocate ( output_buffer )
 
@@ -827,6 +826,7 @@ program LOCA_Colate_to_ClimDivs
                 tt,n_reads-1, n_reads
           print*, "=="
 
+          deallocate (     input_map )
           deallocate (    map_tasmax )
           deallocate (    map_tasmin )
           deallocate (        map_pr )
