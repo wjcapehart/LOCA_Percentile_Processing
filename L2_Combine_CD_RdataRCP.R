@@ -4,8 +4,8 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files"
-work_dir  = "/projects/ECEP/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/work"
+directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files"
+work_dir  = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/work"
 prefix    = "NGP_LOCA_nCLIMDIV_"
 outpref   = "NGP_LOCA_nCLIMDIV_"
 
