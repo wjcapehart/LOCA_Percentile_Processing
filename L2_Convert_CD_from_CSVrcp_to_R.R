@@ -81,6 +81,8 @@ members_factor = factor(members)
 
 for (filename in csv_files)
 {
+
+  print(str_c("Begin Processing ",filename))
   command = str_c("gunzip -v ",
                   filename,
                   ".csv.gz",
@@ -90,7 +92,8 @@ for (filename in csv_files)
 
         loca2_daily = read_csv(str_c(filename,
                                     ".csv",
-                                    sep=""))
+                                    sep=""),
+                      progress = show_progress())
 
 
 
@@ -139,7 +142,7 @@ for (filename in csv_files)
         loca2_daily$tasmin = as.single(loca2_daily$tasmin)
         loca2_daily$pr     = as.single(loca2_daily$pr)
         
-        last2_record = loca2_daily[nrow(loca2_daily), ]
+        last_record = loca2_daily[nrow(loca2_daily), ]
         print(last_record)
 
         save(loca2_daily,
