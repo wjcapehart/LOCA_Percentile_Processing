@@ -45,8 +45,8 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3501
-  integer (kind=4) :: myhuc_high   = 3504
+  integer (kind=4) :: myhuc_low    = 3505
+  integer (kind=4) :: myhuc_high   = 3509
 
   integer, parameter :: npull = 365! 2 !, 3, 7, 487
 
