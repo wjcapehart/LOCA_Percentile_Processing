@@ -4,10 +4,10 @@ library(readr)
 library(tidyverse)
 library(lubridate)
 
-directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/work/"
+directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/work/"
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
 
-prefix    = "LOCA2_nCLIMDIV_"
+prefix    = "LOCA2_V1_nCLIMDIV_"
 
 
 csv_files = intersect(list.files(path    = directory,

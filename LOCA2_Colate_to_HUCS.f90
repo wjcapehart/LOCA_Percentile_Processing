@@ -16,15 +16,15 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 23741
   integer, parameter :: ntime_futr = 31411
 
-  integer, parameter :: nhucs        =   344
-  integer, parameter :: len_hucstr   =     4
+  integer, parameter :: nhucs        =  2413
+  integer, parameter :: len_hucstr   =     8
   integer, parameter :: len_outbuf   =   120
   integer, parameter :: len_ensinv   =     4 ! #XNP
 
   character (len=*), PARAMETER  :: ensinv_file  = "./LOCA2_Model_Member_Available_Ptile.csv"
 
-  character (len=*), PARAMETER  :: map_variable_name = "LOCA2_CLIMDIV"
-  character (len=*), PARAMETER  :: map_values_name   = "climdiv"
+  character (len=*), PARAMETER  :: map_variable_name = "LOCA2_HUC08"
+  character (len=*), PARAMETER  :: map_values_name   = "HUC08"
   character (len=*), PARAMETER  :: filename_map      = "./LOCA2_MASKS.nc"
 
 
@@ -32,15 +32,10 @@ program LOCA_Colate_to_ClimDivs
             "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Original_CONUS/"
   character (len=*), PARAMETER  :: file_output_root  = &
             "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/"    // &
-            "Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/" // &
-            "work/LOCA2_V1_nCLIMDIV_"
+            "Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/" // &
+            "work/LOCA2_V1_HUC08_"
 
 
-
-  !character (len=*), PARAMETER  :: file_front_root   = &
-  !          "http://kyrill.ias.sdsmt.edu:8080/thredds/dodsC/LOCA2/Original_CONUS/"
-  !character (len=*), PARAMETER  :: file_output_root  = &
-  !          "./work/LOCA2_nCLIMDIV_"
 
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
