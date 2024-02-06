@@ -18,7 +18,7 @@ program LOCA_Colate_to_ClimDivs
 
   integer, parameter :: nhucs        =   344
   integer, parameter :: len_hucstr   =     4
-  integer, parameter :: len_outbuf   =   255
+  integer, parameter :: len_outbuf   =   120
   integer, parameter :: len_ensinv   =     4 ! #XNP
 
   character (len=*), PARAMETER  :: ensinv_file  = "./LOCA2_Model_Member_Available_Ptile.csv"
@@ -45,8 +45,8 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: start_scen = 1
   integer, parameter :: end_scen   = nscen
 
-  integer (kind=4) :: myhuc_low    = 3101
-  integer (kind=4) :: myhuc_high   = 3103
+  integer (kind=4) :: myhuc_low    = 3104
+  integer (kind=4) :: myhuc_high   = 3104
 
   integer, parameter :: npull = 365! 2 !, 3, 7, 487
 
