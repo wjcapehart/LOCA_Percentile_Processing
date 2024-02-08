@@ -1,0 +1,53 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="3.34.3-Prizren">
+  <identifier>GIS.OFFICIAL_CLIM_DIVISIONS</identifier>
+  <parentidentifier></parentidentifier>
+  <language>EN</language>
+  <type>dataset</type>
+  <title>GIS.OFFICIAL_CLIM_DIVISIONS</title>
+  <abstract>REQUIRED: A brief narrative summary of the data set.
+
+REQUIRED: A summary of the intentions with which the data set was developed.</abstract>
+  <keywords vocabulary="gmd:topicCategory">
+    <keyword>REQUIRED: Common-use word or phrase used to describe the subject of the data set.</keyword>
+  </keywords>
+  <contact>
+    <name></name>
+    <organization></organization>
+    <position></position>
+    <voice></voice>
+    <fax></fax>
+    <email></email>
+    <role></role>
+  </contact>
+  <links>
+    <link name="SDE Feature Class" url="Server=storm-b.ncdc.noaa.gov; Service=port:5150; User=gis; Version=SDE.DEFAULT" format="" mimeType="" size="" description="" type="ArcSDE Connection"/>
+  </links>
+  <dates/>
+  <fees></fees>
+  <constraints type="Access">REQUIRED: Restrictions and legal prerequisites for accessing the data set.</constraints>
+  <rights>REQUIRED: Restrictions and legal prerequisites for using the data set after access is granted.</rights>
+  <encoding></encoding>
+  <crs>
+    <spatialrefsys nativeFormat="Wkt">
+      <wkt></wkt>
+      <proj4></proj4>
+      <srsid>0</srsid>
+      <srid>0</srid>
+      <authid></authid>
+      <description></description>
+      <projectionacronym></projectionacronym>
+      <ellipsoidacronym></ellipsoidacronym>
+      <geographicflag>false</geographicflag>
+    </spatialrefsys>
+  </crs>
+  <extent>
+    <spatial maxx="-66.95000500000000443" maxy="49.38435900000000345" miny="24.5439399999999992" minz="0" minx="-124.73317400000000532" crs="EPSG:4326" maxz="0" dimensions="2"/>
+    <temporal>
+      <period>
+        <start></start>
+        <end></end>
+      </period>
+    </temporal>
+  </extent>
+</qgis>

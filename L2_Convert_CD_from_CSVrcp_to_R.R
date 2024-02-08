@@ -3,6 +3,7 @@ library(forcats)
 library(readr)
 library(tidyverse)
 library(lubridate)
+library(labelled)
 
 directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/work/"
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
@@ -144,6 +145,22 @@ for (filename in csv_files)
         
         last_record = loca2_daily[nrow(loca2_daily), ]
         print(last_record)
+
+
+
+        loca2_daily = remove_attributes(x          = loca2_daily, 
+                                        attributes = "Csingle") %>%
+                      arrange(Division,
+                      Scenario,
+                      Model,
+                      Member,
+                      Percentile,
+                      Time)
+
+                                    
+
+
+   
 
         save(loca2_daily,
              file = str_c(filename,
