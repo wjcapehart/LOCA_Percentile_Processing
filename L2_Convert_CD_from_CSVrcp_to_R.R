@@ -8,8 +8,8 @@ library(labelled)
 directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/work/"
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
 
+prefix       = "LOCA2_nCLIMDIV_"
 prefix    = "LOCA2_V1_nCLIMDIV_"
-
 
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
@@ -163,7 +163,7 @@ for (filename in csv_files)
    
 
         save(loca2_daily,
-             file = str_c(filename,
+             file = str_c(filenameout,
                           ".RData",
                           sep=""))
 
