@@ -163,7 +163,7 @@ for (filename in csv_files)
    
 
         save(loca2_daily,
-             file = str_c(filenameout,
+             file = str_c(filename,
                           ".RData",
                           sep=""))
 
