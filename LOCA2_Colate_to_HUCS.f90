@@ -1,6 +1,6 @@
 program LOCA_Colate_to_ClimDivs
 
-!ifort -o LOCA2_Colate_to_ClimDivs.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff  ./LOCA2_Colate_to_ClimDivs.f90 
+!ifort -o ./LOCA2_Colate_to_HUCS.exe -I$NETCDFINC -L$NETCDFLIB -lnetcdff  ./LOCA2_Colate_to_HUCS.f90 
 
 
   use netcdf  ! the netcdf module is at /usr/local/netcdf/include/NETCDF.mod
@@ -201,19 +201,24 @@ program LOCA_Colate_to_ClimDivs
 
   
 
-  print*, "opening ",filename_map
+  print*, "Opening Mapping File ",filename_map
 
   ncstat = NF90_OPEN(filename_map, NF90_NOWRITE, netcdf_id_file_map)
     if(ncstat /= nf90_noerr) call handle_err(ncstat)
-
+    
+      print*, "    Touching ", map_variable_name
       ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_variable_name, netcdf_id_map)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
+
+      print*, "   Extracting ", map_variable_name, netcdf_id_map
       ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_map,  huc_map)
          if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+      print*, "    Touching ", map_values_name
       ncstat = NF90_INQ_VARID(netcdf_id_file_map, map_values_name,   netcdf_id_hucs)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
+      print*, "   Extracting ", map_values_name, netcdf_id_hucs
       ncstat = NF90_GET_VAR(netcdf_id_file_map,   netcdf_id_hucs, hucs)
         if(ncstat /= nf90_noerr) call handle_err(ncstat)
 
