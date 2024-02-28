@@ -97,7 +97,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=06), dimension(nvars)  :: variables
   character (len=10), dimension(nscen)  :: scenarios
 
-  character (len=2) :: pr_variable_name
+  character (len=2) ::     pr_variable_name
   character (len=6) :: tasmax_variable_name
   character (len=6) :: tasmin_variable_name
 
@@ -109,11 +109,11 @@ program LOCA_Colate_to_ClimDivs
 
   integer (kind=4)              :: nmyhucs
   integer (kind=4)              :: num_procs
-  integer (kind=4) :: nhuccellslocal
+  integer (kind=4)              :: nhuccellslocal
 
-  integer  (kind=4),         allocatable :: myhucs(:) ! nmyhucs
-  integer  (kind=4),         allocatable :: nhuccells(:) !nmyhucs
-  integer  (kind=4),         allocatable :: unit_huc(:) !nmyhucs
+  integer  (kind=4),         allocatable :: myhucs(:)        ! nmyhucs
+  integer  (kind=4),         allocatable :: nhuccells(:)     !nmyhucs
+  integer  (kind=4),         allocatable :: unit_huc(:)      !nmyhucs
   character(len=len_outbuf), allocatable :: output_buffer(:) ! span_t,
   character(len=255),        allocatable :: csv_filename(:)   
 
@@ -302,7 +302,7 @@ program LOCA_Colate_to_ClimDivs
   print*, " " 
   do h = 1, nmyhucs, 1
     print*, "   opening ",trim(csv_filename(h))
-    open(unit_huc(h), FILE=trim(csv_filename(h)), form="FORMATTED")
+    open(unit_huc(h), FILE=trim(csv_filename(h)), form="FORMATTED", status='REPLACE')
     write(unit_huc(h),*) "Time,Division,Model,Member,Scenario,Percentile,tasmax,tasmin,pr"
   end do
 
