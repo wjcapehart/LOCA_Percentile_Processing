@@ -286,9 +286,9 @@ program LOCA_Colate_to_ClimDivs
 
       nhuccells(t) = sum(mask_map)
 
-      write(csv_filename(t),'(A, I4.4,".csv")') trim(file_output_root), myhucs(t)
+      write(csv_filename(t),'(A, I8.8,".csv")') trim(file_output_root), myhucs(t)
 
-      write(*,'("h:",I3.3," u:",I3.3," Div:",I4.4," size:",I8," ",A)') t, &
+      write(*,'("h:",I3.3," u:",I3.3," Div:",I8.8," size:",I8," ",A)') t, &
                                                                        unit_huc(t), &
                                                                        myhucs(t), &
                                                                        nhuccells(t), &
@@ -732,7 +732,7 @@ program LOCA_Colate_to_ClimDivs
 
               
 
-              write(output_buffer(t_buffer),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+              write(output_buffer(t_buffer),'(A,",",I8.8,4(",",A),3(",",F8.2))')  &
                           trim(caldate), &
                           myhucs(h), &
                           trim(models(e)), &
@@ -741,7 +741,7 @@ program LOCA_Colate_to_ClimDivs
                           "P000",  &
                           minval(sort_tasmax), minval(sort_tasmin), minval(sort_pr)
 
-              write(output_buffer(t_buffer+1),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+              write(output_buffer(t_buffer+1),'(A,",",I8.8,4(",",A),3(",",F8.2))')  &
                           trim(caldate), &
                           myhucs(h), &
                           trim(models(e)), &
@@ -752,7 +752,7 @@ program LOCA_Colate_to_ClimDivs
                           quantile7(sort_tasmin, 0.25, nhuccellslocal), &
                           quantile7(sort_pr,     0.25, nhuccellslocal)
 
-              write(output_buffer(t_buffer+2),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+              write(output_buffer(t_buffer+2),'(A,",",I8.8,4(",",A),3(",",F8.2))')  &
                           trim(caldate), &
                           myhucs(h), &
                           trim(   models(e)), &
@@ -763,7 +763,7 @@ program LOCA_Colate_to_ClimDivs
                           quantile7(sort_tasmin, 0.50, nhuccellslocal), &
                           quantile7(sort_pr,     0.50, nhuccellslocal)
 
-              write(output_buffer(t_buffer+3),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+              write(output_buffer(t_buffer+3),'(A,",",I8.8,4(",",A),3(",",F8.2))')  &
                           trim(caldate), &
                           myhucs(h), &
                           trim(models(e)), &
@@ -774,7 +774,7 @@ program LOCA_Colate_to_ClimDivs
                           quantile7(sort_tasmin, 0.75, nhuccellslocal), &
                           quantile7(sort_pr,     0.75, nhuccellslocal)
 
-              write(output_buffer(t_buffer+4),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+              write(output_buffer(t_buffer+4),'(A,",",I8.8,4(",",A),3(",",F8.2))')  &
                           trim(caldate), &
                           myhucs(h), &
                           trim(models(e)), &
@@ -783,7 +783,7 @@ program LOCA_Colate_to_ClimDivs
                           "P100",  &
                           maxval(sort_tasmax), maxval(sort_tasmin), maxval(sort_pr)
 
-              write(output_buffer(t_buffer+5),'(A,",",I4.4,4(",",A),3(",",F8.2))')  &
+              write(output_buffer(t_buffer+5),'(A,",",I8.8,4(",",A),3(",",F8.2))')  &
                           trim(caldate), &
                           myhucs(h), &
                           trim(models(e)), &
