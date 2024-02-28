@@ -24,7 +24,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: ensinv_file  = "./LOCA2_Model_Member_Available_Ptile.csv"
 
   character (len=*), PARAMETER  :: map_variable_name = "LOCA2_HUC08"
-  character (len=*), PARAMETER  :: map_values_name   = "HUC08"
+  character (len=*), PARAMETER  :: map_values_name   = "huc08"
   character (len=*), PARAMETER  :: filename_map      = "./LOCA2_MASKS.nc"
 
 
