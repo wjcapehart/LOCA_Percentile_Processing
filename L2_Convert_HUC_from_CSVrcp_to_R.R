@@ -8,8 +8,8 @@ library(labelled)
 directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/work/"
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
 
-prefix       = "LOCA2_nCLIMDIV_"
-prefix    = "LOCA2_V1_HUC_"
+prefix    = "LOCA2_HUC08_"
+prefix    = "LOCA2_V1_HUC08_" 
 
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
