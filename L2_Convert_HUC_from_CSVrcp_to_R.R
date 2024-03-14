@@ -8,7 +8,7 @@ library(labelled)
 directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/work/"
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
 
-prefix    = "LOCA2_HUC08_"
+prefix    = "LOCA2_V1_HUC08_"
 prefix    = "LOCA2_V1_HUC08_" 
 
 csv_files = intersect(list.files(path    = directory,
@@ -173,7 +173,7 @@ for (filename in csv_files)
 
   command = str_c("gzip -9fv ",
                   filename,
-                   ".csv",
+                   ".csv &",
                   sep = "")
 
   system(command)

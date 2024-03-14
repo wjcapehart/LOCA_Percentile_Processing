@@ -173,7 +173,7 @@ for (filename in csv_files)
 
   command = str_c("gzip -9fv ",
                   filename,
-                   ".csv",
+                   ".csv &",
                   sep = "")
 
   system(command)
@@ -183,3 +183,6 @@ for (filename in csv_files)
 }
 
 print("We're Outahere like Vladimir")
+
+
+
