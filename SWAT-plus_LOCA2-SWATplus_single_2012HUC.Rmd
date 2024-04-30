@@ -1,0 +1,282 @@
+```{r}
+
+
+  library(package = "stringr")
+  library(package = "forcats")
+  library(package = "readr")
+  library(package = "tidyverse")
+  library(package = "lubridate")
+  library(package = "RCurl")
+  library(package = "elevatr")
+  library(package = "tidync")
+
+
+
+file="./LOCA2_MASKS.nc"
+
+HUC08_MRB_Code_Frame = tidync(file) %>%
+  hyper_tibble()  %>%
+  filter(!is.na(LOCA2_MASK)) %>%
+  rename(elevation = surface_altitude)
+
+
+```
+
+```{r}
+
+thredds_root= "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA2/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
+
+                
+get_metadata = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA2/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/USGS_HUC08_LUT.RData"
+
+load(url(get_metadata), verbose=TRUE)
+
+
+hucs_to_process = c("10120202")
+
+hucs_to_process = c("10120110")
+
+HUC08_MRB_LUT = USGS_HUC08_LUT %>% filter(huc08 %in% hucs_to_process)
+
+
+
+
+
+```
+
+```{r}
+
+
+
+```
+
+```{r}
+ggplot(data = HUC08_MRB_Code_Frame) +
+  aes(x = lon,
+      y = lat,
+      color = elevation,
+      fill  = elevation) + 
+  geom_point()
+
+
+ggplot(data = HUC08_MRB_Code_Frame) +
+  aes(x = lon,
+      y = lat,
+      color = LOCA2_HUC08,
+      fill  = LOCA2_HUC08) + 
+  geom_point( show.legend = FALSE)
+
+
+ for (basin in c("10120110"))
+  {   
+       spatial = HUC08_MRB_Code_Frame %>% 
+      filter(LOCA2_HUC08 == basin) 
+
+    plot = ggplot(data = spatial) +
+      aes(x = lon,
+          y = lat,
+          color = elevation,
+          fill  = elevation) + 
+      geom_point()
+    
+    print(plot)
+    
+       
+    spatial = HUC08_MRB_Code_Frame %>% 
+      filter(LOCA2_HUC08 == basin) %>%
+      group_by(LOCA2_HUC08) %>% 
+      summarize(max_lat = max(lat),
+                min_lat = min(lat),
+                max_lon = max(lon),
+                min_lon = min(lon),
+                lat = mean(lat),
+                lon = mean(lon),
+                elev = mean(elevation))
+    
+    print(spatial)
+      
+
+
+ }
+
+
+HUC08_MRB_LUT$LOCA2_HUC08 = as.numeric(as.character(HUC08_MRB_LUT$huc08))
+
+HUC08_MRB_LUT = left_join(x = HUC08_MRB_LUT, 
+                          y = spatial, 
+                          by = 'LOCA2_HUC08')
+
+
+```
+
+
+
+```{r}
+
+
+  Output_Scenarios = c("SSP2-4.5",
+                       "SSP3-7.0",
+                       "SSP5-8.5")
+
+
+  for (basin in hucs_to_process)
+  {
+
+    metadata = HUC08_MRB_LUT %>% filter(huc08 == basin)
+    
+
+
+    
+    spatial = HUC08_MRB_Code_Frame %>% 
+      filter(LOCA2_HUC08 == basin) %>%
+      group_by(LOCA2_HUC08) %>% 
+      summarize(max_lat = max(lat),
+                min_lat = min(lat),
+                max_lon = max(lon),
+                min_lon = min(lon),
+                lat = mean(lat),
+                lon = mean(lon),
+                elev = mean(elevation))
+    
+    
+
+
+    File_URL = str_c(thredds_root,
+                     "LOCA2_V1_HUC08_",
+                     basin,
+                     ".RData",
+                     sep = "")
+
+    my.connection = url(description = File_URL)
+      load(file = my.connection)
+      close(con = my.connection)
+      remove( my.connection)
+      
+    loca2_daily = loca2_daily %>%
+      mutate(Ensemble = str_c(Model, ".", Member, sep = ""))
+
+    ensembles =  unique(loca2_daily$Ensemble)
+    print(ensembles)
+    print(length(ensembles))
+    for (ensemble in unique(loca2_daily$Ensemble))
+    {
+
+      for (scenario in Output_Scenarios)
+      {
+        
+        out_dir = str_c("~/Desktop/LOCA2_10120110_Forcing/",
+                     ensemble,
+                     "__",
+                     str_replace(string = scenario,
+                                 pattern     = " ",
+                                 replacement = ""),
+                     "/",
+                     sep="")
+        
+
+                     
+        system(str_c("mkdir -pv ",out_dir))
+
+        subset = loca2_daily %>%
+                       filter(((Scenario  == "Historical") |
+                               (Scenario  == scenario)) &
+                              (Ensemble   == ensemble) &
+                              (Percentile == "MEAN")) %>%
+                       mutate(Year   = year(Time),
+                              Julian = yday(Time))
+        
+
+
+        #
+        # Write the Daily Max/Min Temperature File
+        #
+
+
+
+        filename_tmp = str_c(out_dir,
+                             "my_temps.tmp",
+                             sep = "")
+        
+
+
+         line_1 =  str_c("my_temps.tmp: ",ensemble,"__",scenario, sep = "") 
+         line_2 = "NBYR     TSTEP        LAT          LON          ELEV"
+
+         line_3 = str_c(length(unique(subset$Year)),
+                        0,
+                        metadata$lat,
+                        metadata$lon,
+                        metadata$elev,
+                        sep = " ")       
+
+        fileConn<-file(filename_tmp)
+          writeLines(c(line_1, line_2, line_3), fileConn)
+          close(fileConn)
+          
+          subperiod_print = subset %>%
+            select("Year","Julian","tasmax","tasmin")
+
+          
+          write_delim(x     = subperiod_print, 
+                      file  =  filename_tmp, 
+                      delim =       " ",
+                      append=TRUE) 
+     
+
+
+
+
+
+
+
+        filename_pcp = str_c(out_dir,
+                             "my_precp.pcp",
+                            sep = "")
+
+
+
+         line_1 =  str_c("my_precp.pcp: ",ensemble,"__",scenario, sep = "") 
+         line_2 = "NBYR     TSTEP        LAT          LON          ELEV"
+         line_3 = str_c(length(unique(subset$Year)),
+                        0,
+                        metadata$lat,
+                        metadata$lon,
+                        metadata$elev,
+                        sep = " ")
+
+        fileConn<-file(filename_pcp)
+          writeLines(c(line_1, line_2, line_3), fileConn)
+          close(fileConn)
+          
+          subperiod_print = subset %>%
+            select("Year","Julian","pr")
+
+          
+          write_delim(x     = subperiod_print, 
+                      file  =  filename_pcp, 
+                      delim =       " ",
+                      append=TRUE) 
+
+
+
+
+
+        #
+        # Clean Up
+        #
+
+        remove(subset)
+        remove(filename_tmp)
+        remove(filename_pcp)
+      } # scenario
+
+    } # ensemble
+
+  } # basin
+  remove(ensemble)
+  remove(scenario)
+  remove(basin)
+
+
+
+```

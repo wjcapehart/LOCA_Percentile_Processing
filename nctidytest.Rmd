@@ -1,0 +1,33 @@
+---
+title: "nctidytest"
+author: "Bill Capehart"
+date: "2024-04-13"
+output: html_document
+---
+
+```{r}
+library(tidync)
+library(tidyverse)
+
+file="./LOCA2_MASKS.nc"
+
+loca2_mask = tidync(file) %>%
+  hyper_tibble()  %>%
+  filter(!is.na(LOCA2_MASK))
+
+```
+
+## R Markdown
+```{r}
+
+tncf = tnc %>% 
+  hyper_tibble()  %>%
+  filter(!is.na(LOCA2_MASK))
+
+
+```
+
+```{r}
+tncf
+```
+

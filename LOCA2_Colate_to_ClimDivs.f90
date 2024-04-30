@@ -46,7 +46,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: end_scen   = nscen
 
   integer (kind=4) :: myhuc_low    = 4810
-  integer (kind=4) :: myhuc_high   = 4810
+  integer (kind=4) :: myhuc_high  
 
   integer, parameter :: npull = 365! 2 !, 3, 7, 487
 
@@ -154,7 +154,7 @@ program LOCA_Colate_to_ClimDivs
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
+  myhuc_high   = myhuc_low
   num_procs = 1
 
      !num_procs = omp_get_max_threads()
