@@ -146,13 +146,7 @@ program LOCA_Colate_to_ClimDivs
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_start   !  1, 1, 1 array
   INTEGER, DIMENSION(3) :: netcdf_dims_3d_count   ! NX,NY,NT array
 
-  CHARACTER(len=8) :: cmd_line_arg
-
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  CALL get_command_argument(int(1), cmd_line_arg)
-  READ(cmd_line_arg,*) myhuc_low
+ 
 
   myhuc_high   = myhuc_low
   num_procs = 1
