@@ -158,6 +158,8 @@ program LOCA_Colate_to_ClimDivs
   
   CALL get_command_argument(int(1), cmd_line_arg)
   READ(cmd_line_arg,*) myhuc_low
+
+  write(*,*) "Command Line Input for Unit ",myhuc_low
  
   myhuc_high   = myhuc_low
   num_procs = 1
