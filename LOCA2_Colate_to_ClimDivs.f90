@@ -33,7 +33,7 @@ program LOCA_Colate_to_ClimDivs
   character (len=*), PARAMETER  :: file_output_root  = &
             "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/"    // &
             "Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/" // &
-            "work/LOCA2_V1_nCLIMDIV_"
+            "R_Daily_Files/work/LOCA2_V1_nCLIMDIV_"
 
 
 
