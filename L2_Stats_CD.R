@@ -147,6 +147,14 @@ for (filename in RData_files)
                        ".RData",
                        sep = "")
   
+  print(str_c("      Saving ",
+              prefix_mon,
+              "_",
+              loca2_daily$Division[1],
+              ".RData",
+              sep = ""))
+  
+  
   save(loca2_monthly,
        file = filename_mon)         
   print("   Aggregate Annual")
@@ -198,6 +206,13 @@ for (filename in RData_files)
                        loca2_daily$Division[1],
                        ".RData",
                        sep = "")
+  
+  print(str_c("      Saving ",
+              prefix_ann,
+              "_",
+              loca2_daily$Division[1],
+              ".RData",
+              sep = ""))
   
   save(loca2_annual,
        file = str_c(filename_ann,
