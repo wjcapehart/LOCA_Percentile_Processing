@@ -165,6 +165,7 @@ for (filename in csv_files)
              file = str_c(filename,
                           ".RData",
                           sep=""))
+        print("   Aggregate Monthly")
         
         loca2_monthly = loca2_daily %>% 
           group_by(Scenario,
@@ -221,7 +222,9 @@ for (filename in csv_files)
           
           save(loca2_monthly,
                file = filename_mon)         
-
+          
+          print("   Aggregate Annual")
+          
           loca2_annual = loca2_daily %>% 
             group_by(Scenario,
                      Model,

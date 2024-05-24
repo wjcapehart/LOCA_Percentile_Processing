@@ -100,6 +100,7 @@ for (filename in RData_files)
                     sep=("")), 
        verbose = TRUE)
   
+  print("   Aggregate Monthly")
 
   loca2_monthly = loca2_daily %>% 
     group_by(Scenario,
@@ -151,6 +152,7 @@ for (filename in RData_files)
   
   save(loca2_monthly,
        file = filename_mon)         
+  print("   Aggregate Annual")
   
   loca2_annual = loca2_daily %>% 
     group_by(Scenario,
