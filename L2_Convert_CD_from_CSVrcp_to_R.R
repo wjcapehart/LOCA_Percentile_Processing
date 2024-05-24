@@ -222,8 +222,7 @@ for (filename in csv_files)
                              sep = "")
         
         save(loca2_monthly,
-             file = str_c(filename_mon,
-                          sep=""))         
+             file = filename_mon)         
         
         loca2_annual = loca2_daily %>% 
           group_by(Scenario,

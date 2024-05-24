@@ -93,7 +93,10 @@ for (filename in RData_files)
   print(str_c("Begin Processing ",filename))
 
   
-  load(file = filename, verbose = TRUE)
+  load(file = str_c(filename,
+                    ".RData",
+                    sep=("")), 
+       verbose = TRUE)
   
 
   loca2_monthly = loca2_daily %>% 
@@ -145,8 +148,7 @@ for (filename in RData_files)
                        sep = "")
   
   save(loca2_monthly,
-       file = str_c(filename_mon,
-                    sep=""))         
+       file = filename_mon)         
   
   loca2_annual = loca2_daily %>% 
     group_by(Scenario,
