@@ -21,9 +21,9 @@ RData_files = intersect(list.files(path    = directory,
                       list.files(path    = directory,
                                  pattern = "RData"))
 
-RData_files  = str_remove(csv_files, ".csv")
+RData_files  = str_remove(RData_files, ".csv")
 
-RData_files = str_c(directory,csv_files,sep="")
+RData_files = str_c(directory,RData_files,sep="")
 
 print(RData_files)
 
