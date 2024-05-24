@@ -172,8 +172,8 @@ for (filename in csv_files)
                    Model,
                    Member,
                    Percentile,
-                   Month = month(Time),
-                   Year  = year(Time)) %>% 
+                   Year  = year(Time),
+                   Month = month(Time)) %>% 
              summarize(Scenario   = Scenario[1],
                        Division   = Division[1],
                        Model      = Model[1],
@@ -215,16 +215,12 @@ for (filename in csv_files)
           
           filename_mon = str_c(mon_directory,
                                prefix_mon,
-                               "_",
-                               loca2_daily$Division[1],
+                               as.character(loca2_daily$Division[1]),
                                ".RData",
                                sep = "")
-          print(str_c("      Saving ",
-                      prefix_mon,
-                      "_",
-                      loca2_daily$Division[1],
-                      ".RData",
-                      sep = ""))
+
+          
+          
           
           save(loca2_monthly,
                file = filename_mon)         
@@ -250,17 +246,11 @@ for (filename in csv_files)
           
           filename_ann = str_c(ann_directory,
                                prefix_ann,
-                               "_",
-                               loca2_daily$Division[1],
+                               as.character(loca2_daily$Division[1]),
                                ".RData",
                                sep = "")
           
-          print(str_c("      Saving ",
-                      prefix_ann,
-                      "_",
-                      loca2_daily$Division[1],
-                      ".RData",
-                      sep = ""))
+
           
           
           save(loca2_annual,
