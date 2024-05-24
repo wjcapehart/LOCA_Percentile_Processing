@@ -1,0 +1,215 @@
+library(stringr)
+library(forcats)
+library(readr)
+library(tidyverse)
+library(lubridate)
+library(labelled)
+
+
+directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
+out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Daily_Files/"
+mon_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Monthly_Files/"
+ann_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Annual_Files/"
+
+prefix     = "LOCA2_V1_nCLIMDIV_"
+prefix_mon = "LOCA2_V1_nCLIMDIV_MONTHLY_" 
+prefix_ann = "LOCA2_V1_nCLIMDIV_ANNUAL_" 
+
+
+RData_files = intersect(list.files(path    = directory,
+                                 pattern = prefix),
+                      list.files(path    = directory,
+                                 pattern = "RData"))
+
+RData_files  = str_remove(csv_files, ".csv")
+
+RData_files = str_c(directory,csv_files,sep="")
+
+print(RData_files)
+
+
+models = c("ACCESS-CM2", 
+              "ACCESS-ESM1-5", 
+              "AWI-CM-1-1-MR", 
+              "BCC-CSM2-MR", 
+              "CanESM5", 
+              "CESM2-LENS", 
+              "CNRM-CM6-1", 
+              "CNRM-CM6-1-HR", 
+              "CNRM-ESM2-1", 
+              "EC-Earth3", 
+              "EC-Earth3-Veg", 
+              "FGOALS-g3", 
+              "GFDL-CM4", 
+              "GFDL-ESM4", 
+              "HadGEM3-GC31-LL", 
+              "HadGEM3-GC31-MM", 
+              "INM-CM4-8", 
+              "INM-CM5-0", 
+              "IPSL-CM6A-LR", 
+              "KACE-1-0-G", 
+              "MIROC6", 
+              "MPI-ESM1-2-HR", 
+              "MPI-ESM1-2-LR", 
+              "MRI-ESM2-0", 
+              "NorESM2-LM", 
+              "NorESM2-MM", 
+              "TaiESM1")
+
+members = c("r1i1p1f1", 
+            "r1i1p1f2", 
+            "r1i1p1f3", 
+            "r2i1p1f1", 
+            "r2i1p1f3", 
+            "r3i1p1f1", 
+            "r3i1p1f3", 
+            "r4i1p1f1", 
+            "r5i1p1f1", 
+            "r6i1p1f1", 
+            "r7i1p1f1", 
+            "r8i1p1f1", 
+            "r9i1p1f1", 
+            "r10i1p1f1")
+
+
+load("./NCEI_ClimDivs.RData", verbose = TRUE)
+
+
+
+FIPS_CD = NCEI_ClimDivs$FIPS_CD
+
+
+
+models_factor = factor(models)
+members_factor = factor(members)
+
+
+
+for (filename in RData_files)
+{
+  
+
+
+  print(str_c("Begin Processing ",filename))
+
+  
+  load(file = filename, verbose = TRUE)
+  
+
+  loca2_monthly = loca2_daily %>% 
+    group_by(Scenario,
+             Model,
+             Member,
+             Percentile,
+             Month = month(Time),
+             Year  = year(Time)) %>% 
+    summarize(Scenario   = Scenario[1],
+              Division   = Division[1],
+              Model      = Model[1],
+              Percentile = Percentile[1],
+              Time       = mean(Time),
+              tasmax     = mean(tasmax),
+              tasmin     = mean(tasmin),
+              pr         = sum(pr)) %>% 
+    ungroup()
+  
+  
+  
+  loca2_monthly$Scenario   = factor(x      = loca2_monthly$Scenario,
+                                    levels = levels(loca2_daily$Scenario))
+   
+  loca2_monthly$Model   = factor(x      = loca2_monthly$Model,
+                                 levels = models)
+  
+  loca2_monthly$Member   = factor(x      = loca2_monthly$Member,
+                                  levels = members)
+  
+  loca2_monthly$Percentile = factor(x      = loca2_monthly$Percentile,
+                                    levels = c("P000",
+                                               "P025",
+                                               "P050",
+                                               "P075",
+                                               "P100",
+                                               "MEAN"))
+  
+  loca2_monthly$tasmax = as.single(loca2_monthly$tasmax)
+  loca2_monthly$tasmin = as.single(loca2_monthly$tasmin)
+  loca2_monthly$pr     = as.single(loca2_monthly$pr)
+  
+  
+  filename_mon = str_c(mon_directory,
+                       prefix_mon,
+                       "_",
+                       loca2_daily$Division[1],
+                       ".RData",
+                       sep = "")
+  
+  save(loca2_monthly,
+       file = str_c(filename_mon,
+                    sep=""))         
+  
+  loca2_annual = loca2_daily %>% 
+    group_by(Scenario,
+             Model,
+             Member,
+             Percentile,
+             Year  = year(Time)) %>% 
+    summarize(Scenario   = Scenario[1],
+              Division   = Division[1],
+              Model      = Model[1],
+              Percentile = Percentile[1],
+              Time       = mean(Time),
+              tasmax     = mean(tasmax),
+              tasmin     = mean(tasmin),
+              pr         = sum(pr)) %>% 
+    ungroup()
+  
+  
+  
+  
+  
+  loca2_annual$Scenario   = factor(x      = loca2_annual$Scenario,
+                                    levels = levels(loca2_daily$Scenario))
+  
+  loca2_annual$Model   = factor(x      = loca2_annual$Model,
+                                 levels = models)
+  
+  loca2_annual$Member   = factor(x      = loca2_annual$Member,
+                                  levels = members)
+  
+  loca2_annual$Percentile = factor(x      = loca2_annual$Percentile,
+                                    levels = c("P000",
+                                               "P025",
+                                               "P050",
+                                               "P075",
+                                               "P100",
+                                               "MEAN"))
+  
+  loca2_annual$tasmax = as.single(loca2_annual$tasmax)
+  loca2_annual$tasmin = as.single(loca2_annual$tasmin)
+  loca2_annual$pr     = as.single(loca2_annual$pr)
+  
+  
+  filename_ann = str_c(ann_directory,
+                       prefix_ann,
+                       "_",
+                       loca2_daily$Division[1],
+                       ".RData",
+                       sep = "")
+  
+  save(loca2_annual,
+       file = str_c(filename_ann,
+                    sep=""))
+  
+
+
+
+
+
+  print("")
+}
+
+print("We're Outahere like Vladimir")
+
+
+

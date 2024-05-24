@@ -6,10 +6,15 @@ library(lubridate)
 library(labelled)
 
 directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/work/"
-out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
 
-prefix    = "LOCA2_V1_HUC08_"
-prefix    = "LOCA2_V1_HUC08_" 
+out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
+mon_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Monthly_Files/"
+ann_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Annual_Files/"
+
+prefix     = "LOCA2_V1_HUC08_"
+prefix_mon = "LOCA2_V1_HUC08_MONTHLY_" 
+prefix_ann = "LOCA2_V1_HUC08_ANNUAL_" 
+
 
 csv_files = intersect(list.files(path    = directory,
                                  pattern = prefix),
@@ -145,30 +150,107 @@ for (filename in csv_files)
         
         last_record = loca2_daily[nrow(loca2_daily), ]
         print(last_record)
-
-
-
+        
+        
         loca2_daily = remove_attributes(x          = loca2_daily, 
                                         attributes = "Csingle") %>%
-                      arrange(Division,
-                      Scenario,
-                      Model,
-                      Member,
-                      Percentile,
-                      Time)
-
-                                    
-
-
-   
-
+          arrange(Division,
+                  Scenario,
+                  Model,
+                  Member,
+                  Percentile,
+                  Time)
+        
         save(loca2_daily,
              file = str_c(filename,
                           ".RData",
                           sep=""))
+        
+        loca2_monthly = loca2_daily %>% 
+          group_by(Scenario,
+                   Model,
+                   Member,
+                   Percentile,
+                   Month = month(Time),
+                   Year  = year(Time)) %>% 
+             summarize(Scenario   = Scenario[1],
+                       Division   = Division[1],
+                       Model      = Model[1],
+                       Percentile = Percentile[1],
+                       Time       = mean(Time),
+                       tasmax     = mean(tasmax),
+                       tasmin     = mean(tasmin),
+                       pr         = sum(pr))
+          ungroup()
+          
+          
+          
+          loca2_daily$Scenario   = factor(x      = loca2_daily$Scenario,
+                                          levels = c("Historical",
+                                                     "SSP2-4.5",
+                                                     "SSP3-7.0",
+                                                     "SSP5-8.5"))
+          
+          
+          
+          loca2_daily$Model   = factor(x      = loca2_daily$Model,
+                                       levels = models)
+          
+          loca2_daily$Member   = factor(x      = loca2_daily$Member,
+                                        levels = members)
+          
+          loca2_daily$Percentile = factor(x      = loca2_daily$Percentile,
+                                          levels = c("P000",
+                                                     "P025",
+                                                     "P050",
+                                                     "P075",
+                                                     "P100",
+                                                     "MEAN"))
+          
+          loca2_daily$tasmax = as.single(loca2_daily$tasmax)
+          loca2_daily$tasmin = as.single(loca2_daily$tasmin)
+          loca2_daily$pr     = as.single(loca2_daily$pr)
+          
+          
+          filename_mon = str_c(mon_directory,
+                               prefix_mon,
+                               "_",
+                               loca2_daily$Division[1],
+                               ".RData",
+                               sep = "")
+          
+          save(loca2_monthly,
+               file = str_c(filename_mon,
+                            sep=""))         
 
-
-
+          loca2_annual = loca2_daily %>% 
+            group_by(Scenario,
+                     Model,
+                     Member,
+                     Percentile,
+                     Year  = year(Time)) %>% 
+            summarize(Scenario   = Scenario[1],
+                      Division   = Division[1],
+                      Model      = Model[1],
+                      Percentile = Percentile[1],
+                      Time       = mean(Time),
+                      tasmax     = mean(tasmax),
+                      tasmin     = mean(tasmin),
+                      pr         = sum(pr))
+          ungroup()
+          
+          
+          filename_ann = str_c(ann_directory,
+                               prefix_ann,
+                               "_",
+                               loca2_daily$Division[1],
+                               ".RData",
+                               sep = "")
+          
+          save(loca2_annual,
+               file = str_c(filename_ann,
+                            sep=""))
+          
 
 
   command = str_c("gzip -9fv ",
