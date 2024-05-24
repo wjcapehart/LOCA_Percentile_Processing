@@ -6,7 +6,7 @@ library(lubridate)
 library(labelled)
 
 
-directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/work/"
+directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
 
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
 mon_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Monthly_Files/"
@@ -22,7 +22,7 @@ RData_files = intersect(list.files(path    = directory,
                       list.files(path    = directory,
                                  pattern = "RData"))
 
-RData_files  = str_remove(RData_files, ".csv")
+RData_files  = str_remove(RData_files, ".RData")
 
 RData_files = str_c(directory,RData_files,sep="")
 
