@@ -72,15 +72,10 @@ members = c("r1i1p1f1",
             "r10i1p1f1")
 
 
-load("USGS_HUC08_LUT.RData", verbose=TRUE)
+load("./USGS_HUC08_LUT.RData", verbose=TRUE)
 
-
-
-FIPS_CD = NCEI_ClimDivs$FIPS_CD
-
-
-
-models_factor = factor(models)
+Division       = USGS_HUC08_LUT$huc08
+models_factor  = factor(models)
 members_factor = factor(members)
 
 
@@ -88,6 +83,11 @@ members_factor = factor(members)
 for (filename in csv_files)
 {
 
+  Division_Code = RData_files  = str_remove(filename, 
+                                            str_c(directory, 
+                                                  prefix, 
+                                                  sep=""))
+  
   print(str_c("Begin Processing ",filename))
   command = str_c("gunzip -v ",
                   filename,
@@ -101,16 +101,23 @@ for (filename in csv_files)
                                     sep=""),
                       progress = show_progress())
 
-
-
-        print(loca2_daily$Division[1])
-        if (is.numeric(loca2_daily$Division[1]))
-        {
-          loca2_daily$Division = as.character(sprintf("%08d",loca2_daily$Division))
+        if (is.na(unique(loca2_daily$Division))) {
+          
+          print(str_c("   --- Reinforcing Daily Division Codes ", 
+                      Division_Code))
+          
+        } else {
+          
+          print(str_c("   --- Enforcing Daily Division Codes ", 
+                      Division_Code, " ", 
+                      unique(loca2_daily$Division)))
         }
         
-        loca2_daily$Division   = factor(x    = loca2_daily$Division,
-                                        levels = FIPS_CD)     
+        loca2_daily$Division = Division_Code
+        loca2_daily$Division = factor(x      = loca2_daily$Division, 
+                                      levels = division_factor)
+
+ 
         
         loca2_daily$Time       = as.Date( sub("\uFEFF", "", loca2_daily$Time))
         

@@ -7,7 +7,6 @@ library(labelled)
 
 
 directory     = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
-
 out_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Daily_Files/"
 mon_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Monthly_Files/"
 ann_directory = "/data/DATASETS/LOCA_MACA_Ensembles/LOCA2/LOCA2_CONUS/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Annual_Files/"
@@ -27,6 +26,7 @@ RData_files  = str_remove(RData_files, ".RData")
 RData_files = str_c(directory,RData_files,sep="")
 
 print(RData_files)
+
 
 
 models = c("ACCESS-CM2", 
@@ -73,13 +73,13 @@ members = c("r1i1p1f1",
             "r10i1p1f1")
 
 
-load("./NCEI_ClimDivs.RData", verbose = TRUE)
 
 
+load("./USGS_HUC08_LUT.RData", verbose=TRUE)
 
-FIPS_CD = NCEI_ClimDivs$FIPS_CD
+Division = USGS_HUC08_LUT$huc08
 
-
+division_factor = factor(Division)
 
 models_factor = factor(models)
 members_factor = factor(members)
@@ -89,19 +89,40 @@ members_factor = factor(members)
 for (filename in RData_files)
 {
   
-
-
-  print(str_c("Begin Processing ",filename))
-
+  Division_Code = RData_files  = str_remove(filename, str_c(directory, prefix, sep=""))
   
+
+  print(str_c("Begin Processing Divison ",Division_Code))
+  
+
   
   load(file = str_c(filename,
                     ".RData",
                     sep=("")), 
        verbose = TRUE)
   
-  print("   Aggregate Monthly")
+  if (is.na(unique(loca2_daily$Division))) {
+  
+    print(str_c("   --- Reinforcing Daily Division Codes ", 
+                Division_Code))
+    
+  } else {
+    
+    print(str_c("   --- Enforcing Daily Division Codes ", 
+                Division_Code, " ", 
+                unique(loca2_daily$Division)))
+  }
+  
+  loca2_daily$Division = Division_Code
+  loca2_daily$Division = factor(x      = loca2_daily$Division, 
+                                levels = division_factor)
+  
+  save(loca2_daily, file = str_c(filename,
+                                 ".RData",
+                                 sep=("")))
 
+  
+  print("   --- Aggregate Monthly")
   loca2_monthly = loca2_daily %>% 
     group_by(Scenario,
              Model,
@@ -152,11 +173,10 @@ for (filename in RData_files)
 
   
   
-  
-  
   save(loca2_monthly,
-       file = filename_mon)         
-  print("   Aggregate Annual")
+       file = filename_mon)       
+  
+  print("   --- Aggregate Annual")
   
   loca2_annual = loca2_daily %>% 
     group_by(Scenario,

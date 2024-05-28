@@ -77,14 +77,10 @@ members = c("r1i1p1f1",
 
 load("./NCEI_nClimDiv_LUT.RData", verbose=TRUE)
 
-
-
-Division = NCEI_nClimDiv_LUT$Division
-
+Division        = NCEI_nClimDiv_LUT$Division
 division_factor = factor(Division)
-
-models_factor = factor(models)
-members_factor = factor(members)
+models_factor   = factor(models)
+members_factor  = factor(members)
 
 
 
@@ -104,12 +100,22 @@ for (filename in RData_files)
        verbose = TRUE)
   
   
-  print(str_c("   --- Enforcing Daily Division Codes ", 
-              Division_Code, " ", 
-              unique(loca2_daily$Division)))
+  if (is.na(unique(loca2_daily$Division))) {
+    
+    print(str_c("   --- Reinforcing Daily Division Codes ", 
+                Division_Code))
+    
+  } else {
+    
+    print(str_c("   --- Enforcing Daily Division Codes ", 
+                Division_Code, " ", 
+                unique(loca2_daily$Division)))
+  }
+  
   
   loca2_daily$Division = Division_Code
-  loca2_daily$Division = factor(x = loca2_daily$Division, levels = division_factor)
+  loca2_daily$Division = factor(x      = loca2_daily$Division, 
+                                levels = division_factor)
   
   save(loca2_daily, file = str_c(filename,
                                  ".RData",
