@@ -72,11 +72,11 @@ members = c("r1i1p1f1",
             "r10i1p1f1")
 
 
-load("./NCEI_ClimDivs.RData")
+load("./NCEI_nClimDiv_LUT.RData", verbose=TRUE)
 
 
 
-FIPS_CD = NCEI_ClimDivs$FIPS_CD
+FIPS_CD = NCEI_nClimDiv_LUT$Division
 
 
 

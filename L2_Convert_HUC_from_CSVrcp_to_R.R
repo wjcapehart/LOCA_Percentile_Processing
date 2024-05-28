@@ -72,7 +72,7 @@ members = c("r1i1p1f1",
             "r10i1p1f1")
 
 
-load("./NCEI_ClimDivs.RData")
+load("USGS_HUC08_LUT.RData", verbose=TRUE)
 
 
 
@@ -106,7 +106,7 @@ for (filename in csv_files)
         print(loca2_daily$Division[1])
         if (is.numeric(loca2_daily$Division[1]))
         {
-          loca2_daily$Division = as.character(sprintf("%04d",loca2_daily$Division))
+          loca2_daily$Division = as.character(sprintf("%08d",loca2_daily$Division))
         }
         
         loca2_daily$Division   = factor(x    = loca2_daily$Division,

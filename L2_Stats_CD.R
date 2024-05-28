@@ -28,6 +28,7 @@ RData_files = str_c(directory,RData_files,sep="")
 print(RData_files)
 
 
+
 models = c("ACCESS-CM2", 
               "ACCESS-ESM1-5", 
               "AWI-CM-1-1-MR", 
@@ -72,13 +73,15 @@ members = c("r1i1p1f1",
             "r10i1p1f1")
 
 
-load("./NCEI_ClimDivs.RData", verbose = TRUE)
+
+
+load("./NCEI_nClimDiv_LUT.RData", verbose=TRUE)
 
 
 
-FIPS_CD = NCEI_ClimDivs$FIPS_CD
+Division = NCEI_nClimDiv_LUT$Division
 
-
+division_factor = factor(Division)
 
 models_factor = factor(models)
 members_factor = factor(members)
@@ -88,9 +91,11 @@ members_factor = factor(members)
 for (filename in RData_files)
 {
   
+  Division_Code = RData_files  = str_remove(filename, str_c(directory, prefix, sep=""))
+  
 
-
-  print(str_c("Begin Processing ",filename))
+  print(str_c("Begin Processing Divison ",Division_Code))
+  
 
   
   load(file = str_c(filename,
@@ -98,7 +103,20 @@ for (filename in RData_files)
                     sep=("")), 
        verbose = TRUE)
   
-  print("   Aggregate Monthly")
+  
+  print(str_c("   --- Enforcing Daily Division Codes ", 
+              Division_Code, " ", 
+              unique(loca2_daily$Division)))
+  
+  loca2_daily$Division = Division_Code
+  loca2_daily$Division = factor(x = loca2_daily$Division, levels = division_factor)
+  
+  save(loca2_daily, file = str_c(filename,
+                                 ".RData",
+                                 sep=("")))
+
+  
+  print("   --- Aggregate Monthly")
   loca2_monthly = loca2_daily %>% 
     group_by(Scenario,
              Model,
@@ -152,7 +170,7 @@ for (filename in RData_files)
   save(loca2_monthly,
        file = filename_mon)       
   
-  print("   Aggregate Annual")
+  print("   --- Aggregate Annual")
   
   loca2_annual = loca2_daily %>% 
     group_by(Scenario,
