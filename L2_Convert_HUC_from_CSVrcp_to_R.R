@@ -228,6 +228,7 @@ for (filename in csv_files)
                                sep = "")
 
           
+          print(filename_mon)
           
           
           save(loca2_monthly,
@@ -251,7 +252,7 @@ for (filename in csv_files)
                       pr         = sum(pr)) %>% 
           ungroup()
           
-          
+          print(filename_ann)
           filename_ann = str_c(ann_directory,
                                prefix_ann,
                                as.character(loca2_daily$Division[1]),
