@@ -1,0 +1,149 @@
+---
+title: "LUT Factor"
+output: html_notebook
+---
+
+
+
+
+```{r}
+library(package="tidyverse")
+library(package="readxl")
+```
+
+
+```{r}
+
+USGS_HUC08_LUT <- read_excel("USGS_HUC08_LUT.xlsx")
+
+
+
+
+NCEI_nClimDiv_LUT <- read_excel("NCEI_nClimDiv_LUT.xlsx")
+
+
+```
+
+
+```{r}
+
+USGS_HUC08_LUT$huc08 = sprintf(fmt="%0.8d", USGS_HUC08_LUT$huc08)
+USGS_HUC08_LUT$huc06 = sprintf(fmt="%0.6d", USGS_HUC08_LUT$huc06)
+USGS_HUC08_LUT$huc04 = sprintf(fmt="%0.4d", USGS_HUC08_LUT$huc04)
+USGS_HUC08_LUT$huc02 = sprintf(fmt="%0.2d", USGS_HUC08_LUT$huc02)
+
+
+
+USGS_HUC08_LUT$huc08 = factor(x      =        USGS_HUC08_LUT$huc08, 
+                              levels = unique(USGS_HUC08_LUT$huc08))
+
+USGS_HUC08_LUT$huc06 = factor(x      =        USGS_HUC08_LUT$huc06, 
+                              levels = unique(USGS_HUC08_LUT$huc06))
+
+USGS_HUC08_LUT$huc04 = factor(x      =        USGS_HUC08_LUT$huc04, 
+                              levels = unique(USGS_HUC08_LUT$huc04))
+
+USGS_HUC08_LUT$huc02 = factor(x      =        USGS_HUC08_LUT$huc02, 
+                              levels = unique(USGS_HUC08_LUT$huc02))
+
+
+
+
+USGS_HUC08_LUT$huc08_name = factor(x      =        USGS_HUC08_LUT$huc08_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc08_name))
+
+
+USGS_HUC08_LUT$huc08_state = factor(x      =        USGS_HUC08_LUT$huc08_state, 
+                                    levels = unique(USGS_HUC08_LUT$huc08_state))
+
+
+USGS_HUC08_LUT$huc06_name = factor(x      =        USGS_HUC08_LUT$huc06_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc06_name))
+
+USGS_HUC08_LUT$huc04_name = factor(x      =        USGS_HUC08_LUT$huc04_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc04_name))
+
+USGS_HUC08_LUT$huc02_name = factor(x      =        USGS_HUC08_LUT$huc02_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc02_name))
+```
+
+
+
+
+
+```{r}
+
+USGS_HUC08_LUT$huc08 = sprintf(fmt="%0.8d", USGS_HUC08_LUT$huc08)
+USGS_HUC08_LUT$huc06 = sprintf(fmt="%0.6d", USGS_HUC08_LUT$huc06)
+USGS_HUC08_LUT$huc04 = sprintf(fmt="%0.4d", USGS_HUC08_LUT$huc04)
+USGS_HUC08_LUT$huc02 = sprintf(fmt="%0.2d", USGS_HUC08_LUT$huc02)
+
+
+
+USGS_HUC08_LUT$huc08 = factor(x      =        USGS_HUC08_LUT$huc08, 
+                              levels = unique(USGS_HUC08_LUT$huc08))
+
+USGS_HUC08_LUT$huc06 = factor(x      =        USGS_HUC08_LUT$huc06, 
+                              levels = unique(USGS_HUC08_LUT$huc06))
+
+USGS_HUC08_LUT$huc04 = factor(x      =        USGS_HUC08_LUT$huc04, 
+                              levels = unique(USGS_HUC08_LUT$huc04))
+
+USGS_HUC08_LUT$huc02 = factor(x      =        USGS_HUC08_LUT$huc02, 
+                              levels = unique(USGS_HUC08_LUT$huc02))
+
+
+
+
+USGS_HUC08_LUT$huc08_name = factor(x      =        USGS_HUC08_LUT$huc08_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc08_name))
+
+
+USGS_HUC08_LUT$huc08_state = factor(x      =        USGS_HUC08_LUT$huc08_state, 
+                                    levels = unique(USGS_HUC08_LUT$huc08_state))
+
+
+USGS_HUC08_LUT$huc06_name = factor(x      =        USGS_HUC08_LUT$huc06_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc06_name))
+
+USGS_HUC08_LUT$huc04_name = factor(x      =        USGS_HUC08_LUT$huc04_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc04_name))
+
+USGS_HUC08_LUT$huc02_name = factor(x      =        USGS_HUC08_LUT$huc02_name, 
+                                   levels = unique(USGS_HUC08_LUT$huc02_name))
+
+save(USGS_HUC08_LUT, file = "./USGS_HUC08_LUT.RData")
+
+```
+
+
+
+
+
+```{r}
+
+NCEI_nClimDiv_LUT$climdiv            = sprintf(fmt="%0.4d", NCEI_nClimDiv_LUT$climdiv)
+NCEI_nClimDiv_LUT$fips_cd            = sprintf(fmt="%0.4d", NCEI_nClimDiv_LUT$fips_cd)
+NCEI_nClimDiv_LUT$climdiv_state_code = sprintf(fmt="%0.2d", NCEI_nClimDiv_LUT$climdiv_state_code)
+NCEI_nClimDiv_LUT$cdnew              = sprintf(fmt="%0.2d", NCEI_nClimDiv_LUT$cdnew)
+NCEI_nClimDiv_LUT$state_fips         = sprintf(fmt="%0.2d", NCEI_nClimDiv_LUT$state_fips)
+
+
+NCEI_nClimDiv_LUT$climdiv = factor(x      =        NCEI_nClimDiv_LUT$climdiv, 
+                                   levels = unique(NCEI_nClimDiv_LUT$climdiv))
+
+NCEI_nClimDiv_LUT$fips_cd = factor(x      =        NCEI_nClimDiv_LUT$fips_cd, 
+                                   levels = unique(NCEI_nClimDiv_LUT$fips_cd))
+
+NCEI_nClimDiv_LUT$climdiv_state_code = factor(x      =        NCEI_nClimDiv_LUT$climdiv_state_code, 
+                                              levels = unique(NCEI_nClimDiv_LUT$climdiv_state_code))
+
+NCEI_nClimDiv_LUT$cdnew = factor(x      =        NCEI_nClimDiv_LUT$cdnew, 
+                                 levels = unique(NCEI_nClimDiv_LUT$cdnew))
+
+NCEI_nClimDiv_LUT$state_fips = factor(x      =        NCEI_nClimDiv_LUT$state_fips, 
+                                      levels = unique(NCEI_nClimDiv_LUT$state_fips))
+
+save(NCEI_nClimDiv_LUT, file = "./NCEI_nClimDiv_LUT.RData")
+
+```

@@ -75,6 +75,7 @@ members = c("r1i1p1f1",
 load("./USGS_HUC08_LUT.RData", verbose=TRUE)
 
 Division       = USGS_HUC08_LUT$huc08
+division_factor = factor(Division)
 models_factor  = factor(models)
 members_factor = factor(members)
 
