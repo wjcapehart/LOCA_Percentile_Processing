@@ -258,14 +258,14 @@ for (filename in csv_files)
                       pr         = sum(pr)) %>% 
           ungroup()
           
-          print(filename_ann)
           filename_ann = str_c(ann_directory,
                                prefix_ann,
-                               as.character(loca2_daily$Division[1]),
+                               as.character(Division_Code),
                                ".RData",
                                sep = "")
           
 
+          print(filename_ann)
           
           
           save(loca2_annual,
