@@ -120,7 +120,9 @@ for (filename in csv_files)
 
  
         
-        loca2_daily$Time       = as.Date( sub("\uFEFF", "", loca2_daily$Time))
+        loca2_daily$Time       = as.Date( sub("\uFEFF", 
+                                              "", 
+                                              loca2_daily$Time))
         
         
         loca2_daily = loca2_daily %>%
