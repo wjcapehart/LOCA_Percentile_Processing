@@ -173,6 +173,8 @@ for (filename in csv_files)
              file = str_c(filename,
                           ".RData",
                           sep=""))
+        
+        
         print("   Aggregate Monthly")
         
         loca2_monthly = loca2_daily %>% 
@@ -219,6 +221,15 @@ for (filename in csv_files)
           loca2_daily$tasmax = as.single(loca2_daily$tasmax)
           loca2_daily$tasmin = as.single(loca2_daily$tasmin)
           loca2_daily$pr     = as.single(loca2_daily$pr)
+          
+          
+          save(loca2_daily,
+               file = str_c(filename,
+                            ".RData",
+                            sep=""))
+          
+          
+          
           
           print(mon_directory)
           print(prefix_mon)
