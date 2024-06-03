@@ -79,6 +79,8 @@ division_factor = factor(Division)
 models_factor  = factor(models)
 members_factor = factor(members)
 
+print(USGS_HUC08_LUT)
+
 
 
 for (filename in csv_files)

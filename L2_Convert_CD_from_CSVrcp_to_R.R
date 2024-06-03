@@ -79,6 +79,7 @@ division_factor = factor(Division)
 models_factor   = factor(models)
 members_factor  = factor(members)
 
+print(NCEI_nClimDiv_LUT)
 
 for (filename in csv_files)
 {
