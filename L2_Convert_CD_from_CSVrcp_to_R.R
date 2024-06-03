@@ -225,7 +225,7 @@ for (filename in csv_files)
         
         filename_mon = str_c(mon_directory,
                              prefix_mon,
-                             as.character(loca2_daily$Division[1]),
+                             as.character(Division_Code),
                              ".RData",
                              sep = "")
         
@@ -283,7 +283,7 @@ for (filename in csv_files)
         
         filename_ann = str_c(ann_directory,
                              prefix_ann,
-                             as.character(loca2_daily$Division[1]),
+                             as.character(Division_Code),
                              ".RData",
                              sep = "")
         

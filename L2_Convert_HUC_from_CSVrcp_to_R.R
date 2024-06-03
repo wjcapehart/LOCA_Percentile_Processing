@@ -220,10 +220,16 @@ for (filename in csv_files)
           loca2_daily$tasmin = as.single(loca2_daily$tasmin)
           loca2_daily$pr     = as.single(loca2_daily$pr)
           
+          print(mon_directory)
+          print(prefix_mon)
+          print(as.character(Division_Code))
+          print(".RData")
+          
+          
           
           filename_mon = str_c(mon_directory,
                                prefix_mon,
-                               as.character(loca2_daily$Division[1]),
+                               as.character(Division_Code),
                                ".RData",
                                sep = "")
 
