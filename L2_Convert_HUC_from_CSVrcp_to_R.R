@@ -189,7 +189,7 @@ for (filename in csv_files)
                        Time       = mean(Time),
                        tasmax     = mean(tasmax),
                        tasmin     = mean(tasmin),
-                       pr         = sum(pr))
+                       pr         = sum(pr)) %>% 
           ungroup()
           
           
@@ -248,7 +248,7 @@ for (filename in csv_files)
                       Time       = mean(Time),
                       tasmax     = mean(tasmax),
                       tasmin     = mean(tasmin),
-                      pr         = sum(pr))
+                      pr         = sum(pr)) %>% 
           ungroup()
           
           
