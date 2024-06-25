@@ -3,7 +3,7 @@
 
 # ## Inventory for LOCA2 Regions
 
-# In[ ]:
+# In[1]:
 
 
 import numpy              as np
@@ -27,7 +27,7 @@ print(socket.gethostname())
 myhostname = socket.gethostname()
 
 
-# In[ ]:
+# In[2]:
 
 
 ####################################################
@@ -60,7 +60,7 @@ plt.rcParams.update({'text.color'      : Mines_Blue,
 
 
 
-# In[ ]:
+# In[3]:
 
 
 ####################################################
@@ -96,7 +96,7 @@ print(target_dir)
 
 
 
-# In[ ]:
+# In[4]:
 
 
 dir_hucs = "http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/LOCA2/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Annual_Files/catalog.xml"
@@ -127,7 +127,7 @@ available_cdiv = np.array(available_cdiv, dtype=np.int32)
 
 
 
-# In[ ]:
+# In[5]:
 
 
 table_huc = table_hucs[table_hucs["huc08"].isin(available_hucs)]
@@ -147,10 +147,13 @@ table_huc["HUC-08"] = [str(x).zfill(8)   for x in table_huc["HUC-08"].values]
 table_huc = table_huc.sort_values("HUC-08")
 table_huc.to_csv(path_or_buf = target_dir + "HUC_table_avail.csv", index=False)
 print(target_dir + "HUC_table_avail.csv")
-display(table_huc)
 
 
-# In[ ]:
+if (display_img) :
+    display(table_huc)
+
+
+# In[6]:
 
 
 table_div = table_cdiv[table_cdiv["climdiv"].isin(available_cdiv)][["climdiv",
@@ -165,7 +168,8 @@ table_div  = table_div.rename(columns = {"climdiv":"DIVISION",
 table_div.to_csv(path_or_buf = target_dir + "ClimDiv_table_avail.csv", index=False)
 print(target_dir + "ClimDiv_table_avail.csv")
 
-display(table_div)
+if (display_img) :
+    display(table_div)
 
 
 # In[ ]:
@@ -174,21 +178,21 @@ display(table_div)
 
 
 
-# In[ ]:
+# In[7]:
 
 
 shp_hucs = gp.read_file("GeoJSON_Files/CONUS_USGS_HUC-08.geojson")
 shp_cdiv = gp.read_file("GeoJSON_Files/CONUS_NCEI_Climate_Divisions.geojson")
 
 
-# In[ ]:
+# In[8]:
 
 
 print("  HUC08:RAW:",len(shp_hucs), len(shp_hucs.get_coordinates()))
 print("CLIMDIV:RAW:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
 
 
-# In[ ]:
+# In[9]:
 
 
 shp_cdiv = shp_cdiv[shp_cdiv["CLIMDIV"].isin(available_cdiv)]
@@ -196,7 +200,8 @@ shp_hucs = shp_hucs[shp_hucs[  "huc8" ].isin(available_hucs)]
 
 
 
-display(shp_cdiv)
+if (display_img) :
+    display(shp_cdiv)
 
 
 # In[ ]:
@@ -223,7 +228,7 @@ display(shp_cdiv)
 
 
 
-# In[ ]:
+# In[10]:
 
 
 shp_cdiv = shp_cdiv.assign(CLIMDIV=1) 
@@ -238,21 +243,21 @@ print("CLIMDIV:CUT:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
 
 
 
-# In[ ]:
+# In[11]:
 
 
 shp_cdivD = shp_cdiv.dissolve(by = "CLIMDIV")
 shp_hucsD = shp_hucs.dissolve(by =    "huc8")
 
 
-# In[ ]:
+# In[12]:
 
 
 print("  HUC08:DIS:",len(shp_hucsD), len(shp_hucs.get_coordinates()))
 print("CLIMDIV:DIS:",len(shp_cdivD), len(shp_cdiv.get_coordinates()))
 
 
-# In[ ]:
+# In[13]:
 
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
@@ -292,7 +297,7 @@ if (display_img) :
     plt.show()
 
 
-# In[ ]:
+# In[14]:
 
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
@@ -333,7 +338,7 @@ if (display_img) :
     plt.show()
 
 
-# In[ ]:
+# In[15]:
 
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
@@ -346,8 +351,8 @@ fig = plt.figure(figsize=[9,5], facecolor="white")
 ax  = fig.add_subplot(1, 1, 1, 
                       projection = ccrs_proj)
 
-fig.suptitle("CMIP6 LOCA-2 Available Regions", color = Mines_Blue, fontsize= 'xx-large')
-ax.set_title("USGS HUC-08 Basins and NCEI State Climate Divisions", color = Mines_Blue, fontsize= 'x-large')
+#fig.suptitle("CMIP6 LOCA-2 Available Regions", color = Mines_Blue, fontsize= 'xx-large')
+#ax.set_title("NCEI State Climate Divisions", color = Mines_Blue, fontsize= 'x-large')
 ax.set_extent([-119, -73, 22.5, 51])
 
 ax.add_feature(cfeature.COASTLINE, edgecolor = Mines_Blue)
