@@ -11,6 +11,11 @@ DIVISION,NAME,STATE
 0503,Kansas Drainage Basin,Colorado
 0504,Platte Drainage Basin,Colorado
 0505,Rio Grande Drainage Basin,Colorado
+0601,Northwest,Connecticut
+0602,Central,Connecticut
+0603,Coastal,Connecticut
+0701,Northern,Delaware
+0702,Southern,Delaware
 1001,Panhandle,Idaho
 1002,North Central Prairies,Idaho
 1003,North Central Canyons,Idaho
@@ -107,6 +112,9 @@ DIVISION,NAME,STATE
 2507,Southwest,Nebraska
 2508,South Central,Nebraska
 2509,Southeast,Nebraska
+2601,Northwestern,Nevada
+2602,Northeastern,Nevada
+2603,South Central,Nevada
 2701,Northern,New Hampshire
 2702,Southern,New Hampshire
 2901,Northwestern Plateau,New Mexico
