@@ -1,10 +1,4 @@
 HUC-08,BASIN NAME,HUC-06 BASIN,HUC-04 BASIN,HUC-02 REGION
-04300101,Mettawee River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
-04300102,Otter Creek,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
-04300103,Winooski River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
-04300104,Ausable River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
-04300105,Lamoille River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
-04300106,Saranac River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
 10020001,Red Rock,Missouri Headwaters,Missouri Headwaters,Missouri Region
 10020002,Beaverhead,Missouri Headwaters,Missouri Headwaters,Missouri Region
 10020003,Ruby,Missouri Headwaters,Missouri Headwaters,Missouri Region
@@ -119,6 +113,7 @@ HUC-08,BASIN NAME,HUC-06 BASIN,HUC-04 BASIN,HUC-02 REGION
 10120112,Lower Cheyenne,Cheyenne,Cheyenne,Missouri Region
 10120113,Cherry,Cheyenne,Cheyenne,Missouri Region
 10120201,Upper Belle Fourche,Belle Fourche,Cheyenne,Missouri Region
+10120202,Lower Belle Fourche,Belle Fourche,Cheyenne,Missouri Region
 10120203,Redwater,Belle Fourche,Cheyenne,Missouri Region
 10130101,Painted Woods-Square Butte,Lake Oahe,Missouri-Oahe,Missouri Region
 10130102,Upper Lake Oahe,Lake Oahe,Missouri-Oahe,Missouri Region
@@ -215,3 +210,8 @@ HUC-08,BASIN NAME,HUC-06 BASIN,HUC-04 BASIN,HUC-02 REGION
 11050002,Lower Cimarron-Skeleton,Lower Cimarron,Lower Cimarron,Arkansas-White-Red Region
 11050003,Lower Cimarron,Lower Cimarron,Lower Cimarron,Arkansas-White-Red Region
 11130302,Upper Washita,Washita,Red-Washita,Arkansas-White-Red Region
+14080201,Lower San Juan-Four Corners,Lower San Juan,San Juan,Upper Colorado Region
+14080202,McElmo,Lower San Juan,San Juan,Upper Colorado Region
+14080203,Montezuma,Lower San Juan,San Juan,Upper Colorado Region
+14080204,Chinle,Lower San Juan,San Juan,Upper Colorado Region
+14080205,Lower San Juan,Lower San Juan,San Juan,Upper Colorado Region

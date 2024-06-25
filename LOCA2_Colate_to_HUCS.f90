@@ -16,7 +16,7 @@ program LOCA_Colate_to_ClimDivs
   integer, parameter :: ntime_hist = 23741
   integer, parameter :: ntime_futr = 31411
 
-  integer, parameter :: nhucs        =  2413
+  integer, parameter :: nhucs        =  2181
   integer, parameter :: len_hucstr   =     8
   integer, parameter :: len_outbuf   =   120
   integer, parameter :: len_ensinv   =     4 ! #XNP

@@ -115,8 +115,12 @@ DIVISION,NAME,STATE
 2601,Northwestern,Nevada
 2602,Northeastern,Nevada
 2603,South Central,Nevada
+2604,Extreme Southern,Nevada
 2701,Northern,New Hampshire
 2702,Southern,New Hampshire
+2801,Northern,New Jersey
+2802,Southern,New Jersey
+2803,Coastal,New Jersey
 2901,Northwestern Plateau,New Mexico
 2902,Northern Mountains,New Mexico
 2903,Northeastern Plains,New Mexico
@@ -125,6 +129,16 @@ DIVISION,NAME,STATE
 2906,Central Highlands,New Mexico
 2907,Southeastern Plains,New Mexico
 2908,Southern Desert,New Mexico
+3001,Western Plateau,New York
+3002,Eastern Plateau,New York
+3003,Northern Plateau,New York
+3004,Coastal,New York
+3005,Hudson Valley,New York
+3006,Mohawk Valley,New York
+3007,Champlain Valley,New York
+3008,St. Lawrence Valley,New York
+3009,Great Lakes,New York
+3010,Central Lakes,New York
 3101,Southern Mountains,North Carolina
 3102,Northern Mountains,North Carolina
 3103,Northern Piedmont,North Carolina
