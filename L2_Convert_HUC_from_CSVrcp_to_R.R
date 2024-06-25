@@ -225,12 +225,18 @@ for (filename in csv_files)
           loca2_daily$tasmax = as.single(loca2_daily$tasmax)
           loca2_daily$tasmin = as.single(loca2_daily$tasmin)
           loca2_daily$pr     = as.single(loca2_daily$pr)
+
+          filename_daily = str_c(out_directory,
+                               prefix,
+                               as.character(Division_Code),
+                               ".RData",
+                               sep = "")
           
-          
+          print(filename_daily)
+
+
           save(loca2_daily,
-               file = str_c(filename,
-                            ".RData",
-                            sep=""))
+               file = filename_daily)
           
           
           

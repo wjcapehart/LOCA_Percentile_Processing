@@ -50,3 +50,16 @@ LOCA2_nCLIMDIV_????.csv
 LOCA2_HUC_????.csv
 ./work/.DS_Store
 .DS_Store
+*.geojson
+shapefiles/CONUS_NCEI_Climate_Divisions/CONUS_NCEI_Climate_Divisions.cpg
+shapefiles/CONUS_NCEI_Climate_Divisions/CONUS_NCEI_Climate_Divisions.dbf
+shapefiles/CONUS_NCEI_Climate_Divisions/CONUS_NCEI_Climate_Divisions.prj
+shapefiles/CONUS_NCEI_Climate_Divisions/CONUS_NCEI_Climate_Divisions.qmd
+shapefiles/CONUS_NCEI_Climate_Divisions/CONUS_NCEI_Climate_Divisions.shp
+shapefiles/CONUS_NCEI_Climate_Divisions/CONUS_NCEI_Climate_Divisions.shx
+shapefiles/CONUS_USGS_HUC-08/CONUS_USGS_HUC-08.cpg
+shapefiles/CONUS_USGS_HUC-08/CONUS_USGS_HUC-08.dbf
+shapefiles/CONUS_USGS_HUC-08/CONUS_USGS_HUC-08.prj
+shapefiles/CONUS_USGS_HUC-08/CONUS_USGS_HUC-08.qmd
+shapefiles/CONUS_USGS_HUC-08/CONUS_USGS_HUC-08.shp
+shapefiles/CONUS_USGS_HUC-08/CONUS_USGS_HUC-08.shx

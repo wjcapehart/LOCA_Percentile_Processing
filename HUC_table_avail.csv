@@ -1,0 +1,211 @@
+HUC-08,BASIN NAME,HUC-06 BASIN,HUC-04 BASIN,HUC-02 REGION
+10020001,Red Rock,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020002,Beaverhead,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020003,Ruby,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020004,Big Hole,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020005,Jefferson,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020006,Boulder,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020007,Madison,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10020008,Gallatin,Missouri Headwaters,Missouri Headwaters,Missouri Region
+10030101,Upper Missouri,Upper Missouri,Missouri-Marias,Missouri Region
+10030102,Upper Missouri-Dearborn,Upper Missouri,Missouri-Marias,Missouri Region
+10030103,Smith,Upper Missouri,Missouri-Marias,Missouri Region
+10030104,Sun,Upper Missouri,Missouri-Marias,Missouri Region
+10030105,Belt,Upper Missouri,Missouri-Marias,Missouri Region
+10030201,Two Medicine,Marias,Missouri-Marias,Missouri Region
+10030202,Cut Bank,Marias,Missouri-Marias,Missouri Region
+10030203,Marias,Marias,Missouri-Marias,Missouri Region
+10030204,Willow,Marias,Missouri-Marias,Missouri Region
+10030205,Teton,Marias,Missouri-Marias,Missouri Region
+10040101,Bullwhacker-Dog,Fort Peck Lake,Missouri-Musselshell,Missouri Region
+10040102,Arrow,Fort Peck Lake,Missouri-Musselshell,Missouri Region
+10040103,Judith,Fort Peck Lake,Missouri-Musselshell,Missouri Region
+10040104,Fort Peck Reservoir,Fort Peck Lake,Missouri-Musselshell,Missouri Region
+10040105,Big Dry,Fort Peck Lake,Missouri-Musselshell,Missouri Region
+10040106,Little Dry,Fort Peck Lake,Missouri-Musselshell,Missouri Region
+10040201,Upper Musselshell,Musselshell,Missouri-Musselshell,Missouri Region
+10040202,Middle Musselshell,Musselshell,Missouri-Musselshell,Missouri Region
+10040203,Flatwillow,Musselshell,Missouri-Musselshell,Missouri Region
+10040204,Box Elder,Musselshell,Missouri-Musselshell,Missouri Region
+10040205,Lower Musselshell,Musselshell,Missouri-Musselshell,Missouri Region
+10050001,Milk Headwaters,Milk,Milk,Missouri Region
+10050002,Upper Milk,Milk,Milk,Missouri Region
+10050003,Wild Horse Lake,Milk,Milk,Missouri Region
+10050004,Middle Milk,Milk,Milk,Missouri Region
+10050005,Big Sandy,Milk,Milk,Missouri Region
+10050006,Sage,Milk,Milk,Missouri Region
+10050007,Lodge,Milk,Milk,Missouri Region
+10050008,Battle,Milk,Milk,Missouri Region
+10050009,Peoples,Milk,Milk,Missouri Region
+10050010,Cottonwood,Milk,Milk,Missouri Region
+10050011,Whitewater,Milk,Milk,Missouri Region
+10050012,Lower Milk,Milk,Milk,Missouri Region
+10050013,Frenchman,Milk,Milk,Missouri Region
+10050014,Beaver,Milk,Milk,Missouri Region
+10050015,Rock,Milk,Milk,Missouri Region
+10050016,Porcupine,Milk,Milk,Missouri Region
+10060001,Prairie Elk-Wolf,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10060002,Redwater,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10060003,Poplar,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10060004,West Fork Poplar,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10060005,Charlie-Little Muddy,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10060006,Big Muddy,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10060007,Brush Lake Closed Basin,Missouri-Poplar,Missouri-Poplar,Missouri Region
+10070001,Yellowstone Headwaters,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070002,Upper Yellowstone,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070003,Shields,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070004,Upper Yellowstone-Lake Basin,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070005,Stillwater,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070006,Clarks Fork Yellowstone,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070007,Upper Yellowstone-Pompeys Pillar,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10070008,Pryor,Upper Yellowstone,Upper Yellowstone,Missouri Region
+10080001,Upper Wind,Big Horn,Big Horn,Missouri Region
+10080002,Little Wind,Big Horn,Big Horn,Missouri Region
+10080003,Popo Agie,Big Horn,Big Horn,Missouri Region
+10080004,Muskrat,Big Horn,Big Horn,Missouri Region
+10080005,Lower Wind,Big Horn,Big Horn,Missouri Region
+10080006,Badwater,Big Horn,Big Horn,Missouri Region
+10080007,Upper Bighorn,Big Horn,Big Horn,Missouri Region
+10080008,Nowood,Big Horn,Big Horn,Missouri Region
+10080009,Greybull,Big Horn,Big Horn,Missouri Region
+10080010,Big Horn Lake,Big Horn,Big Horn,Missouri Region
+10080011,Dry,Big Horn,Big Horn,Missouri Region
+10080012,North Fork Shoshone,Big Horn,Big Horn,Missouri Region
+10080013,South Fork Shoshone,Big Horn,Big Horn,Missouri Region
+10080014,Shoshone,Big Horn,Big Horn,Missouri Region
+10080015,Lower Bighorn,Big Horn,Big Horn,Missouri Region
+10080016,Little Bighorn,Big Horn,Big Horn,Missouri Region
+10090101,Upper Tongue,Tongue,Powder-Tongue,Missouri Region
+10090102,Lower Tongue,Tongue,Powder-Tongue,Missouri Region
+10090201,Middle Fork Powder,Powder,Powder-Tongue,Missouri Region
+10090202,Upper Powder,Powder,Powder-Tongue,Missouri Region
+10090203,South Fork Powder,Powder,Powder-Tongue,Missouri Region
+10090204,Salt,Powder,Powder-Tongue,Missouri Region
+10090205,Crazy Woman,Powder,Powder-Tongue,Missouri Region
+10090206,Clear,Powder,Powder-Tongue,Missouri Region
+10090207,Middle Powder,Powder,Powder-Tongue,Missouri Region
+10090208,Little Powder,Powder,Powder-Tongue,Missouri Region
+10090209,Lower Powder,Powder,Powder-Tongue,Missouri Region
+10090210,Mizpah,Powder,Powder-Tongue,Missouri Region
+10100001,Lower Yellowstone-Sunday,Lower Yellowstone,Lower Yellowstone,Missouri Region
+10100002,Big Porcupine,Lower Yellowstone,Lower Yellowstone,Missouri Region
+10100003,Rosebud,Lower Yellowstone,Lower Yellowstone,Missouri Region
+10100004,Lower Yellowstone,Lower Yellowstone,Lower Yellowstone,Missouri Region
+10100005,O'Fallon,Lower Yellowstone,Lower Yellowstone,Missouri Region
+10110101,Lake Sakakawea,Lake Sakakawea,Missouri-Little Missouri,Missouri Region
+10110102,Little Muddy,Lake Sakakawea,Missouri-Little Missouri,Missouri Region
+10110201,Upper Little Missouri,Little Missouri,Missouri-Little Missouri,Missouri Region
+10110202,Boxelder,Little Missouri,Missouri-Little Missouri,Missouri Region
+10110203,Middle Little Missouri,Little Missouri,Missouri-Little Missouri,Missouri Region
+10110204,Beaver,Little Missouri,Missouri-Little Missouri,Missouri Region
+10110205,Lower Little Missouri,Little Missouri,Missouri-Little Missouri,Missouri Region
+10120101,Antelope,Cheyenne,Cheyenne,Missouri Region
+10120102,Dry Fork Cheyenne,Cheyenne,Cheyenne,Missouri Region
+10120103,Upper Cheyenne,Cheyenne,Cheyenne,Missouri Region
+10120104,Lance,Cheyenne,Cheyenne,Missouri Region
+10120105,Lightning,Cheyenne,Cheyenne,Missouri Region
+10120106,Angostura Reservoir,Cheyenne,Cheyenne,Missouri Region
+10120107,Beaver,Cheyenne,Cheyenne,Missouri Region
+10120108,Hat,Cheyenne,Cheyenne,Missouri Region
+10120109,Middle Cheyenne-Spring,Cheyenne,Cheyenne,Missouri Region
+10120110,Rapid,Cheyenne,Cheyenne,Missouri Region
+10120111,Middle Cheyenne-Elk,Cheyenne,Cheyenne,Missouri Region
+10120112,Lower Cheyenne,Cheyenne,Cheyenne,Missouri Region
+10120113,Cherry,Cheyenne,Cheyenne,Missouri Region
+10120201,Upper Belle Fourche,Belle Fourche,Cheyenne,Missouri Region
+10120203,Redwater,Belle Fourche,Cheyenne,Missouri Region
+10130101,Painted Woods-Square Butte,Lake Oahe,Missouri-Oahe,Missouri Region
+10130102,Upper Lake Oahe,Lake Oahe,Missouri-Oahe,Missouri Region
+10130103,Apple Creek,Lake Oahe,Missouri-Oahe,Missouri Region
+10130104,Beaver,Lake Oahe,Missouri-Oahe,Missouri Region
+10130105,Lower Lake Oahe,Lake Oahe,Missouri-Oahe,Missouri Region
+10130106,West Missouri Coteau,Lake Oahe,Missouri-Oahe,Missouri Region
+10130201,Knife,Cannonball-Heart-Knife,Missouri-Oahe,Missouri Region
+10130202,Upper Heart,Cannonball-Heart-Knife,Missouri-Oahe,Missouri Region
+10130203,Lower Heart,Cannonball-Heart-Knife,Missouri-Oahe,Missouri Region
+10130204,Upper Cannonball,Cannonball-Heart-Knife,Missouri-Oahe,Missouri Region
+10130205,Cedar,Cannonball-Heart-Knife,Missouri-Oahe,Missouri Region
+10130206,Lower Cannonball,Cannonball-Heart-Knife,Missouri-Oahe,Missouri Region
+10130301,North Fork Grand,Grand-Moreau,Missouri-Oahe,Missouri Region
+10130302,South Fork Grand,Grand-Moreau,Missouri-Oahe,Missouri Region
+10130303,Grand,Grand-Moreau,Missouri-Oahe,Missouri Region
+10130304,South Fork Moreau,Grand-Moreau,Missouri-Oahe,Missouri Region
+10130305,Upper Moreau,Grand-Moreau,Missouri-Oahe,Missouri Region
+10130306,Lower Moreau,Grand-Moreau,Missouri-Oahe,Missouri Region
+10140101,Fort Randall Reservoir,Fort Randall Reservoir,Missouri-White,Missouri Region
+10140102,Bad,Fort Randall Reservoir,Missouri-White,Missouri Region
+10140103,Medicine Knoll,Fort Randall Reservoir,Missouri-White,Missouri Region
+10140104,Medicine,Fort Randall Reservoir,Missouri-White,Missouri Region
+10140105,Crow,Fort Randall Reservoir,Missouri-White,Missouri Region
+10140201,Upper White,White,Missouri-White,Missouri Region
+10140202,Middle White,White,Missouri-White,Missouri Region
+10140203,Little White,White,Missouri-White,Missouri Region
+10140204,Lower White,White,Missouri-White,Missouri Region
+10150002,Niobrara Headwaters,Niobrara,Niobrara,Missouri Region
+10150003,Upper Niobrara,Niobrara,Niobrara,Missouri Region
+10150004,Middle Niobrara,Niobrara,Niobrara,Missouri Region
+10150005,Snake,Niobrara,Niobrara,Missouri Region
+10150006,Keya Paha,Niobrara,Niobrara,Missouri Region
+10150007,Lower Niobrara,Niobrara,Niobrara,Missouri Region
+10160001,James Headwaters,James,James,Missouri Region
+10160002,Pipestem,James,James,Missouri Region
+10160003,Upper James,James,James,Missouri Region
+10160004,Elm,James,James,Missouri Region
+10160005,Mud,James,James,Missouri Region
+10160006,Middle James,James,James,Missouri Region
+10160007,North Fork Snake,James,James,Missouri Region
+10160008,Snake,James,James,Missouri Region
+10160009,Turtle,James,James,Missouri Region
+10160011,Lower James,James,James,Missouri Region
+10170101,Lewis and Clark Lake,Lewis and Clark Lake,Missouri-Big Sioux,Missouri Region
+10170102,Vermillion,Lewis and Clark Lake,Missouri-Big Sioux,Missouri Region
+10170103,Lake Thompson,Lewis and Clark Lake,Missouri-Big Sioux,Missouri Region
+10170104,Ponca,Lewis and Clark Lake,Missouri-Big Sioux,Missouri Region
+10170201,Upper Big Sioux,Big Sioux,Missouri-Big Sioux,Missouri Region
+10170202,Middle Big Sioux,Big Sioux,Missouri-Big Sioux,Missouri Region
+10170203,Lower Big Sioux,Big Sioux,Missouri-Big Sioux,Missouri Region
+10170204,Rock,Big Sioux,Missouri-Big Sioux,Missouri Region
+10180001,North Platte Headwaters,North Platte,North Platte,Missouri Region
+10180002,Upper North Platte,North Platte,North Platte,Missouri Region
+10180003,Pathfinder-Seminoe Reservoirs,North Platte,North Platte,Missouri Region
+10180004,Medicine Bow,North Platte,North Platte,Missouri Region
+10180005,Little Medicine Bow,North Platte,North Platte,Missouri Region
+10180006,Sweetwater,North Platte,North Platte,Missouri Region
+10180007,Middle North Platte-Casper,North Platte,North Platte,Missouri Region
+10180008,Glendo Reservoir,North Platte,North Platte,Missouri Region
+10180009,Middle North Platte-Scotts Bluff,North Platte,North Platte,Missouri Region
+10180010,Upper Laramie,North Platte,North Platte,Missouri Region
+10180011,Lower Laramie,North Platte,North Platte,Missouri Region
+10180012,Horse,North Platte,North Platte,Missouri Region
+10180013,Pumpkin,North Platte,North Platte,Missouri Region
+10180014,Lower North Platte,North Platte,North Platte,Missouri Region
+10190001,South Platte Headwaters,South Platte,South Platte,Missouri Region
+10190002,Upper South Platte,South Platte,South Platte,Missouri Region
+10190003,Middle South Platte-Cherry Creek,South Platte,South Platte,Missouri Region
+10190004,Clear,South Platte,South Platte,Missouri Region
+10190005,St. Vrain,South Platte,South Platte,Missouri Region
+10190006,Big Thompson,South Platte,South Platte,Missouri Region
+10190007,Cache La Poudre,South Platte,South Platte,Missouri Region
+10190008,Lone Tree-Owl,South Platte,South Platte,Missouri Region
+10190009,Crow,South Platte,South Platte,Missouri Region
+10190010,Kiowa,South Platte,South Platte,Missouri Region
+10190011,Bijou,South Platte,South Platte,Missouri Region
+10190012,Middle South Platte-Sterling,South Platte,South Platte,Missouri Region
+10190013,Beaver,South Platte,South Platte,Missouri Region
+10190014,Pawnee,South Platte,South Platte,Missouri Region
+10190015,Upper Lodgepole,South Platte,South Platte,Missouri Region
+10190016,Lower Lodgepole,South Platte,South Platte,Missouri Region
+10190017,Sidney Draw,South Platte,South Platte,Missouri Region
+10190018,Lower South Platte,South Platte,South Platte,Missouri Region
+10230001,Blackbird-Soldier,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+10230002,Floyd,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+10230003,Little Sioux,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+10230004,Monona-Harrison Ditch,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+10230005,Maple,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+10230006,Big Papillion-Mosquito,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+10230007,Boyer,Missouri-Little Sioux,Missouri-Little Sioux,Missouri Region
+11030017,Upper Walnut River,Middle Arkansas,Middle Arkansas,Arkansas-White-Red Region
+11030018,Lower Walnut River,Middle Arkansas,Middle Arkansas,Arkansas-White-Red Region
+11050002,Lower Cimarron-Skeleton,Lower Cimarron,Lower Cimarron,Arkansas-White-Red Region
+11050003,Lower Cimarron,Lower Cimarron,Lower Cimarron,Arkansas-White-Red Region
+11130302,Upper Washita,Washita,Red-Washita,Arkansas-White-Red Region

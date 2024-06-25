@@ -1,0 +1,54 @@
+<html lang="en">
+  <head>
+     <title>SD Mines CMIP6-LOCA2 USGS HUC Holdings</title>
+  </head>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,300" rel="stylesheet" type="text/css">
+  <body style="font-family: 'Open Sans', sans-serif;"  lang="en" color="#002554" onload="load_figures();">
+    <font color="#002554">
+
+      <H1 color="#002554"  align="center">SD Mines CMIP6-LOCA2 USGS HUC Holdings</H1>
+      <hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+      <center><img  src="http://kyrill.ias.sdsmt.edu/wjc/eduresources/LOCA2_HUCs_Available_Regions_Map.png"></center>
+      <hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+
+
+
+
+
+
+
+
+      <table id="table_HUC" color="#8f1402"></table>
+
+
+
+
+
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.js"></script>
+      <script>
+          function arrayToTable(tableData) {
+              var table_HUC = $('<center><table color="#8f1402"></table></center>');
+              $(tableData).each(function (i, rowData) {
+                  var row = $('<tr color="#8f1402"></tr>');
+                  $(rowData).each(function (j, cellData) {
+                      row.append($('<td color="#8f1402">'+cellData+'</td>'));
+                  });
+                  table_HUC.append(row);
+              });
+              return table_HUC;
+          }
+      
+          $.ajax({
+              type: "GET",
+              url: "http://kyrill.ias.sdsmt.edu/wjc/eduresources/HUC_table_avail.csv",
+              success: function (data) {
+                  $('body').append(arrayToTable(Papa.parse(data).data));
+              }
+          });
+      </script>
+
+
+    </font>
+  </body>
+</html>

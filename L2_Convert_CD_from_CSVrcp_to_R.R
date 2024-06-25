@@ -171,10 +171,17 @@ for (filename in csv_files)
                       Time)
 
                             
-        save(loca2_daily,
-             file = str_c(filename,
-                          ".RData",
-                          sep=""))
+          filename_daily = str_c(out_directory,
+                               prefix,
+                               as.character(Division_Code),
+                               ".RData",
+                               sep = "")
+          
+          print(filename_daily)
+
+
+          save(loca2_daily,
+               file = filename_daily)
         
         print("   Aggregate Monthly")
         

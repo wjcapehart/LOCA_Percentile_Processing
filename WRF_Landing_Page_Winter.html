@@ -1,0 +1,281 @@
+<html lang="en">
+<head>
+   <title>SD Mines Realtime WRF System</title>
+
+
+
+
+</head>
+
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,300" rel="stylesheet" type="text/css">
+
+<body style="font-family: 'Open Sans', sans-serif;"  lang="en" color="#002554" onload="load_figures();">
+<font color="#002554">
+<img src="http://kyrill.ias.sdsmt.edu/wjc/web_graphics/AES_WRF_Masthead.png" alt="SD Mines WRF Masthead" width="100%">
+
+<H1 color="#002554" id="WRF_RUN_HEADER_TEXT" align="center"></H1>
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+function load_figures() {
+  var date_string;
+  var formatted_date_string;
+  let domain_string = Domain.value;
+  let fx_hour       = "Fxx";
+  let station       = Station.value;
+
+
+    fetch("http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/current_run_formatted.txt")
+    .then(response => response.text())
+    .then(json => {
+       formatted_date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+       document.getElementById('WRF_RUN_HEADER_TEXT').innerHTML = "<font color='#002554'>Western South Dakota Real-Time WRF for<br>" + formatted_date_string + "</font>";
+     });
+
+   fetch("http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/current_run.txt")
+   .then(response => response.text())
+   .then(json => {
+      date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+      document.getElementById('date_string').innerHTML = date_string;
+    });
+
+
+
+
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('TOTAL_SNOWFALL').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/TSNOW/wrfout_" + domain_string + "_" + date_string + "_FXX_MAP_TSNOW.png";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('TOTAL_RAINFALL').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/TRAIN/wrfout_" + domain_string + "_" + date_string + "_FXX_MAP_TRAIN.png";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_WIND').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/WIND/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_WIND.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_SFCT').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/SFCT/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_SFCT.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_DBZ').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/DBZ/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_DBZ.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_SNOW').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/SNOWH/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_SNOWH.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_RAIN').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/RAIN/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_RAIN.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_SHOWH').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/SHOWH/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_SHOWH.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_WEASD').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/MAPS/" + domain_string + "/WEASD/wrfout_" + domain_string + "_" + date_string + "_"+fx_hour+"_MAP_WEASD.gif";
+  });
+
+  fetch("./WEB_IMAGES/current_run.txt")
+    .then(response => response.text())
+    .then(json => {
+    date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+    document.getElementById('HRLY_SKEWT').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/SKEWTS/" + station + "/wrfout_dxx_" + date_string + "_"+fx_hour+"_SKEWT_" + station + ".gif";
+  });
+
+
+    fetch("./WEB_IMAGES/current_run.txt")
+      .then(response => response.text())
+      .then(json => {
+      date_string = JSON.stringify(json).replace(/"/g, '').replace(/\\n/g, '')
+      document.getElementById('METEOGRAM').src = "http://kyrill.ias.sdsmt.edu/WRF/WEB_IMAGES/STATION_TIME_SERIES/wrfout_dxx_" + date_string + "_" + station + ".png";
+    });
+
+}
+</script>
+
+
+
+
+<form>
+
+      <select name="Domain" class="form-control" id="Domain">
+        <option value="d01">Domain 01: &Delta;x=9km</option>
+        <option value="d02">Domain 02: &Delta;x=3km</option>
+      </select>Domains (Maps)
+
+      <br>
+      <input type="button" onclick="load_figures()" value="Change Domain" />
+
+
+</form>
+
+
+
+
+<hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+<table width="100%">
+  <tr>
+    <td><center><font color="#002554" size="+2"><b>MSLP/10-m Wind/2-m Temp</b></font><br><img id="HRLY_SFCT" style="display:block;"  width="100%"></center><hr color="#B3A369" width="80%"  align="center" style="display:block;"/></td>
+
+
+    <td><center><font color="#002554" size="+2"><b>10-m Windspeed</b></font><br><img id="HRLY_WIND" style="display:block;"  width="100%"></center><hr color="#B3A369" width="80%"  align="center" style="display:block;"/></td>
+
+  </tr>
+  <tr>
+    <td><center><font color="#002554" size="+2"><b>Hourly Precip</b></font><br><img id="HRLY_RAIN" style="display:block;" width="100%"></center><hr color="#B3A369" width="80%"  align="center" style="display:block;"/></td>
+
+    <td><center><font color="#002554" size="+2"><b>36-h Rainfall</b></font><br><img id="TOTAL_RAINFALL" style="display:block;"  width="100%"></center><hr color="#B3A369" width="80%"  align="center" style="display:block;"/></td>
+
+
+  </tr>
+  <tr>
+    <td><center><font color="#002554" size="+2"><b>Est Hourly Snowfall</b></font><br><img id="HRLY_WEASD" style="display:block;"  width="100%"></center><hr color="#B3A369" width="80%"  align="center" style="display:block;"/></td>
+
+
+    <td><center><font color='#002554' size="+2"><b>Total Est 36-hrly Snowfall</b></font><br><img id="TOTAL_SNOWFALL" style="display:block;"  width="100%"></center><hr color="#B3A369" width="80%"  align="center" style="display:block;"/></td>
+  </tr>
+  <tr>
+    <td><center><font color='#002554' size="+2"><b>Est Max Radar Reflectivity</b></font><br><img id="HRLY_DBZ" style="display:block;"  width="100%"></center><br><br></td>
+
+    <td><center><font color='#002554' size="+2"><b>WRF/NOAH-Estimated* Hourly Snow Depth*</b></font><br><img id="HRLY_SNOW" style="display:block;"  width="100%"></center></b><br><center><font color='#002554'>*Not for School Cancellation Wishcasting</font></center><!--hr color="#B3A369" width="80%"  align="center" style="display:block;"/--></td>
+
+
+  </tr>
+</table>
+
+
+<hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+
+<form>
+
+      <select name="Station" class="form-control" id="Station">
+        <option value="KUNR">KUNR: Rapid City NWS, SD</option>
+        <option value="KRCA">KRCA: Ellsworth AFB, SD</option>
+        <option value="KRAP">KRAP: Rapid City Airport, SD</option>
+        <option value="KUDX">KUDX: Rapid City, NEXRAD, SD</option>
+        <option value="KCUT">KCUT: Custer Airport, SD</option>
+        <option value="KSPF">KSPF: Clyde Ice Field, SD</option>
+        <option value="KEFC">KEFC: Belle Fourche Airport, SD</option>
+        <option value="KW43">KW43: Hulett Airport, WY</option>
+        <option value="KPHP">KPHP: Philip Airport, SD</option>
+        <option value="KIEN">KIEN: Pine Ridge Airport, SD</option>
+        <option value="KCDR">KCDR: Chadron Airport, NE</option>
+        <option value="K4MC">K4MC: Moorcroft, WY</option>
+        <option value="KD07">KD07: Faith Airport, SD</option>
+        <option value="KGRN">KGRN: Gordon Airport, NE</option>
+        <option value="K2WX">K2WX: Buffalo, SD</option>
+        <option value="KGCC">KGCC: Gillette  Airport, WY</option>
+        <option value="KHEI">KHEI: Hettinger Airport, ND</option>
+        <option value="KY22">KY22: Lemmon, SD</option>
+        <option value="KLEM">KLEM: Lemmon Airport, SD</option>
+        <option value="KDGW">KDGW: Converse, CO Airport, WY</option>
+        <option value="KAIA">KAIA: Alliance Airport, NE</option>
+        <option value="K4DG">K4DG: Douglas, WY</option>
+        <option value="KBWW">KBWW: Bowman Airport, ND</option>
+        <option value="KSIB">KSIB: Sibley Peak, WY</option>
+        <option value="KPIR">KPIR: Pierre Airport, SD</option>
+        <option value="KTOR">KTOR: Torrington Airport, WY</option>
+        <option value="KMIS">KMIS: Mission, SD</option>
+        <option value="KBFF">KBFF: Scottsbluff Airport, NE</option>
+        <option value="KVTN">KVTN: Miller Field Airport, NE</option>
+        <option value="KCYS">KCYS: Cheyenne NWS, WY</option>
+        <option value="KBIS">KBIS: Bismark NWS, ND</option>
+        <option value="KLBF">KLBF: North Platte NWS, NE</option>
+        <option value="KABR">KABR: Aberdeen NWS, SD</option>
+        <option value="KRIW">KRIW: Riverton NWS, WY</option>
+        <option value="KBYZ">KBYZ: Billings NWS, MT</option>
+        <option value="KDEN">KDEN: Denver Intl Airport, CO</option>
+        <option value="KBOU">KBOU: Boulder NWS, CO</option>
+        <option value="KFSD">KFSD: Sioux Falls NWS, SD</option>
+        <option value="KGGW">KGGW: Glasgow NWS, MT</option>
+        <option value="KGLD">KGLD: Goodland NWS KS</option>
+        <option value="KGID">KGID: Hastings NWS, NE</option>
+        <option value="MUNS">MUNS: Munich School, ND</option>
+        <option value="KFGF">KFGF: Grand Forks NWS, ND</option>
+        <option value="KOAX">KOAX: Omaha-Valley NWS, NE</option>
+        <option value="KGJT">KGJT: Grand Junction NWS, CO</option>
+        <option value="KTOP">KTOP: Topeka NWS, KS</option>
+      </select> Station (Sounding and Meteogram)
+
+      <br>
+      <input type="button" onclick="load_figures()" value="Change Station" />
+
+
+</form>
+
+
+<hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+
+<table width="100%">
+  <tr>
+    <td><center><font color="#002554" size="+2"><b>Meteogram</b></font><br><img id="METEOGRAM" style="display:block;"  width="100%"></center></td>
+
+
+    <td><center><font color="#002554" size="+2"><b>Sounding</b></font><br><img id="HRLY_SKEWT" style="display:block;"  width="100%"></center></td>
+
+  </tr>
+</table>
+
+
+
+
+<hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+<H2><font color="#002554">Links to Downloads</font></H2>
+
+<a href="http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/SDSMT_WRF/current_complete_run/catalog.html">Link to SD Mines THREDDS Data Services</a><br>
+<a href="http://kyrill.ias.sdsmt.edu/WRF/GRIB/wrf_out_d01_current.grib2">wrf_out_d01_current.grib2</a><br>
+<a href="http://kyrill.ias.sdsmt.edu/WRF/GRIB/wrf_out_d02_current.grib2">wrf_out_d02_current.grib2</a><br>
+<!-- <a href="http://kyrill.ias.sdsmt.edu/WRF/GRIB/wrf_out_d03_current.grib2">wrf_out_d03_current.grib2</a> -->
+
+
+<hr color="#B3A369" width="80%"  align="center" style="display:block;"/>
+
+
+</font>
+</body>
+
+
+
+
+
+</html>
