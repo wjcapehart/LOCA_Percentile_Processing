@@ -3,7 +3,7 @@
 
 # ## Inventory for LOCA2 Regions
 
-# In[1]:
+# In[ ]:
 
 
 import numpy              as np
@@ -27,7 +27,7 @@ print(socket.gethostname())
 myhostname = socket.gethostname()
 
 
-# In[2]:
+# In[ ]:
 
 
 ####################################################
@@ -60,7 +60,7 @@ plt.rcParams.update({'text.color'      : Mines_Blue,
 
 
 
-# In[3]:
+# In[ ]:
 
 
 ####################################################
@@ -68,13 +68,10 @@ plt.rcParams.update({'text.color'      : Mines_Blue,
 # Kyrill vs Mandrenke
 #
 
-if ("mandrenke" in socket.gethostname()):
-    # Mandrenke
+if ("mandrenke" in socket.gethostname()): # Mandrenke
     target_dir  = "/Users/wjc/GitHub/LOCA_Percentile_Processing/"
     display_img = True
-
-else:
-    # Kyrill
+else:  # Kyrill
     target_dir = "/var/www/html/wjc/eduresources/"
     display_img = False
 
@@ -96,7 +93,7 @@ print(target_dir)
 
 
 
-# In[4]:
+# In[ ]:
 
 
 dir_hucs = "http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/LOCA2/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Annual_Files/catalog.xml"
@@ -127,7 +124,7 @@ available_cdiv = np.array(available_cdiv, dtype=np.int32)
 
 
 
-# In[5]:
+# In[ ]:
 
 
 table_huc = table_hucs[table_hucs["huc08"].isin(available_hucs)]
@@ -152,8 +149,11 @@ print(target_dir + "HUC_table_avail.csv")
 if (display_img) :
     display(table_huc)
 
+os.system('csvtotable --caption "Available HUC-08 Files" --overwrite ' +  target_dir + "HUC_table_avail.csv " + target_dir + "HUC_table_avail.html")
 
-# In[6]:
+
+
+# In[ ]:
 
 
 table_div = table_cdiv[table_cdiv["climdiv"].isin(available_cdiv)][["climdiv",
@@ -171,6 +171,8 @@ print(target_dir + "ClimDiv_table_avail.csv")
 if (display_img) :
     display(table_div)
 
+os.system('csvtotable --caption "Available ClimDiv Files" --overwrite ' +  target_dir + "ClimDiv_table_avail.csv " + target_dir + "ClimDiv_table_avail.html")
+
 
 # In[ ]:
 
@@ -178,21 +180,21 @@ if (display_img) :
 
 
 
-# In[7]:
+# In[ ]:
 
 
 shp_hucs = gp.read_file("GeoJSON_Files/CONUS_USGS_HUC-08.geojson")
 shp_cdiv = gp.read_file("GeoJSON_Files/CONUS_NCEI_Climate_Divisions.geojson")
 
 
-# In[8]:
+# In[ ]:
 
 
 print("  HUC08:RAW:",len(shp_hucs), len(shp_hucs.get_coordinates()))
 print("CLIMDIV:RAW:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
 
 
-# In[9]:
+# In[ ]:
 
 
 shp_cdiv = shp_cdiv[shp_cdiv["CLIMDIV"].isin(available_cdiv)]
@@ -228,7 +230,7 @@ if (display_img) :
 
 
 
-# In[10]:
+# In[ ]:
 
 
 shp_cdiv = shp_cdiv.assign(CLIMDIV=1) 
@@ -243,21 +245,21 @@ print("CLIMDIV:CUT:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
 
 
 
-# In[11]:
+# In[ ]:
 
 
 shp_cdivD = shp_cdiv.dissolve(by = "CLIMDIV")
 shp_hucsD = shp_hucs.dissolve(by =    "huc8")
 
 
-# In[12]:
+# In[ ]:
 
 
 print("  HUC08:DIS:",len(shp_hucsD), len(shp_hucs.get_coordinates()))
 print("CLIMDIV:DIS:",len(shp_cdivD), len(shp_cdiv.get_coordinates()))
 
 
-# In[13]:
+# In[ ]:
 
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
@@ -292,12 +294,12 @@ shp_hucs.plot(ax        = ax,
               transform = ccrs.PlateCarree(),
               linewidth = .5)
 plt.tight_layout()
-plt.savefig("./LOCA2_HUCs_Available_Regions_Map.png")
+plt.savefig(target_dir + "./LOCA2_HUCs_Available_Regions_Map.png")
 if (display_img) :
     plt.show()
 
 
-# In[14]:
+# In[ ]:
 
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
@@ -326,19 +328,18 @@ ax.add_feature(cfeature.STATES,    edgecolor = Mines_Blue, linewidth=0.5)
 shp_cdiv.plot(ax        = ax,
               aspect    = 'equal',
               facecolor = "red",
-              edgecolor = 'white', 
+              edgecolor = 'white',
               alpha     = 0.7,
               transform = ccrs.PlateCarree(),
               linewidth = .5)
 
 plt.tight_layout()
-#plt.savefig("./LOCA2_ClimDiv_Available_Regions_Map.svg")
-plt.savefig("./LOCA2_ClimDiv_Available_Regions_Map.png")
+plt.savefig(target_dir + "./LOCA2_ClimDiv_Available_Regions_Map.png")
 if (display_img) :
     plt.show()
 
 
-# In[15]:
+# In[ ]:
 
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
@@ -367,25 +368,31 @@ ax.add_feature(cfeature.STATES,    edgecolor = Mines_Blue, linewidth=0.5)
 shp_cdiv.plot(ax        = ax,
               aspect    = 'equal',
               facecolor = "magenta",
-              edgecolor = 'None', 
+              edgecolor = 'white', 
               alpha     = 0.5,
               transform = ccrs.PlateCarree(),
-              linewidth = 0)
+              linewidth = .5)
 
 shp_hucs.plot(ax        = ax,
               aspect    = 'equal',
               facecolor = "cyan",
-              edgecolor = 'None', 
+              edgecolor = 'white', 
               alpha     = 0.5,
               transform = ccrs.PlateCarree(),
-              linewidth = 0)
+              linewidth = .5)
 plt.tight_layout()
-plt.savefig("./LOCA2_Available_Regions_Map.png")
+plt.savefig(target_dir + "./LOCA2_Available_Regions_Map.png")
 if (display_img) :
     plt.show()
 
 
 # In[ ]:
+
+
+
+
+
+# In[1]:
 
 
 
