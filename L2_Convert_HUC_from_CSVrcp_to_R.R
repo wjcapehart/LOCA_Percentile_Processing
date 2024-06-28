@@ -173,10 +173,7 @@ for (filename in csv_files)
                   Percentile,
                   Time)
         
-        save(loca2_daily,
-             file = str_c(filename,
-                          ".RData",
-                          sep=""))
+
         
         
         print("   Aggregate Monthly")
