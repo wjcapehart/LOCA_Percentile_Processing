@@ -11,6 +11,9 @@
 # Libraries
 #
 
+print("====")
+print("BEGIN THREDDS INVENTORY SCRIPT")
+
 print("Libraries")
 
 import numpy              as np
@@ -467,6 +470,10 @@ if (display_img) :
     plt.show()
 
 print("----")
+
+print("WE'RE OUTTA HERE LIKE VLADIMIR!")
+
+print("====")
 
 #
 ####################################################
