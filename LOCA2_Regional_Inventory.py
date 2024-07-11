@@ -12,7 +12,10 @@
 #
 
 print("====")
+
 print("BEGIN THREDDS INVENTORY SCRIPT")
+
+print("----")
 
 print("Libraries")
 
