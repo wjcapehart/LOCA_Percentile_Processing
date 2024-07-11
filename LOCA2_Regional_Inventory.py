@@ -38,7 +38,7 @@ from   siphon.catalog import TDSCatalog
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -72,7 +72,7 @@ plt.rcParams.update({'text.color'      : Mines_Blue,
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -109,7 +109,7 @@ print(target_dir)
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -159,7 +159,7 @@ available_cdiv = np.array(available_cdiv, dtype=np.int32)
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -206,7 +206,7 @@ os.system('csvtotable --caption "Available HUC-08 Files" --overwrite ' +  target
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -249,7 +249,7 @@ os.system('csvtotable --caption "Available ClimDiv Files" --overwrite ' +  targe
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -280,7 +280,7 @@ print("     CLIMDIV:RAW:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -319,7 +319,7 @@ if (display_img) :
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -353,7 +353,7 @@ print("     CLIMDIV:DIS:",len(shp_cdivD), len(shp_cdiv.get_coordinates()))
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing =", (t1-t0), "s")
 
 print("----")
 
@@ -412,7 +412,7 @@ if (display_img) :
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s; ", ((t1-t0)/60.), "m")
+print("Timing =",(t1-t0), "s; ", ((t1-t0)/60.), "m")
 
 print("----")
 
@@ -470,7 +470,7 @@ if (display_img) :
     
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s; ", ((t1-t0)/60.), "m")
+print("Timing =",(t1-t0), "s; ", ((t1-t0)/60.), "m")
 
 print("----")
 
@@ -535,13 +535,13 @@ if (display_img) :
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s; ", ((t1-t0)/60.), "m")
+print("Timing =",(t1-t0), "s; ", ((t1-t0)/60.), "m")
 
 print("----")
 
 print("WE'RE OUTTA HERE LIKE VLADIMIR!")
 
-print("Timing = ",(t1-t_00), " s; ", ((t1-t_00)/60.), "m")
+print("Timing =",(t1-t_00), "s; ", ((t1-t_00)/60.), "m")
 
 print("====")
 
