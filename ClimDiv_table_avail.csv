@@ -6,6 +6,13 @@ DIVISION,NAME,STATE
 0205,Southwest,Arizona
 0206,South Central,Arizona
 0207,Southeast,Arizona
+0401,North Coast Drainage,California
+0402,Sacramento Drng.,California
+0403,Northeast Inter. Basins,California
+0404,Central Coast Drng.,California
+0405,San Joaquin Drng.,California
+0406,South Coast Drng.,California
+0407,Southeast Desert Basin,California
 0501,Arkansas Drainage Basin,Colorado
 0502,Colorado Drainage Basin,Colorado
 0503,Kansas Drainage Basin,Colorado
@@ -69,6 +76,14 @@ DIVISION,NAME,STATE
 1701,Northern,Maine
 1702,Southern Interior,Maine
 1703,Coastal,Maine
+1801,Southeastern Shore,Maryland
+1802,Central Eastern Shore,Maryland
+1803,Lower Southern,Maryland
+1804,Upper Southern,Maryland
+1805,Northeastern Shore,Maryland
+1806,Northern Central,Maryland
+1807,Appalachian Mountain,Maryland
+1808,Allegheny Plateau,Maryland
 1901,Western,Massachusettes
 1902,Central,Massachusettes
 1903,Coastal,Massachusettes
@@ -195,6 +210,22 @@ DIVISION,NAME,STATE
 4301,Northeastern,Vermont
 4302,Western,Vermont
 4303,Southeastern,Vermont
+4501,West Olympic Coast,Washington
+4502,Ne Olympic San Juan,Washington
+4503,Puget Sound Lowlands,Washington
+4504,E Olympic Cascade Foothills,Washington
+4505,Cascade Mountains West,Washington
+4506,East Slope Cascades,Washington
+4507,Okanogan Big Bend,Washington
+4508,Central Basin,Washington
+4509,Northeastern,Washington
+4510,Palouse Blue Mountains,Washington
+4601,Northwestern,West Virginia
+4602,North Central,West Virginia
+4603,Southwestern,West Virginia
+4604,Central,West Virginia
+4605,Southern,West Virginia
+4606,Northeastern,West Virginia
 4701,Northwest,Wisconsin
 4702,North Central,Wisconsin
 4703,Northeast,Wisconsin
