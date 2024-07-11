@@ -412,7 +412,7 @@ if (display_img) :
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing = ",(t1-t0), " s; ", ((t1-t0)/60.), "m")
 
 print("----")
 
@@ -470,7 +470,7 @@ if (display_img) :
     
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing = ",(t1-t0), " s; ", ((t1-t0)/60.), "m")
 
 print("----")
 
@@ -535,13 +535,13 @@ if (display_img) :
 
 t1 = time.time()
 
-print("Timing = ",(t1-t0), " s")
+print("Timing = ",(t1-t0), " s; ", ((t1-t0)/60.), "m")
 
 print("----")
 
 print("WE'RE OUTTA HERE LIKE VLADIMIR!")
 
-print("Timing = ",(t1-t_00), " s")
+print("Timing = ",(t1-t_00), " s; ", ((t1-t_00)/60.), "m")
 
 print("====")
 
