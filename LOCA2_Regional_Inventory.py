@@ -19,6 +19,9 @@ print("----")
 
 print("Libraries")
 
+import time               as time
+t_00 = time.time()
+t0 = time.time()
 import numpy              as np
 import cartopy.crs        as ccrs
 import cartopy.feature    as cfeature
@@ -28,12 +31,14 @@ import pandas             as pd
 import shapely            as shapely
 import os                 as os
 import pyproj             as proj
-
 import geopandas          as gp
+import socket             as socket
 
 from   siphon.catalog import TDSCatalog
 
-import socket
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -53,6 +58,8 @@ print("----")
 
 print("Mines Colors and Fonts for Local Branding")
 
+t0 = time.time()
+
 Mines_Blue = "#002554"
 
 
@@ -62,6 +69,10 @@ plt.rcParams.update({'text.color'      : Mines_Blue,
 					 'xtick.color'     : Mines_Blue,
 					 'ytick.color'     : Mines_Blue,
                      'font.family'     : "Open Sans"})
+
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -81,6 +92,8 @@ print("----")
 
 print("Begin Script: Identify Machine")
 
+t0 = time.time()
+
 print(socket.gethostname())
 
 myhostname = socket.gethostname()
@@ -93,6 +106,10 @@ else:  # Kyrill
     display_img = False
 
 print(target_dir)
+
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -111,6 +128,8 @@ print("----")
 #
 
 print("Pulling Inventory from THREDDS Server")
+
+t0 = time.time()
 
 dir_hucs = "http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/LOCA2/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Annual_Files/catalog.xml"
 dir_cdiv = "http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/LOCA2/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Annual_Files/catalog.xml"
@@ -138,6 +157,10 @@ table_cdiv = pd.read_csv(filepath_or_buffer = dir_cdiv_csv)
 available_hucs = np.array(available_hucs, dtype=np.int32)
 available_cdiv = np.array(available_cdiv, dtype=np.int32)
 
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
+
 print("----")
 
 #
@@ -155,6 +178,8 @@ print("----")
 #
 
 print("Cleaning USGS HUC 08 Inventory")
+
+t0 = time.time()
 
 table_huc = table_hucs[table_hucs["huc08"].isin(available_hucs)]
 
@@ -179,6 +204,10 @@ if (display_img) :
 
 os.system('csvtotable --caption "Available HUC-08 Files" --overwrite ' +  target_dir + "HUC_table_avail.csv " + target_dir + "HUC_table_avail.html")
 
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
+
 print("----")
 
 #
@@ -196,6 +225,8 @@ print("----")
 #
 
 print("Cleaning NCEI ClimDiv Inventory")
+
+t0 = time.time()
 
 table_div = table_cdiv[table_cdiv["climdiv"].isin(available_cdiv)][["climdiv",
                                                                     "climdiv_name",
@@ -216,6 +247,9 @@ if (display_img) :
 
 os.system('csvtotable --caption "Available ClimDiv Files" --overwrite ' +  target_dir + "ClimDiv_table_avail.csv " + target_dir + "ClimDiv_table_avail.html")
 
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -235,12 +269,18 @@ print("----")
 
 print("Read the GeoJSON Polygon Files")
 
+t0 = time.time()
+
 shp_hucs = gp.read_file("GeoJSON_Files/CONUS_USGS_HUC-08.geojson")
 shp_cdiv = gp.read_file("GeoJSON_Files/CONUS_NCEI_Climate_Divisions.geojson")
 
 print("Initial Polygon Elements")
 print("       HUC08:RAW:",len(shp_hucs), len(shp_hucs.get_coordinates()))
 print("     CLIMDIV:RAW:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
+
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -260,6 +300,8 @@ print("----")
 
 print("Retain only Polygons Associated with an Available RData File")
 
+t0 = time.time()
+
 shp_cdiv = shp_cdiv[shp_cdiv["CLIMDIV"].isin(available_cdiv)]
 shp_hucs = shp_hucs[shp_hucs[  "huc8" ].isin(available_hucs)]
 
@@ -274,6 +316,10 @@ print("     CLIMDIV:CUT:",len(shp_cdiv), len(shp_cdiv.get_coordinates()))
 if (display_img) :
     display(shp_cdiv)
     display(shp_hucs)
+
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -293,6 +339,8 @@ print("----")
 
 print("Dissolve All Available Polygons")
 
+t0 = time.time()
+
 shp_cdiv = shp_cdiv.assign(CLIMDIV=1) 
 shp_hucs = shp_hucs.assign(   huc8=1) 
 
@@ -302,6 +350,10 @@ shp_hucsD = shp_hucs.dissolve(by =    "huc8")
 print("  Available Polygon Elements")
 print("       HUC08:DIS:",len(shp_hucsD), len(shp_hucs.get_coordinates()))
 print("     CLIMDIV:DIS:",len(shp_cdivD), len(shp_cdiv.get_coordinates()))
+
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
 
 print("----")
 
@@ -321,6 +373,7 @@ print("----")
 
 print("Produce HUC Image")
 
+t0 = time.time()
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
                                  central_latitude   =  37.5, 
@@ -357,16 +410,14 @@ plt.savefig(target_dir + "./LOCA2_HUCs_Available_Regions_Map.png")
 if (display_img) :
     plt.show()
 
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
+
 print("----")
 
 #
 ####################################################
-
-
-# In[ ]:
-
-
-
 
 
 # ## Produce ClimDiv Image
@@ -378,6 +429,10 @@ print("----")
 #
 # Produce ClimDiv Image
 #
+
+print("Produce ClimDiv Image")
+
+t0 = time.time()
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
                                  central_latitude   =  37.5, 
@@ -413,6 +468,10 @@ plt.savefig(target_dir + "./LOCA2_ClimDiv_Available_Regions_Map.png")
 if (display_img) :
     plt.show()
     
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
+
 print("----")
 
 #
@@ -430,6 +489,8 @@ print("----")
 #
 
 print("Produce Combined ClimDiv + HUC Image")
+
+t0 = time.time()
 
 ccrs_proj = ccrs.AlbersEqualArea(central_longitude  =   -96, 
                                  central_latitude   =  37.5, 
@@ -472,12 +533,24 @@ plt.savefig(target_dir + "./LOCA2_Available_Regions_Map.png")
 if (display_img) :
     plt.show()
 
+t1 = time.time()
+
+print("Timing = ",(t1-t0), " s")
+
 print("----")
 
 print("WE'RE OUTTA HERE LIKE VLADIMIR!")
+
+print("Timing = ",(t1-t_00), " s")
 
 print("====")
 
 #
 ####################################################
+
+
+# In[ ]:
+
+
+
 
