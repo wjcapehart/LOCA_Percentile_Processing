@@ -134,8 +134,9 @@ t0 = time.time()
 dir_hucs = "http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/LOCA2/Specific_Regional_Aggregate_Sets/USGS_HUC08_Basins/R_Annual_Files/catalog.xml"
 dir_cdiv = "http://kyrill.ias.sdsmt.edu:8080/thredds/catalog/LOCA2/Specific_Regional_Aggregate_Sets/NCEI_Climate_Divisions/R_Annual_Files/catalog.xml"
 
-dir_hucs_csv = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/USGS_HUC08_LUT.csv"
-dir_cdiv_csv = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/NCEI_nClimDiv_LUT.csv"
+dir_hucs_csv  = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/USGS_HUC08_LUT.csv"
+dir_cdiv_csv  = "http://kyrill.ias.sdsmt.edu/wjc/eduresources/NCEI_nClimDiv_LUT.csv"
+dir_loca2_csv = "http://kyrill.ias.sdsmt.edu:8080/thredds/fileServer/LOCA2/LOCA2_Model_Member_Available_List.csv"
 
 pre_hucs = "LOCA2_V1_HUC08_ANNUAL_"
 pre_cdiv = "LOCA2_V1_nCLIMDIV_ANNUAL_"
@@ -151,8 +152,8 @@ available_cdiv = []
 for file_cdiv in cat_cdiv:
     available_cdiv.append(file_cdiv.replace(pre_cdiv, "").replace(".RData", ""))
 
-table_hucs = pd.read_csv(filepath_or_buffer = dir_hucs_csv)
-table_cdiv = pd.read_csv(filepath_or_buffer = dir_cdiv_csv)
+table_hucs  = pd.read_csv(filepath_or_buffer = dir_hucs_csv)
+table_cdiv  = pd.read_csv(filepath_or_buffer = dir_cdiv_csv)
 
 available_hucs = np.array(available_hucs, dtype=np.int32)
 available_cdiv = np.array(available_cdiv, dtype=np.int32)
@@ -165,6 +166,67 @@ print("----")
 
 #
 ####################################################
+
+
+# ## Creating Table of Ensemble Members
+
+# In[ ]:
+
+
+####################################################
+#
+# Creating List of Ensemble Members
+#
+
+print("Creating List of Ensemble Members")
+
+t0 = time.time()
+
+table_loca2 = pd.read_csv(filepath_or_buffer = dir_loca2_csv)
+
+table_loca2 = table_loca2[(table_loca2[ "Rank"] ==               1)] 
+table_loca2 = table_loca2[(table_loca2["Model"] != "MPI-ESM1-2-LR")]
+
+table_loca2 = table_loca2[["Model",
+                           "Member",
+                           "NetError",
+                           "historical",
+                           "ssp245",
+                           "ssp370",
+                           "ssp585"]]
+
+table_loca2["NetError"] = table_loca2["NetError"].values.round(2)
+
+table_loca2             = table_loca2.rename(columns = {"historical":"Historical",
+                                                            "ssp245":"SSP2-4.5"  ,
+                                                            "ssp370":"SSP3-7.0"  ,
+                                                            "ssp585":"SSP5-8.5"  })
+table_loca2.to_csv(path_or_buf = target_dir + "LOCA2_Ens_Members.csv", index=False)
+
+print(target_dir + "LOCA2_Ens_Members.csv")
+
+os.system('csvtotable --caption "Included LOCA2 Ensemble Members" --overwrite ' +  target_dir + "LOCA2_Ens_Members.csv " + target_dir + "LOCA2_Ens_Members.html")
+
+t1 = time.time()
+
+print("Timing =", (t1-t0), "s")
+
+print("----")
+
+#
+####################################################
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # ## Cleaning the HUC-08 Inventories
