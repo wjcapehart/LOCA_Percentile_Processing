@@ -1,4 +1,12 @@
 DIVISION,NAME,STATE
+0101,Northern Valley,Alabama
+0102,Appalachian Mountain,Alabama
+0103,Upper Plains,Alabama
+0104,Eastern Valley,Alabama
+0105,Piedmont Plateau,Alabama
+0106,Prairie,Alabama
+0107,Coastal Plain,Alabama
+0108,Gulf,Alabama
 0201,Northwest,Arizona
 0202,Northeast,Arizona
 0203,North Central,Arizona
@@ -6,6 +14,15 @@ DIVISION,NAME,STATE
 0205,Southwest,Arizona
 0206,South Central,Arizona
 0207,Southeast,Arizona
+0301,Northwest,Arkansas
+0302,North Central,Arkansas
+0303,Northeast,Arkansas
+0304,West Central,Arkansas
+0305,Central,Arkansas
+0306,East Central,Arkansas
+0307,Southwest,Arkansas
+0308,South Central,Arkansas
+0309,Southeast,Arkansas
 0401,North Coast Drainage,California
 0402,Sacramento Drng.,California
 0403,Northeast Inter. Basins,California
@@ -23,6 +40,22 @@ DIVISION,NAME,STATE
 0603,Coastal,Connecticut
 0701,Northern,Delaware
 0702,Southern,Delaware
+0801,Northwest,Florida
+0802,North,Florida
+0803,North Central,Florida
+0804,South Central,Florida
+0805,Everglades,Florida
+0806,Lower East Coast,Florida
+0807,Keys,Florida
+0901,Northwest,Georgia
+0902,North Central,Georgia
+0903,Northeast,Georgia
+0904,West Central,Georgia
+0905,Central,Georgia
+0906,East Central,Georgia
+0907,Southwest,Georgia
+0908,South Central,Georgia
+0909,Southeast,Georgia
 1001,Panhandle,Idaho
 1002,North Central Prairies,Idaho
 1003,North Central Canyons,Idaho
@@ -73,6 +106,15 @@ DIVISION,NAME,STATE
 1502,Central,Kentucky
 1503,Blue Grass,Kentucky
 1504,Eastern,Kentucky
+1601,Northwest,Louisiana
+1602,North Central,Louisiana
+1603,Northeast,Louisiana
+1604,West Central,Louisiana
+1605,Central,Louisiana
+1606,East Central,Louisiana
+1607,Southwest,Louisiana
+1608,South Central,Louisiana
+1609,Southeast,Louisiana
 1701,Northern,Maine
 1702,Southern Interior,Maine
 1703,Coastal,Maine
@@ -106,6 +148,16 @@ DIVISION,NAME,STATE
 2107,Southwest,Minnesota
 2108,South Central,Minnesota
 2109,Southeast,Minnesota
+2201,Upper Delta,Mississippi
+2202,North Central,Mississippi
+2203,Northeast,Mississippi
+2204,Lower Delta,Mississippi
+2205,Central,Mississippi
+2206,East Central,Mississippi
+2207,Southwest,Mississippi
+2208,South Central,Mississippi
+2209,Southeast,Mississippi
+2210,Coastal,Mississippi
 2301,Northwest Prairie,Missouri
 2302,Northeast Prairie,Missouri
 2303,West Central Plains,Missouri
@@ -181,6 +233,15 @@ DIVISION,NAME,STATE
 3308,Southwest,Ohio
 3309,South Central,Ohio
 3310,Southeast,Ohio
+3401,Panhandle,Oklahoma
+3402,North Central,Oklahoma
+3403,Northeast,Oklahoma
+3404,West Central,Oklahoma
+3405,Central,Oklahoma
+3406,East Central,Oklahoma
+3407,Southwest,Oklahoma
+3408,South Central,Oklahoma
+3409,Southeast,Oklahoma
 3501,Coastal Area,Oregon
 3502,Willamette Valley,Oregon
 3503,Southwestern Valleys,Oregon
@@ -190,7 +251,24 @@ DIVISION,NAME,STATE
 3507,South Central,Oregon
 3508,Northeast,Oregon
 3509,Southeast,Oregon
+3601,Pocono Mountains,Pennsylvania
+3602,East Central Mountains,Pennsylvania
+3603,Southeastern Piedmont,Pennsylvania
+3604,Lower Susquehanna,Pennsylvania
+3605,Middle Susquehanna,Pennsylvania
+3606,Upper Susquehanna,Pennsylvania
+3607,Central Mountains,Pennsylvania
+3608,South Central Mountains,Pennsylvania
+3609,Southwest Plateau,Pennsylvania
+3610,Northwest Plateau,Pennsylvania
 3701,All,Rhode Island
+3801,Mountain,South Carolina
+3802,Northwest,South Carolina
+3803,North Central,South Carolina
+3804,Northeast,South Carolina
+3805,West Central,South Carolina
+3806,Central,South Carolina
+3807,Southern,South Carolina
 3901,Northwest,South Dakota
 3902,North Central,South Dakota
 3903,Northeast,South Dakota
@@ -200,6 +278,20 @@ DIVISION,NAME,STATE
 3907,East Central,South Dakota
 3908,South Central,South Dakota
 3909,Southeast,South Dakota
+4001,Eastern,Tennessee
+4002,Cumberland Plateau,Tennessee
+4003,Middle,Tennessee
+4004,Western,Tennessee
+4101,High Plains,Texas
+4102,Low Rolling Plains,Texas
+4103,North Central,Texas
+4104,East Texas,Texas
+4105,Trans Pecos,Texas
+4106,Edwards Plateau,Texas
+4107,South Central,Texas
+4108,Upper Coast,Texas
+4109,Southern,Texas
+4110,Lower Valley,Texas
 4201,Western,Utah
 4202,Dixie,Utah
 4203,North Central,Utah
@@ -210,6 +302,12 @@ DIVISION,NAME,STATE
 4301,Northeastern,Vermont
 4302,Western,Vermont
 4303,Southeastern,Vermont
+4401,Tidewater,Virginia
+4402,Eastern Piedmont,Virginia
+4403,Western Piedmont,Virginia
+4404,Northern,Virginia
+4405,Central Mountain,Virginia
+4406,Southwestern Mountain,Virginia
 4501,West Olympic Coast,Washington
 4502,Ne Olympic San Juan,Washington
 4503,Puget Sound Lowlands,Washington

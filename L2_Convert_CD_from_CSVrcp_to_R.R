@@ -74,28 +74,28 @@ members = c("r1i1p1f1",
 
 load("./NCEI_nClimDiv_LUT.RData", verbose=TRUE)
 
-Division        = NCEI_nClimDiv_LUT$Division
+Division        = NCEI_nClimDiv_LUT$climdiv
 division_factor = factor(Division)
 models_factor   = factor(models)
 members_factor  = factor(members)
-
 print(NCEI_nClimDiv_LUT)
+print(csv_files)
 
 for (filename in csv_files)
 {
 
   Division_Code = RData_files  = str_remove(filename, str_c(directory, prefix, sep=""))
   
-  
+  print(Division_Code)
   print(str_c("Begin Processing Divison ",Division_Code))
   
 
-  command = str_c("gunzip -v ",
-                  filename,
-                  ".csv.gz",
-                  sep = "")
+    command = str_c("gunzip -v ",
+                    filename,
+                    ".csv.gz",
+                    sep = "")
 
-  system(command)
+    system(command)
 
         loca2_daily = read_csv(str_c(filename,
                                     ".csv",
@@ -116,6 +116,7 @@ for (filename in csv_files)
         }
         
         loca2_daily$Division = Division_Code
+
         loca2_daily$Division = factor(x      = loca2_daily$Division, 
                                       levels = division_factor)
         
@@ -139,7 +140,7 @@ for (filename in csv_files)
 
 
         loca2_daily$Model   = factor(x      = loca2_daily$Model,
-                                       levels = models)
+                                     levels = models)
         
         loca2_daily$Member   = factor(x      = loca2_daily$Member,
                                     levels = members)
@@ -159,7 +160,7 @@ for (filename in csv_files)
         last_record = loca2_daily[nrow(loca2_daily), ]
         print(last_record)
 
-
+        print(loca2_daily$Division[1])
 
         loca2_daily = remove_attributes(x          = loca2_daily, 
                                         attributes = "Csingle") %>%
@@ -309,7 +310,7 @@ for (filename in csv_files)
                    ".csv &",
                   sep = "")
 
-  system(command)
+  #system(command)
 
 
   print("")

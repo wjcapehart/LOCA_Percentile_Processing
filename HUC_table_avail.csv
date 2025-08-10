@@ -1,4 +1,21 @@
 HUC-08,BASIN NAME,HUC-06 BASIN,HUC-04 BASIN,HUC-02 REGION
+03020101,Upper Tar,Pamlico,Neuse-Pamlico,South Atlantic-Gulf Region
+03020102,Fishing,Pamlico,Neuse-Pamlico,South Atlantic-Gulf Region
+03020103,Lower Tar,Pamlico,Neuse-Pamlico,South Atlantic-Gulf Region
+03020104,Pamlico,Pamlico,Neuse-Pamlico,South Atlantic-Gulf Region
+03020105,Pamlico Sound,Pamlico,Neuse-Pamlico,South Atlantic-Gulf Region
+03020201,Upper Neuse,Neuse,Neuse-Pamlico,South Atlantic-Gulf Region
+03020202,Middle Neuse,Neuse,Neuse-Pamlico,South Atlantic-Gulf Region
+03020203,Contentnea,Neuse,Neuse-Pamlico,South Atlantic-Gulf Region
+03020204,Lower Neuse,Neuse,Neuse-Pamlico,South Atlantic-Gulf Region
+03020301,White Oak River,Onslow Bay,Neuse-Pamlico,South Atlantic-Gulf Region
+03020302,New River,Onslow Bay,Neuse-Pamlico,South Atlantic-Gulf Region
+03030002,Haw,Cape Fear,Cape Fear,South Atlantic-Gulf Region
+03030003,Deep,Cape Fear,Cape Fear,South Atlantic-Gulf Region
+03030004,Upper Cape Fear,Cape Fear,Cape Fear,South Atlantic-Gulf Region
+03030005,Lower Cape Fear,Cape Fear,Cape Fear,South Atlantic-Gulf Region
+03030006,Black,Cape Fear,Cape Fear,South Atlantic-Gulf Region
+03030007,Northeast Cape Fear,Cape Fear,Cape Fear,South Atlantic-Gulf Region
 04300101,Mettawee River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
 04300102,Otter Creek,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
 04300103,Winooski River,Lake Champlain-Richelieu River,Middle Saint Lawrence River,Great Lakes Region
