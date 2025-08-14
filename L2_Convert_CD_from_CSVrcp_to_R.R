@@ -84,7 +84,7 @@ print(csv_files)
 for (filename in csv_files)
 {
 
-  Division_Code = RData_files  = str_remove(filename, str_c(directory, prefix, sep=""))
+  Division_Code =  str_remove(filename, str_c(directory, prefix, sep=""))
   
   print(Division_Code)
   print(str_c("Begin Processing Divison ",Division_Code))
